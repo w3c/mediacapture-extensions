@@ -387,11 +387,11 @@ partial interface MediaStreamTrack {
         <li><p>Let <var>port1</var> be a new {{MessagePort}} in <a href="https://tc39.es/ecma262/#current-realm">the current Realm</a>.</p></li>
         <li><p>Let <var>port2</var> be a new {{MessagePort}} in <a href="https://tc39.es/ecma262/#current-realm">the current Realm</a>.</p></li>
         <li><p><a href="!HTML/#entangle">Entangle</a> <var>port1</var> and <var>port2</var>.</p></li>
-        <li><p>Set <var>port2</var> to <var>value</var>.`[[port]]` if <var>value</var>.`[[port]]` is not <code>undefined</code>.</p></li>
+        <li><p>Set <var>port2</var> to <var>value</var>.`[[receivingPort]]` if <var>value</var>.`[[receivingPort]]` is not <code>undefined</code>.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[port]]` to <a href="!HTML/#structuredserializewithtransfer">StructuredSerializeWithTransfer</a>(<var>port2</var>, « <var>port2</var> »).</p></li>
         <li><p>Set <var>value</var>.`[[IsDetached]]` to <code>true</code>.</p></li>
         <li><p>Set <var>value</var>.{{MediaStreamTrack/readyState}} to <a data-cite="!GETUSERMEDIA/#track-ended">"ended"</a>.</p></li>
-        <li><p>Set <var>value</var>.`[[port]]` to <var>port1</var> if <var>value</var>.`[[port]]` is <code>undefined</code>.</p></li>
+        <li><p>Set <var>value</var>.`[[sendingPort]]` to <var>port1</var> if <var>value</var>.`[[sendingPort]]` is <code>undefined</code>.</p></li>
       </ol>
     </div>
     <div><p>{{MediaStreamTrack}} <a data-cite="!HTML/#transfer-receiving-steps">transfer-receiving steps</a>, given <var>dataHolder</var> and <var>track</var>, are:</p>
@@ -406,9 +406,9 @@ partial interface MediaStreamTrack {
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/muted}} to <var>dataHolder</var>.`[[muted]]`.</p></li>
         <li><p>Initialize <var>track</var> underlying source to <var>dataHolder</var>.`[[source]]`.</p></li>
         <li><p>Set <var>track</var>'s constraints to <var>dataHolder</var>.`[[constraints]]`.</p></li>
-        <li><p>Initialize <var>track</var>.`[[port]]` to <var>port</var>.</p></li>
+        <li><p>Initialize <var>track</var>.`[[receivingPort]]` to <var>port</var>.</p></li>
         <li>
-          <p>Add a handler for <var>track</var>.`[[port]]`'s <a href="!HTML/#event-message">message</a> event with the following steps:</p>
+          <p>Add a handler for <var>track</var>.`[[receivingPort]]`'s <a href="!HTML/#event-message">message</a> event with the following steps:</p>
           <ol>
             <li><p>Let <var>data</var> be the data of the message.</p></li>
             <li><p>If <var>data</var> is "muted", set <var>track</var>'s <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> to <code>true</code>.</p></li>
@@ -417,32 +417,32 @@ partial interface MediaStreamTrack {
           </ol>
         </li>
         <li>
-          <p>Add a handler for <var>track</var>.`[[port]]`'s <a href="!HTML/#event-message">messageerror</a> event with the following steps:</p>
+          <p>Add a handler for <var>track</var>.`[[receivingPort]]`'s <a href="!HTML/#event-message">messageerror</a> event with the following steps:</p>
           <ol>
             <li><p>Run the <a data-cite="!GETUSERMEDIA/#ends-nostop">ended</a> steps on <var>track</var>.</p></li>
           </ol>
         </li>
       </ol>
     </div>
-    <div><p>When a <var>track</var> <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> is set to <code>true</code> and <var>track</var>.`[[port]]` is not <code>undefined</code>, run the following steps:<p>
+    <div><p>When a <var>track</var> <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> is set to <code>true</code> and <var>track</var>.`[[sendingPort]]` is not <code>undefined</code>, run the following steps:<p>
       <ol>
         <li><p>Let <var>message</var> be "muted".</p></li>
         <li><p>Let <var>options</var> be «[ "transfer" → « » ]».</p></li>
-        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[port]]`, <var>message</var> and <var>options</var>.</p></li>
+        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[sendingPort]]`, <var>message</var> and <var>options</var>.</p></li>
       </ol>
     </div>
-    <div><p>When a <var>track</var> <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> is set to <code>false</code> and <var>track</var>.`[[port]]` is not <code>undefined</code>, run the following steps:<p>
+    <div><p>When a <var>track</var> <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> is set to <code>false</code> and <var>track</var>.`[[sendingPort]]` is not <code>undefined</code>, run the following steps:<p>
       <ol>
         <li><p>Let <var>message</var> be "unmuted".</p></li>
         <li><p>Let <var>options</var> be «[ "transfer" → « » ]».</p></li>
-        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[port]]`, <var>message</var> and <var>options</var>.</p></li>
+        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[sendingPort]]`, <var>message</var> and <var>options</var>.</p></li>
       </ol>
     </div>
-    <div><p>When a <var>track</var> is <a data-cite="!GETUSERMEDIA/#ends-nostop">ended</a> and <var>track</var>.`[[port]]` is not <code>undefined</code>, run the following steps:<p>
+    <div><p>When a <var>track</var> is <a data-cite="!GETUSERMEDIA/#ends-nostop">ended</a> and <var>track</var>.`[[sendingPort]]` is not <code>undefined</code>, run the following steps:<p>
       <ol>
         <li><p>Let <var>message</var> be "ended".</p></li>
         <li><p>Let <var>options</var> be «[ "transfer" → « » ]».</p></li>
-        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[port]]`, <var>message</var> and <var>options</var>.</p></li>
+        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[sendingPort]]`, <var>message</var> and <var>options</var>.</p></li>
       </ol>
     </div>
   </section>
