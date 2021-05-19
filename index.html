@@ -385,6 +385,7 @@ partial interface MediaStreamTrack {
         <li><p>Set <var>dataHolder</var>.`[[source]]` to <var>value</var> underlying source.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[constraints]]` to <var>value</var> active constraints.</p></li>
         <li><p>Let <var>port1</var> be a new {{MessagePort}} in <a href="https://tc39.es/ecma262/#current-realm">the current Realm</a>.</p></li>
+        <li><p>Set <var>port1</var>.`[[track]]` to <var>value</var>.</p></li>
         <li><p>Let <var>port2</var> be a new {{MessagePort}} in <a href="https://tc39.es/ecma262/#current-realm">the current Realm</a>.</p></li>
         <li><p><a href="!HTML/#entangle">Entangle</a> <var>port1</var> and <var>port2</var>.</p></li>
         <li><p>Set <var>port2</var> to <var>value</var>.`[[receivingPort]]` if <var>value</var>.`[[receivingPort]]` is not <code>undefined</code>.</p></li>
