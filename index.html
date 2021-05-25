@@ -352,10 +352,9 @@ function setCameraTrack(track) {
     <div>
       <p>A {{MediaStreamTrack}} is a <a data-cite="!HTML/#transferable-objects">transferable object</a>.
       This allows manipulating real-time media outside the context it was requested or created in, for instance in workers or third-party iframes.</p>
+      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks, we need proper track and source lifetime management.
+      A future PR will properly specify this management.</p>
       <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks,
-      a transferred track remains tightly bound to the original track.
-      In particular, if the original track gets muted, unmuted or ended, the transferred track will automatically be muted, unmuted or ended.
-      It is in particular important to ensure that media will stop flowing as soon as the context of the original track goes away.</p>
     </div>
     <div>
       <p>The WebIDL changes are the following:
@@ -384,21 +383,12 @@ partial interface MediaStreamTrack {
         <li><p>Set <var>dataHolder</var>.`[[muted]]` to <var>value</var>.{{MediaStreamTrack/muted}}.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[source]]` to <var>value</var> underlying source.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[constraints]]` to <var>value</var> active constraints.</p></li>
-        <li><p>Let <var>port1</var> be a new {{MessagePort}} in <a href="https://tc39.es/ecma262/#current-realm">the current Realm</a>.</p></li>
-        <li><p>Set <var>port1</var>.`[[track]]` to <var>value</var>.</p></li>
-        <li><p>Let <var>port2</var> be a new {{MessagePort}} in <a href="https://tc39.es/ecma262/#current-realm">the current Realm</a>.</p></li>
-        <li><p><a href="!HTML/#entangle">Entangle</a> <var>port1</var> and <var>port2</var>.</p></li>
-        <li><p>Set <var>port2</var> to <var>value</var>.`[[receivingPort]]` if <var>value</var>.`[[receivingPort]]` is not <code>undefined</code>.</p></li>
-        <li><p>Set <var>dataHolder</var>.`[[port]]` to <a href="!HTML/#structuredserializewithtransfer">StructuredSerializeWithTransfer</a>(<var>port2</var>, « <var>port2</var> »).</p></li>
         <li><p>Set <var>value</var>.`[[IsDetached]]` to <code>true</code>.</p></li>
         <li><p>Set <var>value</var>.{{MediaStreamTrack/readyState}} to <a data-cite="!GETUSERMEDIA/#track-ended">"ended"</a>.</p></li>
-        <li><p>Set <var>value</var>.`[[sendingPort]]` to <var>port1</var> if <var>value</var>.`[[sendingPort]]` is <code>undefined</code>.</p></li>
       </ol>
     </div>
     <div><p>{{MediaStreamTrack}} <a data-cite="!HTML/#transfer-receiving-steps">transfer-receiving steps</a>, given <var>dataHolder</var> and <var>track</var>, are:</p>
       <ol>
-        <li><p>Let <var>deserializedRecord</var> be <a href="!HTML/#structureddeserializewithtransfer">!StructuredDeserializeWithTransfer</a>(<var>dataHolder</var>.`[[port]]`, the current Realm).</p></li>
-        <li><p>Let <var>port</var> be <var>deserializedRecord</var>.`[[Deserialized`]].</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/id}} to <var>dataHolder</var>.`[[id]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/kind}} to <var>dataHolder</var>.`[[kind]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/label}} to <var>dataHolder</var>.`[[label]]`.</p></li>
@@ -407,44 +397,11 @@ partial interface MediaStreamTrack {
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/muted}} to <var>dataHolder</var>.`[[muted]]`.</p></li>
         <li><p>Initialize <var>track</var> underlying source to <var>dataHolder</var>.`[[source]]`.</p></li>
         <li><p>Set <var>track</var>'s constraints to <var>dataHolder</var>.`[[constraints]]`.</p></li>
-        <li><p>Initialize <var>track</var>.`[[receivingPort]]` to <var>port</var>.</p></li>
-        <li>
-          <p>Add a handler for <var>track</var>.`[[receivingPort]]`'s <a href="!HTML/#event-message">message</a> event with the following steps:</p>
-          <ol>
-            <li><p>Let <var>data</var> be the data of the message.</p></li>
-            <li><p>If <var>data</var> is "muted", set <var>track</var>'s <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> to <code>true</code>.</p></li>
-            <li><p>If <var>data</var> is "unmuted", set <var>track</var>'s <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> to <code>false</code>.</p></li>
-            <li><p>If <var>data</var> is "ended", run the <a data-cite="!GETUSERMEDIA/#ends-nostop">ended</a> steps on <var>track</var>.</p></li>
-          </ol>
-        </li>
-        <li>
-          <p>Add a handler for <var>track</var>.`[[receivingPort]]`'s <a href="!HTML/#event-message">messageerror</a> event with the following steps:</p>
-          <ol>
-            <li><p>Run the <a data-cite="!GETUSERMEDIA/#ends-nostop">ended</a> steps on <var>track</var>.</p></li>
-          </ol>
-        </li>
       </ol>
     </div>
-    <div><p>When a <var>track</var> <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> is set to <code>true</code> and <var>track</var>.`[[sendingPort]]` is not <code>undefined</code>, run the following steps:<p>
-      <ol>
-        <li><p>Let <var>message</var> be "muted".</p></li>
-        <li><p>Let <var>options</var> be «[ "transfer" → « » ]».</p></li>
-        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[sendingPort]]`, <var>message</var> and <var>options</var>.</p></li>
-      </ol>
-    </div>
-    <div><p>When a <var>track</var> <a data-cite="!GETUSERMEDIA/#track-muted">muted state</a> is set to <code>false</code> and <var>track</var>.`[[sendingPort]]` is not <code>undefined</code>, run the following steps:<p>
-      <ol>
-        <li><p>Let <var>message</var> be "unmuted".</p></li>
-        <li><p>Let <var>options</var> be «[ "transfer" → « » ]».</p></li>
-        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[sendingPort]]`, <var>message</var> and <var>options</var>.</p></li>
-      </ol>
-    </div>
-    <div><p>When a <var>track</var> is <a data-cite="!GETUSERMEDIA/#ends-nostop">ended</a> and <var>track</var>.`[[sendingPort]]` is not <code>undefined</code>, run the following steps:<p>
-      <ol>
-        <li><p>Let <var>message</var> be "ended".</p></li>
-        <li><p>Let <var>options</var> be «[ "transfer" → « » ]».</p></li>
-        <li><p>Run <a href="!HTML/#message-port-post-message-steps">message port post message steps</a> with <var>track</var>.`[[sendingPort]]`, <var>message</var> and <var>options</var>.</p></li>
-      </ol>
+    <div>
+      <p>The underlying source is supposed to be kept alive between the transfer and transfer-receiving steps, or as long as the data holder is alive.
+      In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
   </section>
 </body>
