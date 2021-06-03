@@ -9,7 +9,7 @@
   // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
   var respecConfig = {
     group: "webrtc",
-    xref: ["html", "infra", "permissions", "dom", "mediacapture-streams", "webidl"],
+    xref: ["html", "infra", "permissions", "dom", "mediacapture-streams", "webaudio", "webidl"],
     edDraftURI: "https://w3c.github.io/mediacapture-extensions/",
     editors:  [
       {name: "Jan-Ivar Bruaroey", company: "Mozilla Corporation", w3cid: 79152},
@@ -346,6 +346,63 @@ function setCameraTrack(track) {
         </pre>
       </div>
     </section>
+  </section>
+  <section>
+    <h2>Transferable MediaStreamTrack</h2>
+    <div>
+      <p>A {{MediaStreamTrack}} is a <a data-cite="!HTML/#transferable-objects">transferable object</a>.
+      This allows manipulating real-time media outside the context it was requested or created in, for instance in workers or third-party iframes.</p>
+      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks, we need proper track and source lifetime management.
+      A future PR will properly specify this management.</p>
+      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks,
+    </div>
+    <div>
+      <p>The WebIDL changes are the following:
+      <pre class="idl"
+>[Exposed=(Window,Worker,AudioWorklet), Transferable]
+partial interface MediaStreamTrack {
+// Remove partial once we figure out how to do it without creating respec warnings.
+// No change to MediaStreamTrack exposed API.
+};</pre>
+    </div>
+    <div>
+      <p>At creation of a {{MediaStreamTrack}} object, called <var>track</var>, run the following steps:</p>
+      <ol>
+        <li><p>Initialize <var>track</var>.`[[IsDetached]]` to <code>false</code>.</p></li>
+      </ol>
+    </div>
+    <div>
+      <p>The {{MediaStreamTrack}} <a data-cite="!HTML/#transfer-steps">transfer steps</a>, given <var>value</var> and <var>dataHolder</var>, are:</p>
+      <ol>
+        <li><p>If <var>value</var>.`[[IsDetached]]` is <code>true</code>, throw a "DataCloneError" DOMException.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[id]]` to <var>value</var>.{{MediaStreamTrack/id}}.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[kind]]` to <var>value</var>.{{MediaStreamTrack/kind}}.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[label]]` to <var>value</var>.{{MediaStreamTrack/label}}.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[readyState]]` to <var>value</var>.{{MediaStreamTrack/readyState}}.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[enabled]]` to <var>value</var>.{{MediaStreamTrack/enabled}}.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[muted]]` to <var>value</var>.{{MediaStreamTrack/muted}}.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[source]]` to <var>value</var> underlying source.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[constraints]]` to <var>value</var> active constraints.</p></li>
+        <li><p>Set <var>value</var>.`[[IsDetached]]` to <code>true</code>.</p></li>
+        <li><p>Set <var>value</var>.{{MediaStreamTrack/readyState}} to <a data-cite="!GETUSERMEDIA/#track-ended">"ended"</a>.</p></li>
+      </ol>
+    </div>
+    <div><p>{{MediaStreamTrack}} <a data-cite="!HTML/#transfer-receiving-steps">transfer-receiving steps</a>, given <var>dataHolder</var> and <var>track</var>, are:</p>
+      <ol>
+        <li><p>Initialize <var>track</var>.{{MediaStreamTrack/id}} to <var>dataHolder</var>.`[[id]]`.</p></li>
+        <li><p>Initialize <var>track</var>.{{MediaStreamTrack/kind}} to <var>dataHolder</var>.`[[kind]]`.</p></li>
+        <li><p>Initialize <var>track</var>.{{MediaStreamTrack/label}} to <var>dataHolder</var>.`[[label]]`.</p></li>
+        <li><p>Initialize <var>track</var>.{{MediaStreamTrack/readyState}} to <var>dataHolder</var>.`[[readyState]]`.</p></li>
+        <li><p>Initialize <var>track</var>.{{MediaStreamTrack/enabled}} to <var>dataHolder</var>.`[[enabled]]`.</p></li>
+        <li><p>Initialize <var>track</var>.{{MediaStreamTrack/muted}} to <var>dataHolder</var>.`[[muted]]`.</p></li>
+        <li><p>Initialize <var>track</var> underlying source to <var>dataHolder</var>.`[[source]]`.</p></li>
+        <li><p>Set <var>track</var>'s constraints to <var>dataHolder</var>.`[[constraints]]`.</p></li>
+      </ol>
+    </div>
+    <div>
+      <p>The underlying source is supposed to be kept alive between the transfer and transfer-receiving steps, or as long as the data holder is alive.
+      In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
+    </div>
   </section>
 </body>
 </html>
