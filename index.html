@@ -359,7 +359,7 @@ function setCameraTrack(track) {
     <div>
       <p>The WebIDL changes are the following:
       <pre class="idl"
->[Exposed=(Window,Worker), Transferable]
+>[Exposed=(Window,Worker,AudioWorklet), Transferable]
 partial interface MediaStreamTrack {
 // Remove partial once we figure out how to do it without creating respec warnings.
 // No change to MediaStreamTrack exposed API.
