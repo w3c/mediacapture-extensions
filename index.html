@@ -354,13 +354,13 @@ function setCameraTrack(track) {
         <ol>
           <li><p>The context that created a track named <var>originalTrack</var> remains in control of the source that provides media, even when <var>originalTrack</var> is transfered into <var>transferedTrack</var>.
           <li>
-            <p>In particular, the context of <var>originalTrack</var> remains the proxy to privacy indicators of the source and <var>transferedTrack</var> or any of its clone are considered as tracks using the source
+            <p>In particular, the context of <var>originalTrack</var> remains the proxy to privacy indicators of the source and <var>transferredTrack</var> or any of its clone are considered as tracks using the source
             as if they were tracks created in and controlled by the context.</p>
           </li>
-          <li><p>When the context of <var>originalTrack</var> and its source goes away, <var>transferedTrack</var> gets ended.</p></li>
-          <li><p>When the context would have muted/unmuted <var>originalTrack</var>, <var>transferedTrack</var> gets muted/unmuted.</p></li>
-          <li><p>If <var>transferedTrack</var> is cloned in <var>transferedTrackClone</var>, <var>transferedTrackClone</var> is tied to <var>originalTrack</var>, not to <var>transferedTrack</var>.</p></li>
-          <li><p>If <var>transferedTrack</var> is transfered into <var>transferedAgainTrack</var>, <var>transferedAgainTrack</var> is tied to <var>originalTrack</var>, not to <var>transferedTrack</var>.</p></li>
+          <li><p>When the context of <var>originalTrack</var> and its source goes away, <var>transferredTrack</var> gets ended.</p></li>
+          <li><p>When the context would have muted/unmuted <var>originalTrack</var>, <var>transferredTrack</var> gets muted/unmuted.</p></li>
+          <li><p>If <var>transferredTrack</var> is cloned in <var>transferredTrackClone</var>, <var>transferredTrackClone</var> is tied to <var>originalTrack</var>, not to <var>transferredTrack</var>.</p></li>
+          <li><p>If <var>transferredTrack</var> is transferred into <var>transferredAgainTrack</var>, <var>transferredAgainTrack</var> is tied to <var>originalTrack</var>, not to <var>transferredTrack</var>.</p></li>
         </ol>
       </p>
     </div>
