@@ -348,9 +348,21 @@ function setCameraTrack(track) {
     <div>
       <p>A {{MediaStreamTrack}} is a <a data-cite="!HTML/#transferable-objects">transferable object</a>.
       This allows manipulating real-time media outside the context it was requested or created in, for instance in workers or third-party iframes.</p>
-      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks, we need proper track and source lifetime management.
-      A future PR will properly specify this management.</p>
-      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks,
+      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks, the track source lifetime management remains tied to the context that created it.
+      The transfer algorithm MUST ensure the following behaviors:</p>
+      <p>
+        <ol>
+          <li><p>The context that created a track named <var>originalTrack</var> remains in control of the source that provides media, even when <var>originalTrack</var> is transfered into <var>transferedTrack</var>.
+          <li>
+            <p>In particular, the context of <var>originalTrack</var> remains the proxy to privacy indicators of the source and <var>transferedTrack</var> or any of its clone are considered as tracks using the source
+            as if they were tracks created in and controlled by the context.</p>
+          </li>
+          <li><p>When the context of <var>originalTrack</var> and its source goes away, <var>transferedTrack</var> gets ended.</p></li>
+          <li><p>When the context would have muted/unmuted <var>originalTrack</var>, <var>transferedTrack</var> gets muted/unmuted.</p></li>
+          <li><p>If <var>transferedTrack</var> is cloned in <var>transferedTrackClone</var>, <var>transferedTrackClone</var> is tied to <var>originalTrack</var>, not to <var>transferedTrack</var>.</p></li>
+          <li><p>If <var>transferedTrack</var> is transfered into <var>transferedAgainTrack</var>, <var>transferedAgainTrack</var> is tied to <var>originalTrack</var>, not to <var>transferedTrack</var>.</p></li>
+        </ol>
+      </p>
     </div>
     <div>
       <p>The WebIDL changes are the following:
