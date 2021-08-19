@@ -347,20 +347,27 @@ function setCameraTrack(track) {
     <h2>Transferable MediaStreamTrack</h2>
     <div>
       <p>A {{MediaStreamTrack}} is a <a data-cite="!HTML/#transferable-objects">transferable object</a>.
-      This allows manipulating real-time media outside the context it was requested or created in, for instance in workers or third-party iframes.</p>
-      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks, the track source lifetime management remains tied to the context that created it.
+      This allows manipulating real-time media outside the context it was requested or created in,
+      for instance in workers or third-party iframes.</p>
+      <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks,
+      the track source lifetime management remains tied to the context that created it.
       The transfer algorithm MUST ensure the following behaviors:</p>
       <p>
         <ol>
-          <li><p>The context that created a track named <var>originalTrack</var> remains in control of the source that provides media, even when <var>originalTrack</var> is transferred into <var>transferredTrack</var>.
-          <li>
-            <p>In particular, the context of <var>originalTrack</var> remains the proxy to privacy indicators of the source and <var>transferredTrack</var> or any of its clones are considered as tracks using the source
-            as if they were tracks created in and controlled by the context.</p>
+          <li><p>The context named <var>originalContext</var> that created a track named <var>originalTrack</var> remains in control
+          of the <var>originalTrack</var> source, named <var>trackSource</var>, even when <var>originalTrack</var> is transferred into <var>transferredTrack</var>.</p>
           </li>
-          <li><p>When the context of <var>originalTrack</var> and its source goes away, <var>transferredTrack</var> gets ended.</p></li>
-          <li><p>When the context would have muted/unmuted <var>originalTrack</var>, <var>transferredTrack</var> gets muted/unmuted.</p></li>
-          <li><p>If <var>transferredTrack</var> is cloned in <var>transferredTrackClone</var>, <var>transferredTrackClone</var> is tied to <var>originalTrack</var>, not to <var>transferredTrack</var>.</p></li>
-          <li><p>If <var>transferredTrack</var> is transferred into <var>transferredAgainTrack</var>, <var>transferredAgainTrack</var> is tied to <var>originalTrack</var>, not to <var>transferredTrack</var>.</p></li>
+          <li>
+            <p>In particular, <var>originalContext</var> remains the proxy to privacy indicators of <var>trackSource</var>.
+            <var>transferredTrack</var> or any of its clones are considered as tracks using <var>trackSource</var>
+            as if they were tracks created in and controlled by <var>originalContext</var>.</p>
+          </li>
+          <li><p>When <var>originalContext</var> goes away, <var>trackSource</var> gets ended, thus <var>transferredTrack</var> gets ended.</p></li>
+          <li><p>When <var>originalContext</var> would have muted/unmuted <var>originalTrack</var>, <var>transferredTrack</var> gets muted/unmuted.</p></li>
+          <li><p>If <var>transferredTrack</var> is cloned in <var>transferredTrackClone</var>, <var>transferredTrackClone</var> is tied to <var>trackSource</var>.
+          It is not tied to <var>originalTrack</var> in any way.</p></li>
+          <li><p>If <var>transferredTrack</var> is transferred into <var>transferredAgainTrack</var>, <var>transferredAgainTrack</var> is tied to <var>trackSource</var>.
+          It is not to <var>transferredTrack</var> or <var>originalTrack</var> in any way.</p></li>
         </ol>
       </p>
     </div>
