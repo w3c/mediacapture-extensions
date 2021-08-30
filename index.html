@@ -418,5 +418,52 @@ partial interface MediaStreamTrack {
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
   </section>
+  <section>
+    <h2>Echo canceller reference signal control</h2>
+    <p>
+      When using echo cancellation, the reference signal that is
+      cancelled against has so far been left unspecified. This
+      extension specifies a default and a means of overriding it.
+    </p>
+    <pre class="idl">
+partial dictionary MediaTrackConstraintSet {
+  ConstrainDOMString echoCancellationReferenceSinkId;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;DOMString&gt; echoCancellationReferenceSinkId;
+};
+
+partial dictionary MediaTrackSupportedConstraints {
+  boolean echoCancellationReferenceSinkId = true;        
+};
+
+partial dictionary MediaTrackSettings {
+  DOMString echoCancellationReferenceSinkId;
+};       
+        
+    </pre>
+     <section>
+       <h4>Additional Dictionary MediaTrackConstraintSet Member</h4>
+       <p>
+         echoCancellationReferenceSinkId refers to a sink ID from
+         [[AUDIO-OUTPUT]]. It controls the reference for echo
+         cancellation. It applies only to audio MediaStreamTrack
+         objects.
+       </p>
+       <p>
+         When the MediaTrackSettings object of the track contains
+         "echoCancellation = false", this constraint has no effect.
+       </p>
+       <p>
+         When the echoCancellationReferenceSinkId is not specified,
+         the default reference signal is the default system output.
+         Specifying the sink id "" chooses the default system output.
+       <p>
+         The property is changeable with applyConstraints().
+       </p>
+     </section>
+    </section>
+  </section>
 </body>
 </html>
