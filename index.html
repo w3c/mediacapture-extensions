@@ -408,8 +408,8 @@ partial interface MediaStreamTrack {
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/readyState}} to <var>dataHolder</var>.`[[readyState]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/enabled}} to <var>dataHolder</var>.`[[enabled]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/muted}} to <var>dataHolder</var>.`[[muted]]`.</p></li>
-        <li><p>[=Initialize the underlying source=] of <var>track</var> to <var>dataHolder</var>.`[[source]]` with
-          {{MediaStreamTrack/tieSourceToContext}} equal to <code>false</code>.</p></li>
+        <li><p>[=MediaStreamTrack/Initialize the underlying source=] of <var>track</var> to <var>dataHolder</var>.`[[source]]` with
+          [=MediaStreamTrack/Initialize the underlying source/tieSourceToContext=] equal to <code>false</code>.</p></li>
         <li><p>Set <var>track</var>'s constraints to <var>dataHolder</var>.`[[constraints]]`.</p></li>
       </ol>
     </div>
