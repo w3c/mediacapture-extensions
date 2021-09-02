@@ -24,7 +24,7 @@
 
 <body>
   <section id="abstract">
-    <p>This document defines a set of ECMAScript APIs in WebIDL to extend the [[GETUSERMEDIA]] specification.</p>
+    <p>This document defines a set of ECMAScript APIs in WebIDL to extend the [[mediacapture-streams]] specification.</p>
   </section>
   <section id="sotd">
     <p>This is an unofficial proposal.</p>
@@ -32,7 +32,7 @@
   <section id="introduction">
     <h2>Introduction</h2>
     <p>This document contains proposed extensions and modifications to the
-    [[GETUSERMEDIA]] specification.</p>
+    [[mediacapture-streams]] specification.</p>
     <p>New features and modifications to existing features proposed here may be
     considered for addition into the main specification post Recommendation.
     Deciding factors will include maturity of the extension or modification,
@@ -51,7 +51,7 @@
     <p>
       This document uses the definitions {{MediaDevices}}, {{MediaStreamTrack}},
       {{MediaStreamConstraints}} and {{ConstrainablePattern}}
-      from [[!GETUSERMEDIA]].
+      from [[!mediacapture-streams]].
       <p>The terms [=permission state=], [=request permission to use=], and
       <a data-cite="permissions">prompt the user to choose</a> are defined in
       [[!permissions]].</p>    </p>
@@ -397,7 +397,7 @@ partial interface MediaStreamTrack {
         <li><p>Set <var>dataHolder</var>.`[[source]]` to <var>value</var> underlying source.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[constraints]]` to <var>value</var> active constraints.</p></li>
         <li><p>Set <var>value</var>.`[[IsDetached]]` to <code>true</code>.</p></li>
-        <li><p>Set <var>value</var>.{{MediaStreamTrack/readyState}} to <a data-cite="!GETUSERMEDIA/#track-ended">"ended"</a>.</p></li>
+        <li><p>Set <var>value</var>.{{MediaStreamTrack/readyState}} to <a data-cite="!mediacapture-streams/#track-ended">"ended"</a>.</p></li>
       </ol>
     </div>
     <div><p>{{MediaStreamTrack}} <a data-cite="!HTML/#transfer-receiving-steps">transfer-receiving steps</a>, given <var>dataHolder</var> and <var>track</var>, are:</p>
