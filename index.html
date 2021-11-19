@@ -418,5 +418,116 @@ partial interface MediaStreamTrack {
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
   </section>
+  <section>
+    <h2>Smart framing</h2>
+    <section>
+      <h3>{{MediaTrackSupportedConstraints}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean smartFraming = true;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackSupportedConstraints}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackSupportedConstraints" data-link-for="MediaTrackSupportedConstraints">
+          <dt><dfn><code>smartFraming</code></dfn> of type <span class="idlMemberType">{{boolean}}</span>, defaulting to <code>true</code></dt>
+          <dd>
+            <p>Whether <a>smart framing</a> constraining is
+            recognized.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>{{MediaTrackCapabilities}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; smartFraming;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackCapabilities}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackCapabilities" data-link-for="MediaTrackCapabilities">
+          <dt><dfn><code>smartFraming</code></dfn> of type <span class="idlMemberType">sequence&lt;{{boolean}}&gt;</span></dt>
+          <dd>
+            <p>A sequence of supported <a>smart framing</a> modes.
+            If the source cannot do smart framing,
+            a single <code>false</code> is reported.
+            If the smart framing cannot be turned off,
+            a single <code>true</code> is reported.
+            If the script can control the smart framing,
+            both <code>false</code> and <code>true</code> are reported as
+            possible values.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>{{MediaTrackConstraintSet}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean smartFraming;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackConstraintSet}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackConstraintSet" data-link-for="MediaTrackConstraintSet">
+          <dt><dfn><code>smartFraming</code></dfn> of type <span class="idlMemberType">{{ConstrainBoolean}}</span></dt>
+          <dd>
+            <p>See <a>smart framing</a> constrainable property.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>{{MediaTrackSettings}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackSettings {
+  boolean smartFraming;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackSettings}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackSettings" data-link-for="MediaTrackSettings">
+          <dt><dfn><code>smartFraming</code></dfn> of type <span class="idlMemberType">{{boolean}}</span></dt>
+          <dd>
+            <p>Current <a>smart framing</a> setting.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>Constrainable Properties</h3>
+      <ol>
+        <li>
+          <p><dfn>Smart framing</dfn> is a boolean setting
+          controlling whether framing is to be improved by cropping to
+          faces.</p>
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h3>Examples</h3>
+      <pre class="example">
+&lt;video&gt;&lt;/video&gt;
+&lt;script&gt;
+// Open camera.
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Try to improve framing.
+const videoCapabilities = videoTrack.getCapabilities();
+if ((videoCapabilities.smartFraming || []).includes(true)) {
+  await videoTrack.applyConstraints({
+    advanced: [{smartFraming: true}]
+  });
+} else {
+  // Smart framing is not supported by the platform or by the camera.
+  // Consider falling back to some other method.
+}
+
+// Show to user.
+const videoElement = document.querySelector("video");
+videoElement.srcObject = stream;
+&lt;/script&gt;
+      </pre>
+    </section>
+  </section>
 </body>
 </html>
