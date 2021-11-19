@@ -809,6 +809,68 @@ videoElement.srcObject = stream;
     </section>
   </section>
   <section>
+    <h2>Exposing MediaStreamTrack source eye gaze correction support</h2>
+    <p>Some platforms or User Agents may provide built-in support for human eye
+       gaze correction to make the eyes of faces appear to look at the camera,
+       in particular for camera video streams.
+       This may for instance allow the web application to update its UI or to
+       not apply human eye gaze correction on its own.
+       For that reason, we extend {{MediaStreamTrack}} with the following
+       properties.
+    </p>
+    <p>The WebIDL changes are the following:</p>
+    <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean eyeGazeCorrection = true;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; eyeGazeCorrection;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean eyeGazeCorrection;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean eyeGazeCorrection;
+};</pre>
+    <section>
+      <h3>Processing considerations</h3>
+      <p>When the "eyeGazeCorrection" setting is set to <code>true</code>,
+         the User Agent will attempt to correct human eye gaze so that the eyes
+         of faces appear to look at the camera.
+      </p>
+      <p>When the "eyeGazeCorrection" setting is set to <code>false</code>,
+         the User Agent will not correct human eye gaze.
+      </p>
+    </section>
+    <section>
+      <h3>Examples</h3>
+      <pre class="example">
+&lt;video&gt;&lt;/video&gt;
+&lt;script&gt;
+// Open camera.
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Try to correct eye gaze.
+const videoCapabilities = videoTrack.getCapabilities();
+if ((videoCapabilities.eyeGazeCorrection || []).includes(true)) {
+  await videoTrack.applyConstraints({eyeGazeCorrection: {exact: true}});
+} else {
+  // Eye gaze correction is not supported by the platform or by the camera.
+  // Consider falling back to some other method.
+}
+
+// Show to user.
+const videoElement = document.querySelector("video");
+videoElement.srcObject = stream;
+&lt;/script&gt;
+      </pre>
+    </section>
+  </section>
+  <section>
     <h2>VoiceIsolation constraint</h2>
     <div>
       <p>Some platforms offer functionality for voice isolation:
