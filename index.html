@@ -9,7 +9,7 @@
   // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
   var respecConfig = {
     group: "webrtc",
-    xref: ["html", "infra", "permissions", "dom", "mediacapture-streams", "webaudio", "webidl"],
+    xref: ["html", "infra", "permissions", "dom", "image-capture", "mediacapture-streams", "webaudio", "webidl"],
     edDraftURI: "https://w3c.github.io/mediacapture-extensions/",
     editors:  [
       {name: "Jan-Ivar Bruaroey", company: "Mozilla Corporation", w3cid: 79152},
@@ -708,6 +708,71 @@ partial dictionary MediaTrackCapabilities {
   sequence&lt;boolean&gt; backgroundBlur;
 };</pre>
     </div>
+  </section>
+  <section>
+    <h2>Exposing MediaStreamTrack source automatic face framing support</h2>
+    <p>Some platforms or User Agents may provide built-in support for automatic
+       continuous framing based on the position of human faces within the field
+       of view, in particular for camera video streams.
+       Web applications may either want to control or at least be aware that
+       automatic continuous human face framing is applied at the source level.
+       This may for instance allow the web application to update its UI or to
+       not apply human face framing on its own.
+       For that reason, we extend {{MediaStreamTrack}} with the following
+       properties.
+    </p>
+    <p>The WebIDL changes are the following:</p>
+    <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean faceFraming = true;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; faceFraming;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean faceFraming;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean faceFraming;
+};</pre>
+    <section>
+      <h3>Processing considerations</h3>
+      <p>When the "faceFraming" setting is set to <code>true</code> by
+         the <a>ApplyConstraints algorithm</a>, the UA will attempt to
+         continuously improve framing by cropping to human faces.
+      </p>
+      <p>When the "faceFraming" setting is set to <code>false</code> by
+         the <a>ApplyConstraints algorithm</a>, the UA will not crop to human
+         faces.
+      </p>
+    </section>
+    <section>
+      <h3>Examples</h3>
+      <pre class="example">
+&lt;video&gt;&lt;/video&gt;
+&lt;script&gt;
+// Open camera.
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Try to improve framing.
+const videoCapabilities = videoTrack.getCapabilities();
+if ((videoCapabilities.faceFraming || []).includes(true)) {
+  await videoTrack.applyConstraints({faceFraming: {exact: true}});
+} else {
+  // Face framing is not supported by the platform or by the camera.
+  // Consider falling back to some other method.
+}
+
+// Show to user.
+const videoElement = document.querySelector("video");
+videoElement.srcObject = stream;
+&lt;/script&gt;
+      </pre>
+    </section>
   </section>
   <section>
     <h2>VoiceIsolation constraint</h2>
