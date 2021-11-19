@@ -418,5 +418,113 @@ partial interface MediaStreamTrack {
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
   </section>
+  <section>
+    <h2>Background concealment</h2>
+    <section>
+      <h3>{{MediaTrackSupportedConstraints}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean backgroundBlur = true;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackSupportedConstraints}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackSupportedConstraints" data-link-for="MediaTrackSupportedConstraints">
+          <dt><dfn><code>backgroundBlur</code></dfn> of type <span class="idlMemberType">{{boolean}}</span>, defaulting to <code>true</code></dt>
+          <dd>
+            <p>Whether <a>background blur</a> constraining is
+            recognized.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>{{MediaTrackCapabilities}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackCapabilities {
+  MediaSettingsRange backgroundBlur;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackCapabilities}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackCapabilities" data-link-for="MediaTrackCapabilities">
+          <dt><dfn><code>backgroundBlur</code></dfn> of type <span class="idlMemberType">MediaSettingsRange</span></dt>
+          <dd>
+            <p>This reflects the supported range of <a>background blur</a>.
+            Values are numeric.
+            Increasing values indicate increasing background blur.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>{{MediaTrackConstraintSet}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackConstraintSet {
+  MediaSettingsRange backgroundBlur;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackConstraintSet}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackConstraintSet" data-link-for="MediaTrackConstraintSet">
+          <dt><dfn><code>backgroundBlur</code></dfn> of type <span class="idlMemberType">{{MediaSettingsRange}}</span></dt>
+          <dd>
+            <p>See <a>background blur</a> constrainable property.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>{{MediaTrackSettings}}</h3>
+      <pre class="idl"
+>partial dictionary MediaTrackSettings {
+  double backgroundBlur;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{MediaTrackSettings}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaTrackSettings" data-link-for="MediaTrackSettings">
+          <dt><dfn><code>backgroundBlur</code></dfn> of type <span class="idlMemberType">{{double}}</span></dt>
+          <dd>
+            <p>Current <a>background blur</a> setting.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>Constrainable Properties</h3>
+      <ol>
+        <li>
+          <p><dfn>Background blur</dfn> is numeric setting that controls
+          the blurring of the background.
+          The range of this setting is implementation dependent,
+          but the value of 0.0 indicates no background blur and
+          increasing values indicate increasing background blur.</p>
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h3>Examples</h3>
+      <pre class="example">
+&lt;video&gt;&lt;/video&gt;
+&lt;script&gt;
+// Open camera.
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Try to conceal background.
+const videoCapabilities = videoTrack.getCapabilities();
+if (videoCapabilities.backgroundBlur) {
+  await videoTrack.applyConstraints({
+    advanced: [{backgroundBlur: videoCapabilities.backgroundBlur.max}]
+  });
+} else {
+  // Background concealment is not supported by the platform or by the camera.
+  // Consider falling back to some other method.
+}
+
+// Show to user.
+const videoElement = document.querySelector("video");
+videoElement.srcObject = stream;
+&lt;/script&gt;
+      </pre>
+    </section>
+  </section>
 </body>
 </html>
