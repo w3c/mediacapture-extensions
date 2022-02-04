@@ -842,6 +842,109 @@ self.onmessage = async ({data: {track}}) => {
   await readable.pipeThrough(transformer).pipeTo(generator.writable);
 };
       </pre>
+      <pre class="example">
+// main.js:
+// Open camera.
+const stream = navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Use a video worker and show to user.
+const videoElement = document.querySelector('video');
+const videoWorker = new Worker('video-worker.js');
+videoWorker.postMessage({track: videoTrack}, [videoTrack]);
+const {data} = await new Promise(r => videoWorker.onmessage);
+videoElement.srcObject = new MediaStream([data.videoTrack]);
+
+// video-worker.js:
+self.onmessage = async ({data: {track}}) => {
+  // Apply constraints.
+  let customBackgroundBlur = true;
+  let customEyeGazeCorrection = true;
+  let customFaceDetection = false;
+  let faceDetectionMode;
+  const capabilities = track.getCapabilities();
+  if (capabilities.backgroundBlur &amp;&amp; capabilities.backgroundBlur.max &gt; 0) {
+    // The platform supports background blurring.
+    // Let's use platform background blurring and skip the custom one.
+    await track.applyConstraints({
+      advanced: [{backgroundBlur: capabilities.backgroundBlur.max}]
+    });
+    customBackgroundBlur = false;
+  } else if ((capabilities.faceDetectionMode || []).includes('contour')) {
+    // The platform supports face contour detection but not background
+    // blurring. Let's use platform face contour detection to aid custom
+    // background blurring.
+    faceDetectionMode ||= 'contour';
+    await videoTrack.applyConstraints({
+      advanced: [{faceDetectionMode}]
+    });
+  } else {
+    // The platform does not support background blurring nor face contour
+    // detection. Let's use custom face contour detection to aid custom
+    // background blurring.
+    customFaceDetection = true;
+  }
+  if ((capabilities.eyeGazeCorrection || []).includes(true)) {
+    // The platform supports eye gaze correction.
+    // Let's use platform eye gaze correction and skip the custom one.
+    await videoTrack.applyConstraints({
+      advanced: [{eyeGazeCorrection: true}]
+    });
+    customEyeGazeCorrection = false;
+  } else if ((capabilities.faceDetectionLandmarks || []).includes(true)) {
+    // The platform supports face landmark detection but not eye gaze
+    // correction. Let's use platform face landmark detection to aid custom eye
+    // gaze correction.
+    faceDetectionMode ||= 'presence';
+    await videoTrack.applyConstraints({
+      advanced: [{
+        faceDetectionLandmarks: true,
+        faceDetectionMode
+      }]
+    });
+  } else {
+    // The platform does not support eye gaze correction nor face landmark
+    // detection. Let's use custom face landmark detection to aid custom eye
+    // gaze correction.
+    customFaceDetection = true;
+  }
+
+  // Load custom libraries which may utilize TensorFlow and/or WASM.
+  const requiredScripts = [].concat(
+    customBackgroundBlur    ? 'background.js' : [],
+    customEyeGazeCorrection ? 'eye-gaze.js'   : [],
+    customFaceDetection     ? 'face.js'       : []
+  );
+  importScripts(...requiredScripts);
+
+  const generator = new VideoTrackGenerator();
+  parent.postMessage({videoTrack: generator.track}, [generator.track]);
+  const {readable} = new MediaStreamTrackProcessor({track});
+  const transformer = new TransformStream({
+    async transform(frame, controller) {
+      // Detect faces or retrieve detected faces.
+      const detectedFaces =
+        customFaceDetection
+          ? await detectFaces(frame)
+          : frame.detectedFaces;
+      // Blur the background if needed.
+      if (customBackgroundBlur) {
+        const newFrame = await blurBackground(frame, detectedFaces);
+        frame.close();
+        frame = newFrame;
+      }
+      // Correct the eye gaze if needed.
+      if (customEyeGazeCorrection &amp;&amp; (detectedFaces || []).length &gt; 0) {
+        const newFrame = await correctEyeGaze(frame, detectedFaces);
+        frame.close();
+        frame = newFrame;
+      }
+      controller.enqueue(frame);
+    }
+  });
+  await readable.pipeThrough(transformer).pipeTo(generator.writable);
+};
+      </pre>
     </section>
   </section>
 </body>
