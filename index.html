@@ -50,8 +50,8 @@
     <h2>Terminology</h2>
     <p>
       This document uses the definitions {{MediaDevices}}, {{MediaStreamTrack}},
-      {{MediaStreamConstraints}} and {{ConstrainablePattern}}
-      from [[!mediacapture-streams]].
+      {{MediaStreamConstraints}}, {{ConstrainablePattern}} and
+      {{ConstrainBoolean}} from [[!mediacapture-streams]].
       <p>The terms [=permission state=], [=request permission to use=], and
       <a data-cite="permissions">prompt the user to choose</a> are defined in
       [[!permissions]].</p>    </p>
@@ -206,6 +206,31 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+    <section id="mediastreamconstraints-dictionary-extensions">
+      <h3>MediaTrackConstraintSet dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean efficientPixelFormat;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackConstraintSet}} Members</h2>
+          <dl data-link-for="MediaTrackConstraintSet" data-dfn-for=
+          "MediaTrackConstraintSet" class="dictionary-members">
+            <dt><dfn><code>efficientPixelFormat</code></dfn> of type <span class=
+            "idlMemberType">{{ConstrainBoolean}}</span></dt>
+            <dd>
+              <p>It is common for cameras to support different pixel formats for
+              different resolutions and frame rates. The user agent SHOULD label
+              pixel formats that incur significant performance penalty as
+              "inefficient". What format is or is not considered inefficient is
+              up to the user agent, but software decoding MJPEG in FullHD might
+              be an example of an inefficient path.</p>
+            </dd>
+          </dl>
+        </section>
       </div>
     </section>
     <section>
