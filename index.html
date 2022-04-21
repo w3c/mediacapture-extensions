@@ -214,21 +214,20 @@
       <div>
         <pre class="idl"
 >partial dictionary MediaTrackConstraintSet {
-  ConstrainBoolean powerEfficient;
+  ConstrainBoolean avoidInefficientCompressedPixelFormat;
 };</pre>
         <section>
           <h2>Dictionary {{MediaTrackConstraintSet}} Members</h2>
           <dl data-link-for="MediaTrackConstraintSet" data-dfn-for=
           "MediaTrackConstraintSet" class="dictionary-members">
-            <dt><dfn><code>powerEfficient</code></dfn> of type <span class=
-            "idlMemberType">{{ConstrainBoolean}}</span></dt>
+            <dt><dfn><code>avoidInefficientCompressedPixelFormat</code></dfn> of
+            type <span class="idlMemberType">{{ConstrainBoolean}}</span></dt>
             <dd>
-              <p>Some capture modes are more expensive than others when it comes
-              to power consumption. The user agent SHOULD label modes that incur
-              significant power penalty as not power efficient. What format is
-              or is not considered power efficient is up to the user agent, but
-              modes that cause software MJPEG decode are examples of expensive
-              modes.</p>
+              <p>Compressed pixel formats need to be decoded. The user agent
+              SHOULD label compressed pixel formats that incur significant power
+              penalty when decoded as not power efficient. The labeling is up to
+              the user agent, but decoding MJPEG in software is an example of an
+              expensive mode.</p>
             </dd>
           </dl>
         </section>
