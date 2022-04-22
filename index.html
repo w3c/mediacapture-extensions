@@ -51,8 +51,10 @@
     <p>
       This document uses the definitions {{MediaDevices}}, {{MediaStreamTrack}},
       {{MediaStreamConstraints}}, {{ConstrainablePattern}},
-      {{MediaTrackConstraintSet}} and {{ConstrainBoolean}} from
-      [[!mediacapture-streams]].
+      {{MediaTrackSupportedConstraints}}, {{MediaTrackCapabilities}},
+      {{MediaTrackConstraintSet}}, {{MediaTrackSettings}},
+      <a data-cite="mediacapture-streams">allowed required constraints for device selection</a>
+      and {{ConstrainBoolean}} from [[!mediacapture-streams]].
       <p>The terms [=permission state=], [=request permission to use=], and
       <a data-cite="permissions">prompt the user to choose</a> are defined in
       [[!permissions]].</p>    </p>
@@ -209,29 +211,105 @@
         </table>
       </div>
     </section>
-    <section id="mediatrackconstraintset-dictionary-extensions">
-      <h3>MediaTrackConstraintSet dictionary extensions</h3>
+    <section id="mediatracksupportedconstraints-dictionary-extensions">
+      <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
       <div>
         <pre class="idl"
->partial dictionary MediaTrackConstraintSet {
-  ConstrainBoolean avoidInefficientCompressedPixelFormat;
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean avoidInefficientCompressedPixelFormat = true;
 };</pre>
         <section>
-          <h2>Dictionary {{MediaTrackConstraintSet}} Members</h2>
-          <dl data-link-for="MediaTrackConstraintSet" data-dfn-for=
-          "MediaTrackConstraintSet" class="dictionary-members">
-            <dt><dfn><code>avoidInefficientCompressedPixelFormat</code></dfn> of
-            type <span class="idlMemberType">{{ConstrainBoolean}}</span></dt>
+          <h2>Dictionary {{MediaTrackSupportedConstraints}} Members</h2>
+          <dl data-link-for="MediaTrackSupportedConstraints" data-dfn-for=
+          "MediaTrackSupportedConstraints" class="dictionary-members">
+            <dt><dfn>avoidInefficientCompressedPixelFormat</dfn> of type
+            {{boolean}}, defaulting to <code>true</code></dt>
+            <dd>See <a href=
+            "#def-constraint-avoidInefficientCompressedPixelFormat">
+            avoidInefficientCompressedPixelFormat</a> for details.</dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="mediatrackcapabilities-dictionary-extensions">
+      <h3>MediaTrackCapabilities dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; avoidInefficientCompressedPixelFormat;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackCapabilities}} Members</h2>
+          <dl data-link-for="MediaTrackCapabilities" data-dfn-for=
+          "MediaTrackCapabilities" class="dictionary-members">
+            <dt><dfn>avoidInefficientCompressedPixelFormat</dfn> of type
+            <code>sequence&lt;{{boolean}}&gt;</code></dt>
             <dd>
+              <p>If the source has no inefficient compressed pixel formats, a
+              single <code>true</code> is reported. If the source only has
+              inefficient compressed pixel formats, a single <code>false</code>
+              is reported. If the script can control the feature, the source
+              reports a list with both <code>true</code> and <code>false</code>
+              as possible values. See <a href=
+              "#def-constraint-avoidInefficientCompressedPixelFormat">
+              avoidInefficientCompressedPixelFormat</a> for additional
+              details.</p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="mediatracksettings-dictionary-extensions">
+      <h3>MediaTrackSettings dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackSettings {
+  boolean avoidInefficientCompressedPixelFormat;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackSettings}} Members</h2>
+          <dl data-link-for="MediaTrackSettings" data-dfn-for=
+          "MediaTrackSettings" class="dictionary-members">
+            <dt><dfn>avoidInefficientCompressedPixelFormat</dfn> of type
+            {{boolean}}</dt>
+            <dd>See <a href=
+            "#def-constraint-avoidInefficientCompressedPixelFormat">
+            avoidInefficientCompressedPixelFormat</a> for details.</dd>
+      </section>
+      </div>
+    </section>
+      <h2>Constrainable Properties</h2>
+      <h3>Additions to Constrainable Properties</h3>
+      <p>The names of constrainable properties in this document are defined
+      below.</p>
+      <table class="simple">
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>Values</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><dfn id="def-constraint-avoidInefficientCompressedPixelFormat">
+            avoidInefficientCompressedPixelFormat</dfn></td>
+            <td>{{ConstrainBoolean}}</td>
+            <td>
               <p>Compressed pixel formats need to be decoded. The user agent
               SHOULD label compressed pixel formats that incur significant power
               penalty when decoded as not power efficient. The labeling is up to
               the user agent, but decoding MJPEG in software is an example of an
               expensive mode.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Additions to allowed required constraints for device selection</h3>
+      <p>The following constrainable properties are
+      <a data-cite="mediacapture-streams">allowed required constraints for device selection</a>:
+      <a>avoidInefficientCompressedPixelFormat</a>.
+      </p>
     </section>
     <section>
       <h2>Algorithms</h2>
