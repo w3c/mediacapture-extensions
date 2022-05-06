@@ -293,11 +293,16 @@
             avoidInefficientCompressedPixelFormat</dfn></td>
             <td>{{ConstrainBoolean}}</td>
             <td>
-              <p>Compressed pixel formats need to be decoded. The user agent
-              SHOULD label compressed pixel formats that incur significant power
-              penalty when decoded as not power efficient. The labeling is up to
-              the user agent, but decoding MJPEG in software is an example of an
-              expensive mode.</p>
+              <p>Compressed pixel formats often need to be decoded, for instance
+              for display purposes or when being encoded during a video call.
+              The user agent SHOULD label compressed pixel formats that incur
+              significant power penalty when decoded as inefficient. The
+              labeling is up to the user agent, but decoding MJPEG in software
+              is an example of an expensive mode.</p>
+              <p>As a constraint, setting this to true can be used to filter out
+              inefficient modes, and not specifying a value is the same as
+              setting it to false. As a setting, this reflects whether or not
+              an inefficient mode is currently avoided.</p>
             </td>
           </tr>
         </tbody>
