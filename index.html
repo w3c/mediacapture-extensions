@@ -215,17 +215,17 @@
       <div>
         <pre class="idl"
 >partial dictionary MediaTrackSupportedConstraints {
-  boolean avoidInefficientCompressedPixelFormat = true;
+  boolean powerEfficientPixelFormat = true;
 };</pre>
         <section>
           <h2>Dictionary {{MediaTrackSupportedConstraints}} Members</h2>
           <dl data-link-for="MediaTrackSupportedConstraints" data-dfn-for=
           "MediaTrackSupportedConstraints" class="dictionary-members">
-            <dt><dfn>avoidInefficientCompressedPixelFormat</dfn> of type
+            <dt><dfn>powerEfficientPixelFormat</dfn> of type
             {{boolean}}, defaulting to <code>true</code></dt>
             <dd>See <a href=
-            "#def-constraint-avoidInefficientCompressedPixelFormat">
-            avoidInefficientCompressedPixelFormat</a> for details.</dd>
+            "#def-constraint-powerEfficientPixelFormat">
+            powerEfficientPixelFormat</a> for details.</dd>
           </dl>
         </section>
       </div>
@@ -235,23 +235,23 @@
       <div>
         <pre class="idl"
 >partial dictionary MediaTrackCapabilities {
-  sequence&lt;boolean&gt; avoidInefficientCompressedPixelFormat;
+  sequence&lt;boolean&gt; powerEfficientPixelFormat;
 };</pre>
         <section>
           <h2>Dictionary {{MediaTrackCapabilities}} Members</h2>
           <dl data-link-for="MediaTrackCapabilities" data-dfn-for=
           "MediaTrackCapabilities" class="dictionary-members">
-            <dt><dfn>avoidInefficientCompressedPixelFormat</dfn> of type
+            <dt><dfn>powerEfficientPixelFormat</dfn> of type
             <code>sequence&lt;{{boolean}}&gt;</code></dt>
             <dd>
-              <p>If the source has no inefficient compressed pixel formats, a
-              single <code>true</code> is reported. If the source only has
-              inefficient compressed pixel formats, a single <code>false</code>
-              is reported. If the script can control the feature, the source
+              <p>If the source only has power efficient pixel formats, a single
+              <code>true</code> is reported. If the source only has power
+              inefficient pixel formats, a single <code>false</code> is
+              reported. If the script can control the feature, the source
               reports a list with both <code>true</code> and <code>false</code>
               as possible values. See <a href=
-              "#def-constraint-avoidInefficientCompressedPixelFormat">
-              avoidInefficientCompressedPixelFormat</a> for additional
+              "#def-constraint-powerEfficientPixelFormat">
+              powerEfficientPixelFormat</a> for additional
               details.</p>
             </dd>
           </dl>
@@ -263,17 +263,17 @@
       <div>
         <pre class="idl"
 >partial dictionary MediaTrackSettings {
-  boolean avoidInefficientCompressedPixelFormat;
+  boolean powerEfficientPixelFormat;
 };</pre>
         <section>
           <h2>Dictionary {{MediaTrackSettings}} Members</h2>
           <dl data-link-for="MediaTrackSettings" data-dfn-for=
           "MediaTrackSettings" class="dictionary-members">
-            <dt><dfn>avoidInefficientCompressedPixelFormat</dfn> of type
+            <dt><dfn>powerEfficientPixelFormat</dfn> of type
             {{boolean}}</dt>
             <dd>See <a href=
-            "#def-constraint-avoidInefficientCompressedPixelFormat">
-            avoidInefficientCompressedPixelFormat</a> for details.</dd>
+            "#def-constraint-powerEfficientPixelFormat">
+            powerEfficientPixelFormat</a> for details.</dd>
       </section>
       </div>
     </section>
@@ -289,20 +289,23 @@
         </thead>
         <tbody>
           <tr>
-            <td><dfn id="def-constraint-avoidInefficientCompressedPixelFormat">
-            avoidInefficientCompressedPixelFormat</dfn></td>
+            <td><dfn id="def-constraint-powerEfficientPixelFormat">
+              powerEfficientPixelFormat</dfn></td>
             <td>{{ConstrainBoolean}}</td>
             <td>
               <p>Compressed pixel formats often need to be decoded, for instance
               for display purposes or when being encoded during a video call.
               The user agent SHOULD label compressed pixel formats that incur
-              significant power penalty when decoded as inefficient. The
+              significant power penalty when decoded as power inefficient. The
               labeling is up to the user agent, but decoding MJPEG in software
-              is an example of an expensive mode.</p>
-              <p>As a constraint, setting this to true can be used to filter out
-              inefficient modes, and not specifying a value is the same as
-              setting it to false. As a setting, this reflects whether or not
-              an inefficient mode is currently avoided.</p>
+              is an example of an expensive mode. Pixel formats that have not
+              been labeled power inefficient by the user agent are for the
+              purpose of this API considered power efficient.</p>
+              <p>As a constraint, setting it to true allows filtering out
+              inefficient pixel formats and setting it to false allows filtering
+              out efficient pixel formats.</p>
+              <p>As a setting, this reflects whether or not the current pixel
+              format is considered power efficient by the user agent.</p>
             </td>
           </tr>
         </tbody>
