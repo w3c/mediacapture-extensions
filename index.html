@@ -417,5 +417,71 @@ partial interface MediaStreamTrack {
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
   </section>
+  <section>
+    <h2>Exposing MediaStreamTrack source background blur support</h2>
+    <div>
+      <p>Some platforms or User Agents may provide built-in support for background blurring of video frames, in particular for camera video streams.
+         Web applications may either want to control or at least be aware that background blur is applied at the source level.
+         This may for instance allow the web application to update its UI or to not apply background blur on its own.
+         For that reason, we extend {{MediaStreamTrack}} with the following properties.
+      </p>
+    </div>
+    <div>
+      <p>The WebIDL changes are the following:
+      <pre class="idl">
+partial dictionary MediaTrackSupportedConstraints {
+  boolean backgroundBlur = true;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean backgroundBlur;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean backgroundBlur;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; backgroundBlur;
+};</pre>
+    </div>
+  </section>
+  <section>
+    <h2>Exposing change of MediaStreamTrack configuration</h2>
+    <div>
+      <p>The configuration (capabilities, constraints or settings) of a {{MediaStreamTrack}} may be changed dynamically
+        outside the control of web applications. One example is when a user decides to switch on background blur through
+        the operating system. Web applications might want to know that the configuration
+        of a particular {{MediaStreamTrack}} has changed. For that purpose, a new event is defined below.
+     </p>
+      <pre class="idl">
+partial interface MediaStreamTrack {
+  attribute EventHandler onconfigurationchange;
+};</pre>
+    <p>
+      <p>When the [=User Agent=] detects <dfn data-export id="change-track-configuration">a change of configuration</dfn>
+       in a <var>track</var>'s underlying source, the [=User Agent=] MUST run the following steps:</p>
+      <ol>
+        <li><p>If <var>track</var>.{{MediaStreamTrack/muted}} is <code>true</code>, wait for <var>track</var>.{{MediaStreamTrack/muted}}
+          to become <code>false</code> or <var>track</var>.{{MediaStreamTrack/readyState}} to be "ended".</p></li>
+        <li><p>If <var>track</var>.{{MediaStreamTrack/readyState}} is "ended", abort these steps.</p></li>
+        <li><p>If <var>track</var>'s capabilities, constraints and settings are matching <var>source</var> configuration, abort these steps.
+        <li>
+          <!-- FIXME: Export capabilities, constraints and settings so that we can use them here. -->
+          <p>Update <var>track</var>'s capabilities, constraints and settings according <var>track</var>'s underlying source.</p>
+        </li>
+        <li>
+          <p>[=Fire an event=] named <var>configurationchange</var> on <var>track</var>.</p>
+        </li>
+      </ol>
+    </p>
+    <p>
+      <div class="note">
+        <p class="fingerprint">These events are potentially triggered simultaneously on documents of different origins.
+          [=User Agents=] MAY add fuzzing on the timing of events to avoid cross-origin activity correlation.</p>
+      </div>
+    </p>
+    </div>
+  </section>
 </body>
 </html>
