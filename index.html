@@ -210,112 +210,8 @@
         </table>
       </div>
     </section>
-  </section>
-  <section id="the powerEfficientPixelFormat constraint">
-    <h2>The powerEfficientPixelFormat constraint</h2>
-    <section id="mediatracksupportedconstraints-dictionary-extensions">
-      <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
-      <div>
-        <pre class="idl"
->partial dictionary MediaTrackSupportedConstraints {
-  boolean powerEfficientPixelFormat = true;
-};</pre>
-        <section>
-          <h2>Dictionary {{MediaTrackSupportedConstraints}} Members</h2>
-          <dl data-link-for="MediaTrackSupportedConstraints" data-dfn-for=
-          "MediaTrackSupportedConstraints" class="dictionary-members">
-            <dt><dfn>powerEfficientPixelFormat</dfn> of type
-            {{boolean}}, defaulting to <code>true</code></dt>
-            <dd>See <a href=
-            "#def-constraint-powerEfficientPixelFormat">
-            powerEfficientPixelFormat</a> for details.</dd>
-          </dl>
-        </section>
-      </div>
-    </section>
-    <section id="mediatrackcapabilities-dictionary-extensions">
-      <h3>MediaTrackCapabilities dictionary extensions</h3>
-      <div>
-        <pre class="idl"
->partial dictionary MediaTrackCapabilities {
-  sequence&lt;boolean&gt; powerEfficientPixelFormat;
-};</pre>
-        <section>
-          <h2>Dictionary {{MediaTrackCapabilities}} Members</h2>
-          <dl data-link-for="MediaTrackCapabilities" data-dfn-for=
-          "MediaTrackCapabilities" class="dictionary-members">
-            <dt><dfn>powerEfficientPixelFormat</dfn> of type
-            <code>sequence&lt;{{boolean}}&gt;</code></dt>
-            <dd>
-              <p>If the source only has power efficient pixel formats, a single
-              <code>true</code> is reported. If the source only has power
-              inefficient pixel formats, a single <code>false</code> is
-              reported. If the script can control the feature, the source
-              reports a list with both <code>true</code> and <code>false</code>
-              as possible values. See <a href=
-              "#def-constraint-powerEfficientPixelFormat">
-              powerEfficientPixelFormat</a> for additional
-              details.</p>
-            </dd>
-          </dl>
-        </section>
-      </div>
-    </section>
-    <section id="mediatracksettings-dictionary-extensions">
-      <h3>MediaTrackSettings dictionary extensions</h3>
-      <div>
-        <pre class="idl"
->partial dictionary MediaTrackSettings {
-  boolean powerEfficientPixelFormat;
-};</pre>
-        <section>
-          <h2>Dictionary {{MediaTrackSettings}} Members</h2>
-          <dl data-link-for="MediaTrackSettings" data-dfn-for=
-          "MediaTrackSettings" class="dictionary-members">
-            <dt><dfn>powerEfficientPixelFormat</dfn> of type
-            {{boolean}}</dt>
-            <dd>See <a href=
-            "#def-constraint-powerEfficientPixelFormat">
-            powerEfficientPixelFormat</a> for details.</dd>
-      </section>
-      </div>
-    </section>
-      <h2>Constrainable Properties</h2>
-      <p>The constrainable properties in this document are defined below.</p>
-      <table class="simple">
-        <thead>
-          <tr>
-            <th>Property Name</th>
-            <th>Values</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><dfn id="def-constraint-powerEfficientPixelFormat">
-              powerEfficientPixelFormat</dfn></td>
-            <td>{{ConstrainBoolean}}</td>
-            <td>
-              <p>Compressed pixel formats often need to be decoded, for instance
-              for display purposes or when being encoded during a video call.
-              The user agent SHOULD label compressed pixel formats that incur
-              significant power penalty when decoded as power inefficient. The
-              labeling is up to the user agent, but decoding MJPEG in software
-              is an example of an expensive mode. Pixel formats that have not
-              been labeled power inefficient by the user agent are for the
-              purpose of this API considered power efficient.</p>
-              <p>As a constraint, setting it to true allows filtering out
-              inefficient pixel formats and setting it to false allows filtering
-              out efficient pixel formats.</p>
-              <p>As a setting, this reflects whether or not the current pixel
-              format is considered power efficient by the user agent.</p>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
     <section>
-      <h2>Algorithms</h2>
+      <h3>Algorithms</h3>
       <p>When the {{MediaDevices/getUserMedia()}} method is invoked, run the
       following steps before invoking the {{MediaDevices/getUserMedia()}}
       algorithm:</p>
@@ -402,7 +298,7 @@
       </ol>
     </section>
     <section>
-      <h2>Examples</h2>
+      <h3>Examples</h3>
       <div>
         <p>This example shows a setup with a start button and a camera selector
         using the new semantics (microphone is not shown for brievity but is
@@ -523,6 +419,109 @@ partial interface MediaStreamTrack {
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
   </section>
+  <section id="the powerEfficientPixelFormat constraint">
+    <h2>The powerEfficientPixelFormat constraint</h2>
+    <section id="mediatracksupportedconstraints-dictionary-extensions">
+      <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean powerEfficientPixelFormat = true;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackSupportedConstraints}} Members</h2>
+          <dl data-link-for="MediaTrackSupportedConstraints" data-dfn-for=
+          "MediaTrackSupportedConstraints" class="dictionary-members">
+            <dt><dfn>powerEfficientPixelFormat</dfn> of type
+            {{boolean}}, defaulting to <code>true</code></dt>
+            <dd>See <a href=
+            "#def-constraint-powerEfficientPixelFormat">
+            powerEfficientPixelFormat</a> for details.</dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="mediatrackcapabilities-dictionary-extensions">
+      <h3>MediaTrackCapabilities dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; powerEfficientPixelFormat;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackCapabilities}} Members</h2>
+          <dl data-link-for="MediaTrackCapabilities" data-dfn-for=
+          "MediaTrackCapabilities" class="dictionary-members">
+            <dt><dfn>powerEfficientPixelFormat</dfn> of type
+            <code>sequence&lt;{{boolean}}&gt;</code></dt>
+            <dd>
+              <p>If the source only has power efficient pixel formats, a single
+              <code>true</code> is reported. If the source only has power
+              inefficient pixel formats, a single <code>false</code> is
+              reported. If the script can control the feature, the source
+              reports a list with both <code>true</code> and <code>false</code>
+              as possible values. See <a href=
+              "#def-constraint-powerEfficientPixelFormat">
+              powerEfficientPixelFormat</a> for additional
+              details.</p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section id="mediatracksettings-dictionary-extensions">
+      <h3>MediaTrackSettings dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackSettings {
+  boolean powerEfficientPixelFormat;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackSettings}} Members</h2>
+          <dl data-link-for="MediaTrackSettings" data-dfn-for=
+          "MediaTrackSettings" class="dictionary-members">
+            <dt><dfn>powerEfficientPixelFormat</dfn> of type
+            {{boolean}}</dt>
+            <dd>See <a href=
+            "#def-constraint-powerEfficientPixelFormat">
+            powerEfficientPixelFormat</a> for details.</dd>
+      </section>
+      </div>
+    </section>
+      <h2>Constrainable Properties</h2>
+      <p>The constrainable properties in this document are defined below.</p>
+      <table class="simple">
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>Values</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><dfn id="def-constraint-powerEfficientPixelFormat">
+              powerEfficientPixelFormat</dfn></td>
+            <td>{{ConstrainBoolean}}</td>
+            <td>
+              <p>Compressed pixel formats often need to be decoded, for instance
+              for display purposes or when being encoded during a video call.
+              The user agent SHOULD label compressed pixel formats that incur
+              significant power penalty when decoded as power inefficient. The
+              labeling is up to the user agent, but decoding MJPEG in software
+              is an example of an expensive mode. Pixel formats that have not
+              been labeled power inefficient by the user agent are for the
+              purpose of this API considered power efficient.</p>
+              <p>As a constraint, setting it to true allows filtering out
+              inefficient pixel formats and setting it to false allows filtering
+              out efficient pixel formats.</p>
+              <p>As a setting, this reflects whether or not the current pixel
+              format is considered power efficient by the user agent.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   <section>
     <h2>Exposing MediaStreamTrack source background blur support</h2>
     <div>
