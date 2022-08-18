@@ -552,6 +552,72 @@ partial dictionary MediaTrackCapabilities {
     </div>
   </section>
   <section>
+    <h2>VoiceIsolation constraint</h2>
+    <div>
+      <p>Some platforms offer functionality for voice isolation:
+      Attempting to remove all parts of an audio track that do not
+      correspond to a human voice. Some platforms even attempt to
+      remove extraneous voices, leaving the "main voice" as the
+        dominant component of the audio. The exact methods used may
+      vary between implementations.
+      </p>
+      <p>
+        This constraint permits the platform to turn on that functionality,
+        with the desired result being that the "main voice" in the audio
+        signal is the dominant component of the audio.
+      </p>
+      <p>
+        This will have large effects on audio that is presented for
+        other reasons than to transmit voice (for instance music or
+        ambient noises), so needs to be off by default.
+      </p>
+      <p>
+        This constraint is a stronger version of noise cancellation,
+        which means that if the "noiseSuppression" constraint is set
+        to false and "voiceIsolation" is set to true, the value of
+        "noiseCancellation" will be ignored.
+      </p>
+      <p>
+        This constraint has no such relationship with any other
+        constraint; in particular it does not affect echoCancellation.
+      </p>
+    </div>
+    <div>
+      <p>
+        The WebIDL changes are the following:
+        <pre class="idl">
+partial dictionary MediaTrackSupportedConstraints {
+  boolean voiceIsolation = true;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean voiceIsolation;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean voiceIsolation;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; voiceIsolation;
+};
+        </pre>
+        </p>
+      <h4>Processing considerations</h4>
+      <p>
+        When the "voiceIsolation" setting is set to <code>true</code> by the
+        <a>ApplyConstraints algorithm</a>, the UA
+        will attempt to remove the components of the audio track that
+        do not correspond to a human voice. If a dominant voice can be
+        identified, the UA will attempt to enhance that voice.
+      </p>
+      <p>
+        When the "voiceIsolation" constraint setting is set to <code>false</code>
+        by the <a>ApplyConstraints algorithm</a>, the UA will process the
+        audio according to other settings in its normal fashion.
+      </p>
+  </section>
+  <section>
     <h2>Exposing change of MediaStreamTrack configuration</h2>
     <div>
       <p>The configuration (capabilities, constraints or settings) of a {{MediaStreamTrack}} may be changed dynamically
