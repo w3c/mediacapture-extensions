@@ -437,8 +437,9 @@ partial interface MediaStreamTrack {
         </dt>
         <dd>
           <p>
-            The total number of frames emitted by the track's source for
-            consumption by one or more sinks. See also {{framesDropped}}.
+            Only defined for video tracks. The total number of frames emitted by
+            the track's source for consumption by one or more sinks. See also
+            {{framesDropped}}.
           </p>
         </dd>
         <dt>
@@ -446,17 +447,17 @@ partial interface MediaStreamTrack {
         </dt>
         <dd>
           <p>
-            Incremented every time a source frame was dropped prior to being
-            emitted. This happens when a frame is decimated in order to achieve
-            the desired {{MediaTrackSettings/frameRate}} or if the user agent
-            had to drop the frame for other reasons, such as if a frame was not
-            consumed on time by the pipeline. This could also happen if the
-            track does not have any sinks.
+            Only defined for video tracks. Incremented every time a source frame
+            was dropped prior to being emitted. This happens when a frame is
+            decimated in order to achieve the desired
+            {{MediaTrackSettings/frameRate}} or if the user agent dropped the
+            frame for other reasons, such as if the pipeline is not consuming
+            emitted frames fast enough or if the track does not have any sinks.
           </p>
           <p>
             The sum of {{framesEmitted}} and {{framesDropped}} is the total
             number of frames produced by the source. For example if the source
-            is a camera, this is the total number of frames captured.
+            is a camera, this is the total number of captured frames.
           </p>
         </dd>
       </dl>
