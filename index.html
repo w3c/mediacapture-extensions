@@ -346,7 +346,8 @@ function setCameraTrack(track) {
     </section>
   </section>
   <section>
-    <h2>Transferable MediaStreamTrack</h2>
+    <h2>MediaStreamTrack extensions</h2>
+    <h3>Transferable MediaStreamTrack</h3>
     <div>
       <p>A {{MediaStreamTrack}} is a <a data-cite="!HTML/#transferable-objects">transferable object</a>.
       This allows manipulating real-time media outside the context it was requested or created in,
@@ -374,7 +375,7 @@ function setCameraTrack(track) {
       </p>
     </div>
     <div>
-      <p>The WebIDL changes are the following:
+      <p>The WebIDL changes to make the track transferrable are the following:
       <pre class="idl"
 >[Exposed=(Window,Worker), Transferable]
 partial interface MediaStreamTrack {
@@ -418,6 +419,48 @@ partial interface MediaStreamTrack {
       <p>The underlying source is supposed to be kept alive between the transfer and transfer-receiving steps, or as long as the data holder is alive.
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
+    <h3>MediaStreamTrack frame counters</h3>
+    <div>
+      <p>The WebIDL changes to add frame counters are the following:
+      <pre class="idl"
+>partial interface MediaStreamTrack {
+  readonly attribute unsigned long long framesEmitted;
+  readonly attribute unsigned long long framesDropped;
+};</pre>
+    </div>
+    <section>
+      <h2>Attributes</h2>
+      <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
+      class="attributes">
+        <dt>
+          <dfn>framesEmitted</dfn> of type {{unsigned long long}}, readonly
+        </dt>
+        <dd>
+          <p>
+            The total number of frames emitted by the track's source for
+            consumption by one or more sinks. See also {{framesDropped}}.
+          </p>
+        </dd>
+        <dt>
+          <dfn>framesDropped</dfn> of type {{unsigned long long}}, readonly
+        </dt>
+        <dd>
+          <p>
+            Incremented every time a source frame was dropped prior to being
+            emitted. This happens when a frame is decimated in order to achieve
+            the desired {{MediaTrackSettings/frameRate}} or if the user agent
+            had to drop the frame for other reasons, such as if a frame was not
+            consumed on time by the pipeline. This could also happen if the
+            track does not have any sinks.
+          </p>
+          <p>
+            The sum of {{framesEmitted}} and {{framesDropped}} is the total
+            number of frames produced by the source. For example if the source
+            is a camera, this is the total number of frames captured.
+          </p>
+        </dd>
+      </dl>
+    </section>
   </section>
   <section id="the powerEfficientPixelFormat constraint">
     <h2>The powerEfficientPixelFormat constraint</h2>
