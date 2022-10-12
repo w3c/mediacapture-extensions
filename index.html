@@ -421,6 +421,15 @@ partial interface MediaStreamTrack {
     </div>
     <h3>MediaStreamTrack frame counters</h3>
     <div>
+      <p>
+        Frame counters allow you to tell why the frame rate experienced is
+        different from the expected one - for instance, the camera may be
+        slowing down frame production because it's dark, the settings applied
+        may produce decimation of frames, or the system may be CPU starved and
+        therefore dropping frames.
+      </p>
+    </div>
+    <div>
       <p>The WebIDL changes to add frame counters are the following:
       <pre class="idl"
 >partial interface MediaStreamTrack {
@@ -429,7 +438,7 @@ partial interface MediaStreamTrack {
 };</pre>
     </div>
     <section>
-      <h2>Attributes</h2>
+      <h4>Attributes</h4>
       <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
       class="attributes">
         <dt>
