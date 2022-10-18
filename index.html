@@ -430,43 +430,120 @@ partial interface MediaStreamTrack {
       </p>
     </div>
     <div>
-      <p>The WebIDL changes to add frame counters are the following:
+      <p>
+        Frame counters are available via the {{MediaStreamTrack/getStats}} method.
+      </p>
       <pre class="idl"
 >partial interface MediaStreamTrack {
-  readonly attribute unsigned long long framesEmitted;
-  readonly attribute unsigned long long framesDropped;
+    Promise&lt;MediaTrackStats&gt; getStats();
+};</pre>
+    </div>
+    <section>
+      <h4>Methods</h4>
+      <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
+      class="methods">
+        <dt>
+          <dfn>getStats</dfn>
+        </dt>
+        <dd>
+          <p>
+            When this method is called, the user agenst MUST run the following
+            steps:
+          </p>
+          <ol>
+            <li>
+              <p>
+                Let <var>track</var> be the {{MediaStreamTrack}} that this
+                method was called on.
+              </p>
+            </li>
+            <li>
+              <p>Let <var>p</var> be a new promise.</p>
+            </li>
+            <li>
+              <p>
+                In parallel, begin the [= in-parallel steps to get track
+                stats =], given <var>track</var> and <var>p</var>.
+              </p>
+            </li>
+            <li>
+              <p>Return <var>p</var>.</p>
+            </li>
+          </ol>
+          <p>
+            The <dfn>in-parallel steps to get track stats</dfn> given
+            <var>track</var> and <var>p</var> are as follows:
+          </p>
+          <ol>
+            <li>
+              <p>
+                Let <var>stats</var> be a snapshot of the current frame
+                counters of <var>track</var>, as defined in {{MediaTrackStats}}.
+              </p>
+            </li>
+            <li>
+              <p>
+                Queue a task to resolve <var>p</var> with <var>stats</var>.
+              </p>
+            </li>
+          </ol>
+        </dd>
+      </dl>
+    </section>
+    <div>
+      <pre class="idl"
+>dictionary MediaTrackStats {
+    unsigned long long framesCaptured;
+    unsigned long long framesEmitted;
 };</pre>
     </div>
     <section>
       <h4>Attributes</h4>
-      <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
-      class="attributes">
+      <dl data-link-for="MediaTrackStats" data-dfn-for="MediaTrackStats"
+      class="dictionary-members">
         <dt>
-          <dfn>framesEmitted</dfn> of type {{unsigned long long}}, readonly
+          <dfn>framesCaptured</dfn> of type {{unsigned long long}}
         </dt>
         <dd>
           <p>
-            Only defined for video tracks. The total number of frames emitted by
-            the track's source for consumption by one or more sinks. See also
-            {{framesDropped}}.
+            Only defined for video tracks. This is the sum of frames that was
+            [= emitted =] and frames that was [= dropped prior to emission =].
           </p>
+          <p>
+            The number of frames that was [= dropped prior to emission =] can be
+            calculated by subtracting {{framesEmitted}} from {{framesCaptured}}.
+          </p>
+          <div class="note">
+            If the track is sourced from a camera, delta framesCaptured divided
+            by delta time correspond to the frame rate that the camera is
+            producing on average. This may be higher than the frameRate
+            settings when the settings are causing frame decimation, or lower
+            than the frameRate settings if the camera is producing less frames
+            due to lighting conditions.
+          </div>
         </dd>
         <dt>
-          <dfn>framesDropped</dfn> of type {{unsigned long long}}, readonly
+          <dfn>framesEmitted</dfn> of type {{unsigned long long}}
         </dt>
         <dd>
           <p>
-            Only defined for video tracks. Incremented every time a source frame
-            was dropped prior to being emitted. This happens when a frame is
-            decimated in order to achieve the desired
-            {{MediaTrackSettings/frameRate}} or if the user agent dropped the
-            frame for other reasons, such as if the pipeline is not consuming
-            emitted frames fast enough or if the track does not have any sinks.
+            Only defined for video tracks. This is the total number of frames
+            that was [= emitted =] by this track.
           </p>
           <p>
-            The sum of {{framesEmitted}} and {{framesDropped}} is the total
-            number of frames produced by the source. For example if the source
-            is a camera, this is the total number of captured frames.
+            A frame can either be [= emitted =] or [= dropped prior to
+            emission =]. A frame is <dfn>emitted</dfn> when it is delivered to a
+            sink or [= dropped prior to emission =] if it is dropped prior to
+            that. Note that an [= emitted =] frame can still be dropped later in
+            the pipeline such as if the sink is an <code>HTMLMediaElement</code>
+            and the frame is not rendered on time, but frame drops after
+            emission is out of scope of {{MediaTrackStats}}.
+          </p>
+          <p>
+            A frame could get <dfn>dropped prior to emission</dfn> for different
+            reasons, including frame decimation due to frameRate constraints,
+            track muted state, performance reasons or because the track does not
+            have any sinks.
           </p>
         </dd>
       </dl>
