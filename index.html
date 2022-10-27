@@ -56,7 +56,8 @@
       {{ConstrainBoolean}} from [[!mediacapture-streams]].
       <p>The terms [=permission state=], [=request permission to use=], and
       <a data-cite="permissions">prompt the user to choose</a> are defined in
-      [[!permissions]].</p>    </p>
+      [[!permissions]].</p>
+    </p>
   </section>
   <section id="conformance">
   </section>
@@ -426,12 +427,13 @@ partial interface MediaStreamTrack {
         different from the expected one - for instance, the camera may be
         slowing down frame production because it's dark, the settings applied
         may produce decimation of frames, or the system may be CPU starved and
-        therefore dropping frames.
+        therefore dropping frames. The {{MediaTrackStats}} dictionary contains
+        information about how many frames was captured by the source.
       </p>
     </div>
     <div>
       <p>
-        Frame counters are available via the {{MediaStreamTrack/getStats}} method.
+        Frame counters are available via the {{MediaStreamTrack/getStats()}} method.
       </p>
       <pre class="idl"
 >partial interface MediaStreamTrack {
@@ -494,7 +496,6 @@ partial interface MediaStreamTrack {
       <pre class="idl"
 >dictionary MediaTrackStats {
     unsigned long long framesCaptured;
-    unsigned long long framesEmitted;
 };</pre>
     </div>
     <section>
@@ -507,43 +508,9 @@ partial interface MediaStreamTrack {
         <dd>
           <p>
             Only defined for video tracks. This is the sum of frames that was
-            [= emitted =] and frames that was [= dropped prior to emission =].
-          </p>
-          <p>
-            The number of frames that was [= dropped prior to emission =] can be
-            calculated by subtracting {{framesEmitted}} from {{framesCaptured}}.
-          </p>
-          <div class="note">
-            If the track is sourced from a camera, delta framesCaptured divided
-            by delta time correspond to the frame rate that the camera is
-            producing on average. This may be higher than the frameRate
-            settings when the settings are causing frame decimation, or lower
-            than the frameRate settings if the camera is producing less frames
-            due to lighting conditions.
-          </div>
-        </dd>
-        <dt>
-          <dfn>framesEmitted</dfn> of type {{unsigned long long}}
-        </dt>
-        <dd>
-          <p>
-            Only defined for video tracks. This is the total number of frames
-            that was [= emitted =] by this track.
-          </p>
-          <p>
-            A frame can either be [= emitted =] or [= dropped prior to
-            emission =]. A frame is <dfn>emitted</dfn> when it is delivered to a
-            sink or [= dropped prior to emission =] if it is dropped prior to
-            that. Note that an [= emitted =] frame can still be dropped later in
-            the pipeline such as if the sink is an <code>HTMLMediaElement</code>
-            and the frame is not rendered on time, but frame drops after
-            emission is out of scope of {{MediaTrackStats}}.
-          </p>
-          <p>
-            A frame could get <dfn>dropped prior to emission</dfn> for different
-            reasons, including frame decimation due to frameRate constraints,
-            track muted state, performance reasons or because the track does not
-            have any sinks.
+            captured by the source. If the source is external from the user
+            agent, such as a capture device, this is the number of frames that
+            have been passed to the user agent.
           </p>
         </dd>
       </dl>
