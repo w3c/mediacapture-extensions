@@ -426,17 +426,17 @@ partial interface MediaStreamTrack {
         different from the expected one - for instance, the camera may be
         slowing down frame production because it's dark, the settings applied
         may produce decimation of frames, or the system may be CPU starved and
-        therefore dropping frames. The {{MediaTrackStats}} dictionary contains
-        information about how many frames was captured by the source.
+        therefore dropping frames.
       </p>
     </div>
     <div>
       <p>
-        Frame counters are available via the {{MediaStreamTrack/getStats()}} method.
+        The number of non-decimated captured frames can be obtained via the
+        {{MediaStreamTrack/framesCaptured()}} method.
       </p>
       <pre class="idl"
 >partial interface MediaStreamTrack {
-    Promise&lt;MediaTrackStats&gt; getStats();
+    Promise&lt;unsigned long long&gt; framesCaptured();
 };</pre>
     </div>
     <section>
@@ -444,7 +444,7 @@ partial interface MediaStreamTrack {
       <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
       class="methods">
         <dt>
-          <dfn>getStats</dfn>
+          <dfn>framesCaptured</dfn>
         </dt>
         <dd>
           <p>
@@ -463,8 +463,8 @@ partial interface MediaStreamTrack {
             </li>
             <li>
               <p>
-                In parallel, begin the [= in-parallel steps to get track
-                stats =], given <var>track</var> and <var>p</var>.
+                In parallel, begin the [= in-parallel steps to get
+                framesCaptured =], given <var>track</var> and <var>p</var>.
               </p>
             </li>
             <li>
@@ -472,45 +472,25 @@ partial interface MediaStreamTrack {
             </li>
           </ol>
           <p>
-            The <dfn>in-parallel steps to get track stats</dfn> given
+            The <dfn>in-parallel steps to get framesCaptured</dfn> given
             <var>track</var> and <var>p</var> are as follows:
           </p>
           <ol>
             <li>
               <p>
-                Let <var>stats</var> be a snapshot of the current frame
-                counters of <var>track</var>, as defined in {{MediaTrackStats}}.
+                Let <var>framesCaptured</var> be a snapshot of the number of
+                non-decimated captured frames, this includes frames that were
+                dropped by the user agent for any reason other than decimation
+                in order to achieve the configured frame rate settings.
               </p>
             </li>
             <li>
               <p>
-                Queue a task to resolve <var>p</var> with <var>stats</var>.
+                Queue a task to resolve <var>p</var> with
+                <var>framesCaptured</var>.
               </p>
             </li>
           </ol>
-        </dd>
-      </dl>
-    </section>
-    <div>
-      <pre class="idl"
->dictionary MediaTrackStats {
-    unsigned long long framesCaptured;
-};</pre>
-    </div>
-    <section>
-      <h4>Attributes</h4>
-      <dl data-link-for="MediaTrackStats" data-dfn-for="MediaTrackStats"
-      class="dictionary-members">
-        <dt>
-          <dfn>framesCaptured</dfn> of type {{unsigned long long}}
-        </dt>
-        <dd>
-          <p>
-            Only defined for video tracks. This is the sum of frames that was
-            captured by the source. If the source is external from the user
-            agent, such as a capture device, this is the number of frames that
-            have been passed to the user agent.
-          </p>
         </dd>
       </dl>
     </section>
