@@ -501,6 +501,8 @@ partial interface MediaStreamTrack {
                 Let <var>timestamp</var> be the current time relative to the
                 UNIX epoch (Jan 1, 1970, UTC).
               </p>
+            </li>
+            <li>
               <p>
                 Let <var>framesCaptured</var> be the result of atomically
                 reading <var>track</var>.`[[FramesCaptured]]`.
@@ -508,9 +510,11 @@ partial interface MediaStreamTrack {
             </li>
             <li>
               <p>
-                Queue a task to resolve <var>p</var> with
-                {{MediaStreamTrackStats/timestamp}} set to <var>timestamp</var>
-                and {{MediaStreamTrackStats/framesCaptured}} set to
+                Queue a task to resolve <var>p</var> with a newly constructed
+                {{MediaStreamTrackStats}} dictionary where
+                {{MediaStreamTrackStats/timestamp}} is set to
+                <var>timestamp</var> and
+                {{MediaStreamTrackStats/framesCaptured}} set to
                 <var>framesCaptured</var>.
               </p>
             </li>
