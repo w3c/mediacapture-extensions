@@ -56,7 +56,8 @@
       {{ConstrainBoolean}} from [[!mediacapture-streams]].
       <p>The terms [=permission state=], [=request permission to use=], and
       <a data-cite="permissions">prompt the user to choose</a> are defined in
-      [[!permissions]].</p>    </p>
+      [[!permissions]].</p>
+    </p>
   </section>
   <section id="conformance">
   </section>
@@ -430,21 +431,42 @@ partial interface MediaStreamTrack {
       </p>
     </div>
     <div>
-      <p>
-        The number of non-decimated captured frames can be obtained via the
-        {{MediaStreamTrack/framesCaptured()}} method.
-      </p>
       <pre class="idl"
 >partial interface MediaStreamTrack {
-    Promise&lt;unsigned long long&gt; framesCaptured();
-};</pre>
+  Promise&lt;MediaStreamTrackStats&gt; getStats();
+};
+</pre>
+    </div>
+    <div>
+      <p>At creation of a {{MediaStreamTrack}} object, <var>track</var>, run the
+      following steps:</p>
+      <ol>
+        <li>
+          <p>Initialize <var>track</var>.`[[FramesCaptured]]` to 0.</p>
+        </li>
+      </ol>
+    </div>
+    <div>
+      <p>Monitor frames that arrive to <var>track</var> from its source by
+      running the following in-parallel steps for every <var>frame</var>:</p>
+      <ol>
+        <li>
+          <p>If <var>frame</var> is to be discarded by <var>track</var> in
+          order to achive the frame rate decimation of <var>track</var>'s
+          settings, abort these steps.</p>
+        </li>
+        <li>
+          <p>Atomically increment <var>track</var>.`[[FramesCaptured]]` by
+          1.</p>
+        </li>
+      </ol>
     </div>
     <section>
       <h4>Methods</h4>
       <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
       class="methods">
         <dt>
-          <dfn>framesCaptured</dfn>
+          <dfn>getStats</dfn>
         </dt>
         <dd>
           <p>
@@ -463,8 +485,8 @@ partial interface MediaStreamTrack {
             </li>
             <li>
               <p>
-                In parallel, begin the [= in-parallel steps to get
-                framesCaptured =], given <var>track</var> and <var>p</var>.
+                In parallel, begin the [= in-parallel steps to get track
+                stats =], given <var>track</var> and <var>p</var>.
               </p>
             </li>
             <li>
@@ -472,27 +494,67 @@ partial interface MediaStreamTrack {
             </li>
           </ol>
           <p>
-            The <dfn>in-parallel steps to get framesCaptured</dfn> given
+            The <dfn>in-parallel steps to get track stats</dfn> given
             <var>track</var> and <var>p</var> are as follows:
           </p>
           <ol>
             <li>
               <p>
-                Let <var>framesCaptured</var> be a snapshot of the number of
-                non-decimated captured frames, this includes frames that were
-                dropped by the user agent for any reason other than decimation
-                in order to achieve the configured frame rate settings.
+                Let <var>timestamp</var> be the current time relative to the
+                UNIX epoch (Jan 1, 1970, UTC).
+              </p>
+              <p>
+                Let <var>framesCaptured</var> be the result of atomically
+                reading <var>track</var>.`[[FramesCaptured]]`.
               </p>
             </li>
             <li>
               <p>
                 Queue a task to resolve <var>p</var> with
+                {{MediaStreamTrackStats/timestamp}} set to <var>timestamp</var>
+                and {{MediaStreamTrackStats/framesCaptured}} set to
                 <var>framesCaptured</var>.
               </p>
             </li>
           </ol>
         </dd>
       </dl>
+    </section>
+    <section>
+      <h4>The MediaStreamTrackStats dictionary</h4>
+      <div>
+        <pre class="idl" data-cite="HR-TIME"
+>dictionary MediaStreamTrackStats {
+  DOMHighResTimeStamp timestamp;
+  unsigned long long framesCaptured;
+};
+</pre>
+        <section>
+          <h4>Dictionary {{MediaStreamTrackStats}} Members</h4>
+          <dl data-link-for="MediaStreamTrackStats"
+          data-dfn-for="MediaStreamTrackStats" class="dictionary-members">
+            <dt>
+              <dfn data-idl="">timestamp</dfn> of type <span class=
+              "idlMemberType">DOMHighResTimeStamp</span>
+            </dt>
+            <dd>
+              <p>
+                The {{timestamp}}, relative to the UNIX epoch (Jan 1, 1970, UTC),
+                for when these stats where collected.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">framesCaptured</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The total number of non-decimated captured frames of the track.
+              </p>
+            </dd>
+          </dl>
+        </section>
+      </div>
     </section>
   </section>
   <section id="the powerEfficientPixelFormat constraint">
