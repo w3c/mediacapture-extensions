@@ -422,10 +422,12 @@ partial interface MediaStreamTrack {
     <h3>MediaStreamTrack frame counters</h3>
     <div>
       <p>
-        Frame counters allow you to tell what the capture frame rate is, which
-        may be different from what is expected from settings - for instance, the
-        camera may be slowing down frame production because it's dark or the
-        system may be CPU starved and therefore dropping frames.
+        On any track that support {{MediaTrackSettings/frameRate}} as a setting,
+        frame counters allow the application to tell what their frame rate is,
+        which may be lower than the target {{MediaTrackSettings/frameRate}} -
+        for instance, if the track is sourced from a camera the production of
+        frames could be slowed down if it's dark, or frames could be dropped if
+        the system is CPU starved.
       </p>
     </div>
     <div>
@@ -440,24 +442,16 @@ partial interface MediaStreamTrack {
       following steps:</p>
       <ol>
         <li>
-          <p>Initialize <var>track</var>.`[[FramesCaptured]]` to 0.</p>
-        </li>
-      </ol>
-    </div>
-    <div>
-      <p>Monitor frames that arrive to <var>track</var> from its source by
-      running the following in-parallel steps for every <var>frame</var>:</p>
-      <ol>
-        <li>
-          <p>If <var>frame</var> is to be discarded by <var>track</var> in
-          order to achive the frame rate decimation of <var>track</var>'s
-          settings, abort these steps.</p>
+          <p>If <var>track</var> does not support
+          {{MediaTrackSettings/frameRate}} as a setting, abort these steps.</p>
         </li>
         <li>
-          <p>Atomically increment <var>track</var>.`[[FramesCaptured]]` by
-          1.</p>
+          <p>Initialize <var>track</var>.`[[TotalFrames]]` to 0.</p>
         </li>
       </ol>
+      <p>The user agent is required to increment
+      <var>track</var>.`[[TotalFrames]]` once for every frame that is delivered
+      to a sink, or would be delivered to a sink if a sink was connected.</p>
     </div>
     <section>
       <h4>Methods</h4>
@@ -479,44 +473,40 @@ partial interface MediaStreamTrack {
               </p>
             </li>
             <li>
+              <p>If <var>track</var> does not support
+              {{MediaTrackSettings/frameRate}} as a setting, reject this method
+              with {{NotSupportedError}} and abort these steps.</p>
+            </li>
+            <li>
               <p>Let <var>p</var> be a new promise.</p>
             </li>
             <li>
               <p>
-                In parallel, begin the [= in-parallel steps to get track
-                stats =], given <var>track</var> and <var>p</var>.
+                Begin running the following steps in parallel and return
+                <var>p</var>:
               </p>
-            </li>
-            <li>
-              <p>Return <var>p</var>.</p>
-            </li>
-          </ol>
-          <p>
-            The <dfn>in-parallel steps to get track stats</dfn> given
-            <var>track</var> and <var>p</var> are as follows:
-          </p>
-          <ol>
-            <li>
-              <p>
-                Let <var>timestamp</var> be the current time relative to the
-                UNIX epoch (Jan 1, 1970, UTC).
-              </p>
-            </li>
-            <li>
-              <p>
-                Let <var>framesCaptured</var> be the result of atomically
-                reading <var>track</var>.`[[FramesCaptured]]`.
-              </p>
-            </li>
-            <li>
-              <p>
-                Queue a task to resolve <var>p</var> with a newly constructed
-                {{MediaStreamTrackStats}} dictionary where
-                {{MediaStreamTrackStats/timestamp}} is set to
-                <var>timestamp</var> and
-                {{MediaStreamTrackStats/framesCaptured}} set to
-                <var>framesCaptured</var>.
-              </p>
+              <li>
+                <p>
+                  Let <var>timestamp</var> be <code>Performance.timeOrigin +
+                  Performance.now()</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Let <var>totalFrames</var> be the value of
+                  <var>track</var>.`[[TotalFrames]]`.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Queue a task to resolve <var>p</var> with a newly constructed
+                  {{MediaStreamTrackStats}} dictionary where
+                  {{MediaStreamTrackStats/timestamp}} is set to
+                  <var>timestamp</var> and
+                  {{MediaStreamTrackStats/totalFrames}} set to
+                  <var>totalFrames</var>.
+                </p>
+              </li>
             </li>
           </ol>
         </dd>
@@ -528,7 +518,7 @@ partial interface MediaStreamTrack {
         <pre class="idl" data-cite="HR-TIME"
 >dictionary MediaStreamTrackStats {
   DOMHighResTimeStamp timestamp;
-  unsigned long long framesCaptured;
+  unsigned long long totalFrames;
 };
 </pre>
         <section>
@@ -541,17 +531,17 @@ partial interface MediaStreamTrack {
             </dt>
             <dd>
               <p>
-                The {{timestamp}}, relative to the UNIX epoch (Jan 1, 1970, UTC),
-                for when these stats where collected.
+                The {{timestamp}}, relative to the UNIX epoch (Jan 1, 1970,
+                UTC), for when these stats where collected.
               </p>
             </dd>
             <dt>
-              <dfn data-idl="">framesCaptured</dfn> of type <span class=
+              <dfn data-idl="">totalFrames</dfn> of type <span class=
               "idlMemberType">unsigned long long</span>
             </dt>
             <dd>
               <p>
-                The total number of non-decimated captured frames of the track.
+                The total number of deliverable frames.
               </p>
             </dd>
           </dl>
