@@ -419,46 +419,53 @@ partial interface MediaStreamTrack {
       <p>The underlying source is supposed to be kept alive between the transfer and transfer-receiving steps, or as long as the data holder is alive.
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
-    <h3>MediaStreamTrack frame counters</h3>
+    <h3>MediaStreamTrack frame stats</h3>
     <div>
       <p>
-        On any track that support {{MediaTrackSettings/frameRate}} as a setting,
-        frame counters allow the application to tell what their frame rate is,
-        which may be lower than the target {{MediaTrackSettings/frameRate}} -
-        for instance, if the track is sourced from a camera the production of
-        frames could be slowed down if it's dark, or frames could be dropped if
-        the system is CPU starved.
+        On any track that supports {{MediaTrackSettings/frameRate}} as a
+        setting, frame counters allow the application to tell what their frame
+        rate is, which may be lower than the target
+        {{MediaTrackSettings/frameRate}}. For example, if the track is sourced
+        from a camera then the production of frames could be slowed down if it's
+        dark or frames could be dropped if the system is CPU starved.
       </p>
     </div>
     <div>
       <pre class="idl"
 >partial interface MediaStreamTrack {
-  Promise&lt;MediaStreamTrackStats&gt; getStats();
+  Promise&lt;MediaTrackFrameStats&gt; getFrameStats();
 };
 </pre>
     </div>
     <div>
-      <p>At creation of a {{MediaStreamTrack}} object, <var>track</var>, run the
-      following steps:</p>
-      <ol>
+      <p>If a {{MediaStreamTrack}} supports {{MediaTrackSettings/frameRate}} as
+      a setting, the user agent is required to categorize each frame originating
+      from its source into one of the following categories:</p>
+      <ul>
         <li>
-          <p>If <var>track</var> does not support
-          {{MediaTrackSettings/frameRate}} as a setting, abort these steps.</p>
+          <p>A frame is considered
+          <dfn data-lt="delivered frames">delivered</dfn> if it either was
+          delivered to a sink or would have been delivered to a sink, if one was
+          connected.</p>
         </li>
         <li>
-          <p>Initialize <var>track</var>.`[[TotalFrames]]` to 0.</p>
+          <p>A frame is considered
+          <dfn data-lt="decimated frames">decimated</dfn> if it was discarded in
+          order to achieve the target {{MediaTrackSettings/frameRate}}.</p>
         </li>
-      </ol>
-      <p>The user agent is required to increment
-      <var>track</var>.`[[TotalFrames]]` once for every frame that is delivered
-      to a sink, or would be delivered to a sink if a sink was connected.</p>
+        <li>
+          <p>A frame is considered
+          <dfn data-lt="dropped frames">dropped</dfn> if the frame was dropped
+          for any other reason, such as if the system is under heavy load.</p>
+        </li>
+      </ul>
     </div>
     <section>
       <h4>Methods</h4>
       <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
       class="methods">
         <dt>
-          <dfn>getStats</dfn>
+          <dfn>getFrameStats</dfn>
         </dt>
         <dd>
           <p>
@@ -478,53 +485,44 @@ partial interface MediaStreamTrack {
               with {{NotSupportedError}} and abort these steps.</p>
             </li>
             <li>
-              <p>Let <var>p</var> be a new promise.</p>
+              <p>Let <var>p</var> be a new promise. Begin running the following
+              steps in parallel and return <var>p</var>:</p>
             </li>
-            <li>
-              <p>
-                Begin running the following steps in parallel and return
-                <var>p</var>:
-              </p>
+            <ol>
               <li>
-                <p>
-                  Let <var>timestamp</var> be <code>Performance.timeOrigin +
-                  Performance.now()</code>.
-                </p>
+                <p>Queue a task to resolve <var>p</var> with a newly constructed
+                {{MediaTrackFrameStats}} dictionary where
+                {{MediaTrackFrameStats/timestamp}} is set to
+                <code>Performance.timeOrigin + Performance.now()</code> and the
+                frame counters are set according to the total number of frames
+                that have been categorized in each category:
+                {{MediaTrackFrameStats/framesDelivered}} is set the total number
+                of [= delivered frames =],
+                {{MediaTrackFrameStats/framesDecimated}} is set to the total
+                number of [= decimated frames =] and
+                {{MediaTrackFrameStats/framesDropped}} is set to the total
+                number of [= dropped frames =].</p>
               </li>
-              <li>
-                <p>
-                  Let <var>totalFrames</var> be the value of
-                  <var>track</var>.`[[TotalFrames]]`.
-                </p>
-              </li>
-              <li>
-                <p>
-                  Queue a task to resolve <var>p</var> with a newly constructed
-                  {{MediaStreamTrackStats}} dictionary where
-                  {{MediaStreamTrackStats/timestamp}} is set to
-                  <var>timestamp</var> and
-                  {{MediaStreamTrackStats/totalFrames}} set to
-                  <var>totalFrames</var>.
-                </p>
-              </li>
-            </li>
+            </ol>
           </ol>
         </dd>
       </dl>
     </section>
     <section>
-      <h4>The MediaStreamTrackStats dictionary</h4>
+      <h4>The MediaTrackFrameStats dictionary</h4>
       <div>
         <pre class="idl" data-cite="HR-TIME"
->dictionary MediaStreamTrackStats {
+>dictionary MediaTrackFrameStats {
   DOMHighResTimeStamp timestamp;
-  unsigned long long totalFrames;
+  unsigned long long framesDelivered;
+  unsigned long long framesDecimated;
+  unsigned long long framesDropped;
 };
 </pre>
         <section>
-          <h4>Dictionary {{MediaStreamTrackStats}} Members</h4>
-          <dl data-link-for="MediaStreamTrackStats"
-          data-dfn-for="MediaStreamTrackStats" class="dictionary-members">
+          <h4>Dictionary {{MediaTrackFrameStats}} Members</h4>
+          <dl data-link-for="MediaTrackFrameStats"
+          data-dfn-for="MediaTrackFrameStats" class="dictionary-members">
             <dt>
               <dfn data-idl="">timestamp</dfn> of type <span class=
               "idlMemberType">DOMHighResTimeStamp</span>
@@ -536,12 +534,30 @@ partial interface MediaStreamTrack {
               </p>
             </dd>
             <dt>
-              <dfn data-idl="">totalFrames</dfn> of type <span class=
+              <dfn data-idl="">framesDelivered</dfn> of type <span class=
               "idlMemberType">unsigned long long</span>
             </dt>
             <dd>
               <p>
-                The total number of deliverable frames.
+                The total number of [= delivered frames =].
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">framesDecimated</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The total number of [= decimated frames =].
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">framesDropped</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The total number of [= dropped frames =].
               </p>
             </dd>
           </dl>
