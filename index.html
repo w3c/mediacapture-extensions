@@ -461,20 +461,17 @@ partial interface MediaStreamTrack {
         <li>
           <p>The <dfn data-lt="total frames">total</dfn> number of frames that
           have been processed by this source, meaning it is known whether the
-          frame was considered delivered or discarded. An estimate of the number
-          of failed-to-deliver frames can be obtained by subtracting
+          frame was considered delivered, discarded or dropped for any other
+          reason. The number of dropped frames can be calculated by subtracting
           [= delivered frames =] and [= discarded frames =] from
           [= total frames =].</p>
           <div class="note">
-            <p>If the source is a camera, the total frames is the user agent's
-            estimate of the total number of frames produced by the camera.</p>
-            <p>Under normal circumstances, the total number of frames is equal
-            to the sum of delivered and discarded frames, but it is possible for
-            frames to be lost in special cases such as if the system is CPU
-            starved. The user agent should do a best effort to increment total
-            frames in the event of lost frames.</p>
+            <p>If the source is unmuted and enabled and the source is backed by
+            a camera, total frames is incremented by frames produced by the
+            camera. If the source is muted or disabled and the track is
+            producing zero content frames (e.g. black frames), total frames is
+            incremented for each such frame.</p>
           </div>
-          <p>If the source is muted, [= total frames =] does not increment.</p>
         </li>
       </ul>
     </div>
