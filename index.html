@@ -621,7 +621,7 @@ partial dictionary MediaTrackCapabilities {
     <h2>Exposing change of MediaStreamTrack configuration</h2>
     <div>
       <p>The configuration (capabilities, constraints or settings) of a {{MediaStreamTrack}} may be changed dynamically
-        outside the control of web applications. One example is when a user decides to switch on background blur through
+        outside the control of web applications. This can happen when a user decides to toggle background blur through
         the operating system. Web applications might want to know that the configuration
         of a particular {{MediaStreamTrack}} has changed. For that purpose, a new event is defined below.
      </p>
@@ -631,7 +631,7 @@ partial interface MediaStreamTrack {
 };</pre>
     <p>
       <p>When the [=User Agent=] detects <dfn data-export id="change-track-configuration">a change of configuration</dfn>
-       in a <var>track</var>'s underlying source, the [=User Agent=] MUST run the following steps:</p>
+       for background blur in a <var>track</var>'s underlying source, the [=User Agent=] MUST run the following steps:</p>
       <ol>
         <li><p>If <var>track</var>.{{MediaStreamTrack/muted}} is <code>true</code>, wait for <var>track</var>.{{MediaStreamTrack/muted}}
           to become <code>false</code> or <var>track</var>.{{MediaStreamTrack/readyState}} to be "ended".</p></li>
