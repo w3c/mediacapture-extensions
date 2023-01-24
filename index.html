@@ -468,9 +468,8 @@ partial interface MediaStreamTrack {
           <div class="note">
             <p>If the source is unmuted and enabled and the source is backed by
             a camera, total frames is incremented by frames produced by the
-            camera. If the source is muted or disabled and the track is
-            producing zero content frames (e.g. black frames), total frames is
-            incremented for each such frame.</p>
+            camera. If no frames are flowing, such as if the track is muted or
+            disabled, then total frames does not increment.</p>
           </div>
         </li>
       </ul>
