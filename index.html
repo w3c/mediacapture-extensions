@@ -422,14 +422,13 @@ partial interface MediaStreamTrack {
     <h3>MediaStreamTrack frame stats</h3>
     <div>
       <p>
-        On any track that supports {{MediaTrackSettings/frameRate}} as a
-        setting, frame counters allow the application to tell what the frame
-        rate is, which may be lower than the target
+        On camera and screenshare tracks, frame counters allow the application
+        to tell what the frame rate is, which may be lower than the target
         {{MediaTrackSettings/frameRate}}. For example, if the track is sourced
         from a camera then the production of frames could be slowed down if it's
         dark or frames could be dropped if the system is CPU starved. This could
-        impact the total number of frames handled by the source and impact how
-        many frames are delivered, discarded or lost.
+        impact the total number of frames produced by the source and impact how
+        many frames are delivered, discarded or dropped for other reasons.
       </p>
     </div>
     <div>
@@ -440,9 +439,9 @@ partial interface MediaStreamTrack {
 </pre>
     </div>
     <div>
-      <p>If a {{MediaStreamTrack}} supports {{MediaTrackSettings/frameRate}} as
-      a setting, the user agent is required to count each frame from its
-      source as follows:</p>
+      <p>If a {{MediaStreamTrack}} is sourced from <code>getUserMedia()</code>
+      or <code>getDisplayMedia()</code>, the user agent is required to count
+      each frame from its source as follows:</p>
       <ul>
         <li>
           <p>A frame is considered
@@ -462,9 +461,9 @@ partial interface MediaStreamTrack {
           <p>The <dfn data-lt="total frames">total</dfn> number of frames that
           have been processed by this source, meaning it is known whether the
           frame was considered delivered, discarded or dropped for any other
-          reason. The number of dropped frames can be calculated by subtracting
-          [= delivered frames =] and [= discarded frames =] from
-          [= total frames =].</p>
+          reason. The number of dropped frames for various unknown reasons can
+          be calculated by subtracting [= delivered frames =] and
+          [= discarded frames =] from [= total frames =].</p>
           <div class="note">
             <p>If the track is unmuted and enabled and the source is backed by
             a camera, total frames is incremented by frames produced by the
@@ -494,9 +493,10 @@ partial interface MediaStreamTrack {
               </p>
             </li>
             <li>
-              <p>If <var>track</var> does not support
-              {{MediaTrackSettings/frameRate}} as a setting, reject this method
-              with {{NotSupportedError}} and abort these steps.</p>
+              <p>If <var>track</var> is not sourced from
+              <code>getUserMedia()</code> or <code>getDisplayMedia()</code>,
+              reject this method with {{NotSupportedError}} and abort these
+              steps.</p>
             </li>
             <li>
               <p>Let <var>p</var> be a new promise. Begin running the following
