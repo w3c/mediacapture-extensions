@@ -346,7 +346,8 @@ function setCameraTrack(track) {
     </section>
   </section>
   <section>
-    <h2>Transferable MediaStreamTrack</h2>
+    <h2>MediaStreamTrack extensions</h2>
+    <h3>Transferable MediaStreamTrack</h3>
     <div>
       <p>A {{MediaStreamTrack}} is a <a data-cite="!HTML/#transferable-objects">transferable object</a>.
       This allows manipulating real-time media outside the context it was requested or created in,
@@ -374,7 +375,7 @@ function setCameraTrack(track) {
       </p>
     </div>
     <div>
-      <p>The WebIDL changes are the following:
+      <p>The WebIDL changes to make the track transferable are the following:
       <pre class="idl"
 >[Exposed=(Window,Worker), Transferable]
 partial interface MediaStreamTrack {
@@ -418,6 +419,163 @@ partial interface MediaStreamTrack {
       <p>The underlying source is supposed to be kept alive between the transfer and transfer-receiving steps, or as long as the data holder is alive.
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
+    <h3>MediaStreamTrack frame stats</h3>
+    <div>
+      <p>
+        On camera and screenshare tracks, frame counters allow the application
+        to tell what the frame rate is, which may be lower than the target
+        {{MediaTrackSettings/frameRate}}. For example, if the track is sourced
+        from a camera then the production of frames could be slowed down if it's
+        dark or frames could be dropped if the system is CPU starved. This could
+        impact the total number of frames produced by the source and impact how
+        many frames are delivered, discarded or dropped for other reasons.
+      </p>
+    </div>
+    <div>
+      <pre class="idl"
+>partial interface MediaStreamTrack {
+  Promise&lt;MediaTrackFrameStats&gt; getFrameStats();
+};
+</pre>
+    </div>
+    <div>
+      <p>If a {{MediaStreamTrack}} is sourced from <code>getUserMedia()</code>
+      or <code>getDisplayMedia()</code>, the user agent is required to count
+      each frame from its source as follows:</p>
+      <ul>
+        <li>
+          <p>A frame is considered
+          <dfn data-lt="delivered frames">delivered</dfn> if it either was
+          delivered to a sink or would have been delivered to a sink, if one was
+          connected. This is a subset of [= total frames =] and it is
+          incremented at the same time as [= total frames =].</p>
+        </li>
+        <li>
+          <p>A frame is considered
+          <dfn data-lt="discarded frames">discarded</dfn> if it was discarded in
+          order to achieve the target {{MediaTrackSettings/frameRate}}.
+          This is a subset of [= total frames =] and it is incremented at the
+          same time as [= total frames =].</p>
+        </li>
+        <li>
+          <p>The <dfn data-lt="total frames">total</dfn> number of frames that
+          have been processed by this source, meaning it is known whether the
+          frame was considered delivered, discarded or dropped for any other
+          reason. The number of dropped frames for various unknown reasons can
+          be calculated by subtracting [= delivered frames =] and
+          [= discarded frames =] from [= total frames =].</p>
+          <div class="note">
+            <p>If the track is unmuted and enabled and the source is backed by
+            a camera, total frames is incremented by frames produced by the
+            camera. If no frames are flowing, such as if the track is muted or
+            disabled, then total frames does not increment.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <section>
+      <h4>Methods</h4>
+      <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
+      class="methods">
+        <dt>
+          <dfn>getFrameStats</dfn>
+        </dt>
+        <dd>
+          <p>
+            When this method is called, the user agenst MUST run the following
+            steps:
+          </p>
+          <ol>
+            <li>
+              <p>
+                Let <var>track</var> be the {{MediaStreamTrack}} that this
+                method was called on.
+              </p>
+            </li>
+            <li>
+              <p>If <var>track</var> is not sourced from
+              <code>getUserMedia()</code> or <code>getDisplayMedia()</code>,
+              reject this method with {{NotSupportedError}} and abort these
+              steps.</p>
+            </li>
+            <li>
+              <p>Let <var>p</var> be a new promise. Begin running the following
+              steps in parallel and return <var>p</var>:</p>
+            </li>
+            <ol>
+              <li>
+                <p>Queue a task to resolve <var>p</var> with a newly constructed
+                {{MediaTrackFrameStats}} dictionary where
+                {{MediaTrackFrameStats/timestamp}} is set to
+                <code>Performance.timeOrigin + Performance.now()</code>,
+                {{MediaTrackFrameStats/deliveredFrames}} is set the total number
+                of [= delivered frames =],
+                {{MediaTrackFrameStats/discardedFrames}} is set to the total
+                number of [= discarded frames =] and
+                {{MediaTrackFrameStats/totalFrames}} is set to the
+                [= total frames =] count.</p>
+              </li>
+            </ol>
+          </ol>
+        </dd>
+      </dl>
+    </section>
+    <section>
+      <h4>The MediaTrackFrameStats dictionary</h4>
+      <div>
+        <pre class="idl" data-cite="HR-TIME"
+>dictionary MediaTrackFrameStats {
+  DOMHighResTimeStamp timestamp;
+  unsigned long long deliveredFrames;
+  unsigned long long discardedFrames;
+  unsigned long long totalFrames;
+};
+</pre>
+        <section>
+          <h4>Dictionary {{MediaTrackFrameStats}} Members</h4>
+          <dl data-link-for="MediaTrackFrameStats"
+          data-dfn-for="MediaTrackFrameStats" class="dictionary-members">
+            <dt>
+              <dfn data-idl="">timestamp</dfn> of type <span class=
+              "idlMemberType">DOMHighResTimeStamp</span>
+            </dt>
+            <dd>
+              <p>
+                The {{timestamp}}, relative to the UNIX epoch (Jan 1, 1970,
+                UTC), for when these stats where collected.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">deliveredFrames</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The total number of [= delivered frames =].
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">discardedFrames</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The total number of [= discarded frames =].
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">totalFrames</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The [= total frames =] count.
+              </p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
   </section>
   <section id="the powerEfficientPixelFormat constraint">
     <h2>The powerEfficientPixelFormat constraint</h2>
