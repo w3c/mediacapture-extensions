@@ -637,18 +637,22 @@ partial interface MediaStreamTrack {
     </p>
     <p>
       <p>When the [=User Agent=] detects <dfn data-export id="change-track-configuration">a change of configuration</dfn>
-       in a <var>track</var>'s underlying source, the [=User Agent=] MUST run the following steps:</p>
+       in a <var>track</var>'s underlying <var>source</var>, the [=User Agent=] MUST run the following steps:</p>
       <ol>
         <li><p>If <var>track</var>.{{MediaStreamTrack/muted}} is <code>true</code>, wait for <var>track</var>.{{MediaStreamTrack/muted}}
           to become <code>false</code> or <var>track</var>.{{MediaStreamTrack/readyState}} to be "ended".</p></li>
         <li><p>If <var>track</var>.{{MediaStreamTrack/readyState}} is "ended", abort these steps.</p></li>
-        <li><p>If <var>track</var>'s capabilities, constraints and settings are matching <var>source</var> configuration, abort these steps.</li>
         <li>
-          <!-- FIXME: Export capabilities, constraints and settings so that we can use them here. -->
-          <p>Update <var>track</var>'s capabilities, constraints and settings according <var>track</var>'s underlying source.</p>
+          <!-- FIXME: Export capabilities and settings so that we can use them here. -->
+          <p>Update <var>track</var>'s capabilities and settings according <var>track</var>'s underlying source.</p>
         </li>
-        <li><p>Let <var>changes</var> be an empty [=sequence=].</p></li>
-        <li><p>For each change in <var>track</var>'s capabilities and settings, add its name to <var>changes</var>.</p></li>
+        <li><p>Let <var>changes</var> be an empty [=set=].</p></li>
+        <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>source</var>'s settings, if <var>track</var>'s settings does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
+        <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>track</var>'s settings, if <var>source</var>'s settings does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
+        <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>source</var>'s capabilities, if <var>track</var>'s capabilities does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
+        <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>track</var>'s capabilities, if <var>source</var>'s capabilities does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
+        <li><p>If <var>changes</var> [=list/is empty=], abort these steps.</p></li>
+        <li><p>[=list/Sort=] <var>changes</var> in lexicographical order.</p></li>
         <li>     
           <p>[=Fire an event=] named {{MediaStreamTrack/configurationchange}}
           at <var>track</var> using {{ConfigurationChangeEvent}}, with its 
@@ -690,6 +694,9 @@ const [track] = stream.getVideoTracks();
 track.addEventListener("configurationchange", (event) => {
   if (event.changes.includes("backgroundBlur")) {
     // Background blur configuration has changed.
+    if (track.getSettings().backgroundBlur) {
+      // Turn off web app own blurring so that video doesn't get double-blurred.
+    }
   }
 });</pre>
     </div>
