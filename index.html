@@ -654,7 +654,7 @@ partial interface MediaStreamTrack {
         <li><p>If <var>changes</var> [=list/is empty=], abort these steps.</p></li>
         <li><p>[=list/Sort=] <var>changes</var> in lexicographical order.</p></li>
         <li>     
-          <p>[=Fire an event=] named {{MediaStreamTrack/configurationchange}}
+          <p>[=Fire an event=] named {{MediaStreamTrack/configurationchange}} using {{ConfigurationChangeEvent}}.
           at <var>track</var> using {{ConfigurationChangeEvent}}, with its 
           {{ConfigurationChangeEvent.changes}} attribute initialized to
           <var>changes</var>.</p>
