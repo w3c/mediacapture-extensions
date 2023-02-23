@@ -795,6 +795,12 @@ partial interface MediaStreamTrack {
           to become <code>false</code> or <var>track</var>.{{MediaStreamTrack/readyState}} to be "ended".</p></li>
         <li><p>[=Queue a task=] on [=current settings object=]'s [=environment settings object/responsible event loop=] 
           to perform the following steps:</p>
+          <p>
+            <div class="note">
+              <p>This task will run before any other task that may set <var>track</var>.{{MediaStreamTrack/muted}}
+                to <code>true</code>.</p>
+            </div>
+          </p>
           <ol>
             <li><p>If <var>track</var>.{{MediaStreamTrack/readyState}} is "ended", abort these steps.</p></li>
             <li><p>If <var>track</var>'s capabilities, constraints and settings are matching <var>source</var> configuration, abort these steps.
