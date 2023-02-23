@@ -799,8 +799,8 @@ partial interface MediaStreamTrack {
           <!-- FIXME: Export capabilities, constraints and settings so that we can use them here. -->
           <p>Update <var>track</var>'s capabilities, constraints and settings according <var>track</var>'s underlying source.</p>
         </li>
-        <li>
-          <p>[=Fire an event=] named <var>configurationchange</var> on <var>track</var>.</p>
+        <li><p>[=Queue a task=] on [=current settings object=]'s [=environment settings object/responsible event loop=] to
+          [=fire an event=] named <var>configurationchange</var> on <var>track</var>.</p>
         </li>
       </ol>
     </p>
