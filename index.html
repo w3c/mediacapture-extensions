@@ -811,13 +811,7 @@ partial interface MediaStreamTrack {
           </p>
           <ol>
             <li><p>If <var>track</var>.{{MediaStreamTrack/readyState}} is "ended", abort these steps.</p></li>
-            <li><p>If <var>track</var>'s capabilities, constraints and settings are matching <var>source</var> configuration, abort these steps.
-            <li><p>Let <var>changes</var> be an empty [=set=].</p></li>
-            <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>source</var>'s settings, if <var>track</var>'s settings does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
-            <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>track</var>'s settings, if <var>source</var>'s settings does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
-            <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>source</var>'s capabilities, if <var>track</var>'s capabilities does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
-            <li><p>[=map/For each=] <var>key</var>-<var>value</var> pair of <var>track</var>'s capabilities, if <var>source</var>'s capabilities does not have the same pair, [=set/append=] <var>key</var> to <var>changes</var>.</p></li>
-            <li><p>If <var>changes</var> [=list/is empty=], abort these steps.</p></li>
+            <li><p>If <var>track</var>'s capabilities and settings are matching <var>source</var> configuration, abort these steps.
             <li>
               <!-- FIXME: Export capabilities and settings so that we can use them here. -->
               <p>Update <var>track</var>'s capabilities and settings according <var>track</var>'s underlying source.</p>
@@ -840,12 +834,15 @@ partial interface MediaStreamTrack {
     <div>
     <p>This example shows how to monitor external background blur changes.</p>
     <pre class="example">
-const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
 const [track] = stream.getVideoTracks();
-track.addEventListener("configurationchange", (event) => {
-  // Background blur configuration may have changed.
-  if (track.getSettings().backgroundBlur) {
-    // Turn off web app own blurring if needed so that video doesn't get double-blurred.
+let {backgroundBlur} = track.getSettings();
+applyBlurInSoftwareInstead(!backgroundBlur);
+
+track.addEventListener("configurationchange", () => {
+  if (backgroundBlur != track.getSettings().backgroundBlur) {
+    backgroundBlur = track.getSettings().backgroundBlur;
+    applyBlurInSoftwareInstead(!backgroundBlur);
   }
 });</pre>
     </div>
