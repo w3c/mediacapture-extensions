@@ -834,17 +834,18 @@ partial interface MediaStreamTrack {
     <div>
     <p>This example shows how to monitor external background blur changes.</p>
     <pre class="example">
-const stream = await navigator.mediaDevices.getUserMedia({video: true});
-const [track] = stream.getVideoTracks();
-let {backgroundBlur} = track.getSettings();
-applyBlurInSoftwareInstead(!backgroundBlur);
+      const stream = await navigator.mediaDevices.getUserMedia({video: true});
+      const [track] = stream.getVideoTracks();
+      let {backgroundBlur} = track.getSettings();
+      applyBlurInSoftwareInstead(!backgroundBlur);
 
-track.addEventListener("configurationchange", () => {
-  if (backgroundBlur != track.getSettings().backgroundBlur) {
-    backgroundBlur = track.getSettings().backgroundBlur;
-    applyBlurInSoftwareInstead(!backgroundBlur);
-  }
-});</pre>
+      track.addEventListener("configurationchange", () => {
+        if (backgroundBlur != track.getSettings().backgroundBlur) {
+          backgroundBlur = track.getSettings().backgroundBlur;
+          applyBlurInSoftwareInstead(!backgroundBlur);
+        }
+      });
+    </pre>
     </div>
   </section>
 </body>
