@@ -778,15 +778,23 @@ partial dictionary MediaTrackCapabilities {
   <section>
     <h2>Exposing change of MediaStreamTrack configuration</h2>
     <div>
-      <p>The configuration (capabilities, constraints or settings) of a {{MediaStreamTrack}} may be changed dynamically
+      <p>The configuration (capabilities and settings) of a {{MediaStreamTrack}} may be changed dynamically
         outside the control of web applications. One example is when a user decides to switch on background blur through
         the operating system. Web applications might want to know that the configuration
         of a particular {{MediaStreamTrack}} has changed. For that purpose, a new event is defined below.
-     </p>
-      <pre class="idl">
+      </p>
+    </div>
+    <h3>MediaStreamTrack Interface Extensions</h3>
+    <div>
+    <pre class="idl">
 partial interface MediaStreamTrack {
   attribute EventHandler onconfigurationchange;
 };</pre>
+    <p>The <dfn data-dfn-for="MediaStreamTrack">onconfigurationchange</dfn> attribute
+      is an [=event handler IDL attribute=] for the `onconfigurationchange`
+      [=event handler=], whose [=event handler event type=] is
+      <dfn event for=MediaStreamTrack>configurationchange</dfn>.
+    </p>
     <p>
       <p>When the [=User Agent=] detects <dfn data-export id="change-track-configuration">a change of configuration</dfn>
        in a <var>track</var>'s underlying source, the [=User Agent=] MUST run the following steps:</p>
@@ -803,13 +811,13 @@ partial interface MediaStreamTrack {
           </p>
           <ol>
             <li><p>If <var>track</var>.{{MediaStreamTrack/readyState}} is "ended", abort these steps.</p></li>
-            <li><p>If <var>track</var>'s capabilities, constraints and settings are matching <var>source</var> configuration, abort these steps.
+            <li><p>If <var>track</var>'s capabilities and settings are matching <var>source</var> configuration, abort these steps.
             <li>
-              <!-- FIXME: Export capabilities, constraints and settings so that we can use them here. -->
-              <p>Update <var>track</var>'s capabilities, constraints and settings according <var>track</var>'s underlying source.</p>
+              <!-- FIXME: Export capabilities and settings so that we can use them here. -->
+              <p>Update <var>track</var>'s capabilities and settings according <var>track</var>'s underlying source.</p>
             </li>
             <li>
-              <p>[=Fire an event=] named <var>configurationchange</var> on <var>track</var>.</p>
+              <p>[=Fire an event=] named {{configurationchange}} on <var>track</var>.</p>
             </li>
           </ol>
         </li>
@@ -821,6 +829,23 @@ partial interface MediaStreamTrack {
           [=User Agents=] MAY add fuzzing on the timing of events to avoid cross-origin activity correlation.</p>
       </div>
     </p>
+    </div>
+    <h3>Example</h3>
+    <div>
+    <p>This example shows how to monitor external background blur changes.</p>
+    <pre class="example">
+      const stream = await navigator.mediaDevices.getUserMedia({video: true});
+      const [track] = stream.getVideoTracks();
+      let {backgroundBlur} = track.getSettings();
+      applyBlurInSoftwareInstead(!backgroundBlur);
+
+      track.addEventListener("configurationchange", () => {
+        if (backgroundBlur != track.getSettings().backgroundBlur) {
+          backgroundBlur = track.getSettings().backgroundBlur;
+          applyBlurInSoftwareInstead(!backgroundBlur);
+        }
+      });
+    </pre>
     </div>
   </section>
 </body>
