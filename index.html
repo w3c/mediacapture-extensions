@@ -710,6 +710,71 @@ partial dictionary MediaTrackCapabilities {
     </div>
   </section>
   <section>
+    <h2>Exposing MediaStreamTrack source lighting correction support</h2>
+    <p>Some platforms or User Agents may provide built-in support for human
+       face lighting correction, in particular for camera video streams.
+       Web applications may either want to control or at least be aware that
+       human face lighting correction is applied at the source level.
+       This may for instance allow the web application to update its UI or to
+       not apply human face lighting correction on its own.
+       For that reason, we extend {{MediaStreamTrack}} with the following
+       properties.
+    </p>
+    <p>The WebIDL changes are the following:</p>
+    <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean lightingCorrection = true;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; lightingCorrection;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean lightingCorrection;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean lightingCorrection;
+};</pre>
+    <section>
+      <h3>Processing considerations</h3>
+      <p>When the "lightingCorrection" setting is set to <code>true</code> by
+         the <a>ApplyConstraints algorithm</a>, the UA will attempt to correct
+         human face and background lighting balance so that human faces are
+         not underexposed.
+      </p>
+      <p>When the "lightingCorrection" setting is set to <code>false</code> by
+         the <a>ApplyConstraints algorithm</a>, the UA will not correct human
+         face and background lighting balance.
+      </p>
+    </section>
+    <section>
+      <h3>Examples</h3>
+      <pre class="example">
+&lt;video&gt;&lt;/video&gt;
+&lt;script&gt;
+// Open camera.
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Try to correct lighting.
+const videoCapabilities = videoTrack.getCapabilities();
+if ((videoCapabilities.lightingCorrection || []).includes(true)) {
+  await videoTrack.applyConstraints({lightingCorrection: {exact: true}});
+} else {
+  // Lighting correction is not supported by the platform or by the camera.
+  // Consider falling back to some other method.
+}
+
+// Show to user.
+const videoElement = document.querySelector("video");
+videoElement.srcObject = stream;
+&lt;/script&gt;
+      </pre>
+    </section>
+  </section>
+  <section>
     <h2>VoiceIsolation constraint</h2>
     <div>
       <p>Some platforms offer functionality for voice isolation:
