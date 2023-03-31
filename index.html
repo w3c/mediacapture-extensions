@@ -759,9 +759,9 @@ const stream = await navigator.mediaDevices.getUserMedia({video: true});
 const [videoTrack] = stream.getVideoTracks();
 
 // Try to improve framing.
-const videoCapabilities = videoTrack.getCapabilities();
-if ((videoCapabilities.faceFraming || []).includes(true)) {
-  await videoTrack.applyConstraints({faceFraming: {exact: true}});
+const capabilities = videoTrack.getCapabilities();
+if (("faceFraming" in capabilities) {
+  await videoTrack.applyConstraints({faceFraming: true});
 } else {
   // Face framing is not supported by the platform or by the camera.
   // Consider falling back to some other method.
