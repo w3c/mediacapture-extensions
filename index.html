@@ -419,10 +419,10 @@ partial interface MediaStreamTrack {
       <p>The underlying source is supposed to be kept alive between the transfer and transfer-receiving steps, or as long as the data holder is alive.
       In a sense, between these steps, the data holder is attached to the underlying source as if it was a track.</p>
     </div>
-    <h3>MediaStreamTrack frame stats</h3>
+    <h3>MediaStreamTrack capture stats</h3>
     <div>
       <p>
-        On camera and screenshare tracks, frame counters allow the application
+        On camera and screenshare tracks, video frame counters allow the application
         to tell what the frame rate is, which may be lower than the target
         {{MediaTrackSettings/frameRate}}. For example, if the track is sourced
         from a camera then the production of frames could be slowed down if it's
@@ -430,45 +430,105 @@ partial interface MediaStreamTrack {
         impact the total number of frames produced by the source and impact how
         many frames are delivered, discarded or dropped for other reasons.
       </p>
+      <p>
+        On microphone tracks, audio capture stats allow the application to tell
+        quality related metrics such as capture delay and audio glitches due to
+        dropped audio frames.
+      </p>
     </div>
     <div>
       <pre class="idl"
 >partial interface MediaStreamTrack {
-  Promise&lt;MediaTrackFrameStats&gt; getFrameStats();
+  Promise&lt;MediaStreamTrackStats&gt; getStats();
 };
 </pre>
     </div>
     <div>
       <p>If a {{MediaStreamTrack}} is sourced from <code>getUserMedia()</code>
-      or <code>getDisplayMedia()</code>, the user agent is required to count
-      each frame from its source as follows:</p>
+      or <code>getDisplayMedia()</code> and {{MediaStreamTrack/kind}} is
+      <code>"video"</code>, the user agent is required to count each video frame
+      from its source as follows:</p>
       <ul>
         <li>
           <p>A frame is considered
-          <dfn data-lt="delivered frames">delivered</dfn> if it either was
+          <dfn data-lt="delivered video frames">delivered</dfn> if it either was
           delivered to a sink or would have been delivered to a sink, if one was
-          connected. This is a subset of [= total frames =] and it is
-          incremented at the same time as [= total frames =].</p>
+          connected. This is a subset of [= total video frames =] and it is
+          incremented at the same time as [= total video frames =].</p>
         </li>
         <li>
           <p>A frame is considered
-          <dfn data-lt="discarded frames">discarded</dfn> if it was discarded in
+          <dfn data-lt="discarded video frames">discarded</dfn> if it was discarded in
           order to achieve the target {{MediaTrackSettings/frameRate}}.
-          This is a subset of [= total frames =] and it is incremented at the
-          same time as [= total frames =].</p>
+          This is a subset of [= total video frames =] and it is incremented at the
+          same time as [= total video frames =].</p>
         </li>
         <li>
-          <p>The <dfn data-lt="total frames">total</dfn> number of frames that
+          <p>The <dfn data-lt="total video frames">total</dfn> number of frames that
           have been processed by this source, meaning it is known whether the
           frame was considered delivered, discarded or dropped for any other
           reason. The number of dropped frames for various unknown reasons can
-          be calculated by subtracting [= delivered frames =] and
-          [= discarded frames =] from [= total frames =].</p>
+          be calculated by subtracting [= delivered video frames =] and
+          [= discarded video frames =] from [= total video frames =].</p>
           <div class="note">
             <p>If the track is unmuted and enabled and the source is backed by
-            a camera, total frames is incremented by frames produced by the
+            a camera, total video frames is incremented by frames produced by the
             camera. If no frames are flowing, such as if the track is muted or
-            disabled, then total frames does not increment.</p>
+            disabled, then total video frames does not increment.</p>
+          </div>
+        </li>
+      </ul>
+      <p>If a {{MediaStreamTrack}} is sourced from <code>getUserMedia()</code>
+      and {{MediaStreamTrack/kind}} is <code>"audio"</code>, the user agent is
+      required to keep track of the following based on audio frames from its
+      source:</p>
+      <ul>
+        <li>
+          <p>The <dfn data-lt="total audio frame duration">total audio frame duration</dfn>
+          is the sum of duration of all audio frames that have been processed by
+          this source, in milliseconds.</p>
+        </li>
+        <li>
+          <p>The <dfn data-lt="dropped audio frame duration">dropped audio frame
+          duration</dfn> is the sum of duration of all audio frames that were
+          dropped prior to being processed by this source, in milliseconds.</p>
+          <div class="note">
+            <p>Because audio capture devices produce audio in real-time, audio
+            frames may be dropped if not processed in a timely manner.</p>
+            <p>The percentage of audio that was dropped can be calculated as
+            [= dropped audio frame duration =] / ([= dropped audio frame duration =] +
+            [= total audio frame duration =]).
+            </p>
+          </div>
+        </li>
+        <li>
+          <p>The number of <dfn data-lt="dropped audio frame events">dropped
+          audio frame events</dfn> is a counter that is incremented every time an audio
+          frame is dropped where the previous audio frame (if any) was not
+          dropped.</p>
+        </li>
+        <li>
+          <p>The <dfn data-lt="total audio frames captured">total audio frames
+          captured</dfn> is the number of captured audio frames that have been
+          processed by the source, i.e. that were not dropped by the capture
+          pipeline.</p>
+        </li>
+        <li>
+          <p>The <dfn data-lt="total audio capture delay">total audio capture
+          delay</dfn> is the total delay, in milliseconds, of each of the
+          [= total audio frames captured =] between the time they were emitted
+          by the capture device and the time they were processed by the
+          source.</p>
+          <div class="note">
+            <p>The average capture delay per audio frame can be calculated as
+            [= total audio capture delay =] / [= total audio frames captured =].</p>
+          </div>
+          <div class="note">
+            <p>If the track is unmuted and enabled, the total audio frame duration and
+            total audio frames captured are increased by the audio frames
+            produced by the audio capture device. If no audio frames are
+            flowing, such as if the track is muted or disabled, then the audio
+            duration, captured frames and dropped frames does not increase.</p>
           </div>
         </li>
       </ul>
@@ -478,7 +538,7 @@ partial interface MediaStreamTrack {
       <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
       class="methods">
         <dt>
-          <dfn>getFrameStats</dfn>
+          <dfn>getStats</dfn>
         </dt>
         <dd>
           <p>
@@ -493,10 +553,13 @@ partial interface MediaStreamTrack {
               </p>
             </li>
             <li>
-              <p>If <var>track</var> is not sourced from
-              <code>getUserMedia()</code> or <code>getDisplayMedia()</code>,
-              reject this method with {{NotSupportedError}} and abort these
-              steps.</p>
+              <p>If <var>track</var> is of {{MediaStreamTrack/kind}}
+              <code>"video"</code> and not sourced from
+              <code>getUserMedia()</code> or <code>getDisplayMedia()</code>, or
+              <var>track</var> is of {{MediaStreamTrack/kind}}
+              <code>"audio"</code> and not sourced from
+              <code>getUserMedia()</code>, reject this method with
+              {{NotSupportedError}} and abort these steps.</p>
             </li>
             <li>
               <p>Let <var>p</var> be a new promise. Begin running the following
@@ -504,16 +567,36 @@ partial interface MediaStreamTrack {
             </li>
             <ol>
               <li>
-                <p>Queue a task to resolve <var>p</var> with a newly constructed
-                {{MediaTrackFrameStats}} dictionary where
-                {{MediaTrackFrameStats/timestamp}} is set to
-                <code>Performance.timeOrigin + Performance.now()</code>,
-                {{MediaTrackFrameStats/deliveredFrames}} is set the total number
-                of [= delivered frames =],
-                {{MediaTrackFrameStats/discardedFrames}} is set to the total
-                number of [= discarded frames =] and
-                {{MediaTrackFrameStats/totalFrames}} is set to the
-                [= total frames =] count.</p>
+                <p>Let <var>stats</var> be a newly constructed
+                {{MediaStreamTrackStats}} dictionary where
+                {{MediaStreamTrackStats/timestamp}} is set to
+                <code>Performance.timeOrigin + Performance.now()</code>.</p>
+              </li>
+              <li>
+                <p>If {{MediaStreamTrack/kind}} is <code>"video"</code>, set
+                {{MediaStreamTrackStats/deliveredFrames}} to the total number
+                of [= delivered video frames =],
+                {{MediaStreamTrackStats/discardedFrames}} to the total
+                number of [= discarded video frames =] and
+                {{MediaStreamTrackStats/totalFrames}} to the
+                [= total video frames =] count.</p>
+              </li>
+              <li>
+                <p>If {{MediaStreamTrack/kind}} is <code>"audio"</code>, set
+                {{MediaStreamTrackStats/totalFrameDuration}} to
+                [= total audio frame duration =],
+                {{MediaStreamTrackStats/droppedFrameDuration}} to
+                [= dropped audio frame duration =],
+                {{MediaStreamTrackStats/droppedFrameEvents}} to
+                [= dropped audio frame events =],
+                {{MediaStreamTrackStats/framesCaptured}} to
+                [= total audio frames captured =] and
+                {{MediaStreamTrackStats/totalCaptureDelay}} to
+                [= total audio capture delay =].</p>
+              </li>
+              <li>
+                <p>Queue a task to resolve <var>p</var> with
+                <var>stats</var>.</p>
               </li>
             </ol>
           </ol>
@@ -521,20 +604,29 @@ partial interface MediaStreamTrack {
       </dl>
     </section>
     <section>
-      <h4>The MediaTrackFrameStats dictionary</h4>
+      <h4>The MediaStreamTrackStats dictionary</h4>
       <div>
         <pre class="idl" data-cite="HR-TIME"
->dictionary MediaTrackFrameStats {
+>dictionary MediaStreamTrackStats {
   DOMHighResTimeStamp timestamp;
+
+  // Video-only.
   unsigned long long deliveredFrames;
   unsigned long long discardedFrames;
   unsigned long long totalFrames;
+
+  // Audio-only.
+  DOMHighResTimeStamp totalFrameDuration;
+  DOMHighResTimeStamp droppedFrameDuration;
+  unsigned long long droppedFrameEvents;
+  unsigned long long framesCaptured;
+  DOMHighResTimeStamp totalCaptureDelay;
 };
 </pre>
         <section>
-          <h4>Dictionary {{MediaTrackFrameStats}} Members</h4>
-          <dl data-link-for="MediaTrackFrameStats"
-          data-dfn-for="MediaTrackFrameStats" class="dictionary-members">
+          <h4>Dictionary {{MediaStreamTrackStats}} Members</h4>
+          <dl data-link-for="MediaStreamTrackStats"
+          data-dfn-for="MediaStreamTrackStats" class="dictionary-members">
             <dt>
               <dfn data-idl="">timestamp</dfn> of type <span class=
               "idlMemberType">DOMHighResTimeStamp</span>
@@ -551,7 +643,8 @@ partial interface MediaStreamTrack {
             </dt>
             <dd>
               <p>
-                The total number of [= delivered frames =].
+                The total number of [= delivered video frames =]. Missing for
+                audio tracks.
               </p>
             </dd>
             <dt>
@@ -560,7 +653,8 @@ partial interface MediaStreamTrack {
             </dt>
             <dd>
               <p>
-                The total number of [= discarded frames =].
+                The total number of [= discarded video frames =]. Missing for
+                audio tracks.
               </p>
             </dd>
             <dt>
@@ -569,7 +663,53 @@ partial interface MediaStreamTrack {
             </dt>
             <dd>
               <p>
-                The [= total frames =] count.
+                The [= total video frames =] count. Missing for audio tracks.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">totalFrameDuration</dfn> of type <span class=
+              "idlMemberType">DOMHighResTimeStamp</span>
+            </dt>
+            <dd>
+              <p>
+                The [= total audio frame duration =] count. Missing for video
+                tracks.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">droppedFrameDuration</dfn> of type <span class=
+              "idlMemberType">DOMHighResTimeStamp</span>
+            </dt>
+            <dd>
+              <p>
+                The [= dropped audio frame duration =] count. Missing for video tracks.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">droppedFrameEvents</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The [= dropped audio frame events =] count. Missing for video tracks.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">framesCaptured</dfn> of type <span class=
+              "idlMemberType">unsigned long long</span>
+            </dt>
+            <dd>
+              <p>
+                The [= total audio frames captured =] count. Missing for video tracks.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">totalCaptureDelay</dfn> of type <span class=
+              "idlMemberType">DOMHighResTimeStamp</span>
+            </dt>
+            <dd>
+              <p>
+                The [= total audio capture delay =] count. Missing for video tracks.
               </p>
             </dd>
           </dl>
