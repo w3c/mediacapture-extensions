@@ -506,8 +506,6 @@ partial interface MediaStreamTrack {
               <li>
                 <p>Queue a task to resolve <var>p</var> with a newly constructed
                 {{MediaTrackFrameStats}} dictionary where
-                {{MediaTrackFrameStats/timestamp}} is set to
-                <code>Performance.timeOrigin + Performance.now()</code>,
                 {{MediaTrackFrameStats/deliveredFrames}} is set the total number
                 of [= delivered frames =],
                 {{MediaTrackFrameStats/discardedFrames}} is set to the total
@@ -525,7 +523,6 @@ partial interface MediaStreamTrack {
       <div>
         <pre class="idl" data-cite="HR-TIME"
 >dictionary MediaTrackFrameStats {
-  DOMHighResTimeStamp timestamp;
   unsigned long long deliveredFrames;
   unsigned long long discardedFrames;
   unsigned long long totalFrames;
@@ -535,16 +532,6 @@ partial interface MediaStreamTrack {
           <h4>Dictionary {{MediaTrackFrameStats}} Members</h4>
           <dl data-link-for="MediaTrackFrameStats"
           data-dfn-for="MediaTrackFrameStats" class="dictionary-members">
-            <dt>
-              <dfn data-idl="">timestamp</dfn> of type <span class=
-              "idlMemberType">DOMHighResTimeStamp</span>
-            </dt>
-            <dd>
-              <p>
-                The {{timestamp}}, relative to the UNIX epoch (Jan 1, 1970,
-                UTC), for when these stats where collected.
-              </p>
-            </dd>
             <dt>
               <dfn data-idl="">deliveredFrames</dfn> of type <span class=
               "idlMemberType">unsigned long long</span>
