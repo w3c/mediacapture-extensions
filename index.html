@@ -560,7 +560,10 @@ interface MediaStreamTrackVideoStats {
               "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
               and no-data-races as defined in [[API-DESIGN-PRINCIPLES]]. That
               is, while a task is running, the frame counters must return the
-              same values every time the getters are called.</p>
+              same values every time the getters are called. The user agent can
+              achieve this for example by posting tasks to update these values
+              or to cache the values upon getting and clear the cache in the
+              next task execution cycle.</p>
             </div>
           </dl>
         </section>
