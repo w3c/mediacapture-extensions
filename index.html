@@ -506,6 +506,25 @@ partial interface MediaStreamTrack {
               steps.</p>
             </li>
             <li>
+              <p>
+                If this is the first time this getter is called in this task
+                exection cycle, set the internal slots of
+                <var>track</var>.{{MediaStreamTrack/[[VideoStats]]}} as follows:
+                {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} is set to
+                [= delivered frames =],
+                {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}} is set to
+                [= discarded frames =] and
+                {{MediaStreamTrackVideoStats/[[TotalFrames]]}} is set to
+                [= total frames =].
+              </p>
+              <div class="note">
+                <p>Only updating these counters once per task execution cycles
+                preserves the <a href=
+                "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
+                semantics defined in [[API-DESIGN-PRINCIPLES]].</p>
+              </div>
+            </li>
+            <li>
               <p>Return
               <var>track</var>.{{MediaStreamTrack/[[VideoStats]]}}.</p>
             </li>
@@ -522,7 +541,16 @@ interface MediaStreamTrackVideoStats {
   readonly attribute unsigned long long discardedFrames;
   readonly attribute unsigned long long totalFrames;
 };
-</pre>
+        </pre>
+        <div>
+          <p>Let the {{MediaStreamTrackVideoStats}} have internal slots
+          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\DeliveredFrames]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\DiscardedFrames]]</dfn>
+          and
+          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\TotalFrames]]</dfn>,
+          initialized to 0.
+          </p>
+        </div>
         <section>
           <h4>Attributes</h4>
           <dl data-link-for="MediaStreamTrackVideoStats"
@@ -533,7 +561,8 @@ interface MediaStreamTrackVideoStats {
             </dt>
             <dd>
               <p>
-                Upon getting, return the total number of [= delivered frames =].
+                Upon getting, return this track stats'
+                {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}}.
               </p>
             </dd>
             <dt>
@@ -542,7 +571,8 @@ interface MediaStreamTrackVideoStats {
             </dt>
             <dd>
               <p>
-                Upon getting, return the total number of [= discarded frames =].
+                Upon getting, return this track stats'
+                {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}}.
               </p>
             </dd>
             <dt>
@@ -551,20 +581,10 @@ interface MediaStreamTrackVideoStats {
             </dt>
             <dd>
               <p>
-                Upon getting, return the [= total frames =] count.
+                Upon getting, return this track stats'
+                {{MediaStreamTrackVideoStats/[[TotalFrames]]}}.
               </p>
             </dd>
-            <div class="note">
-              <p>The general principles for Javascript APIs apply, including the
-              principle of <a href=
-              "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
-              and no-data-races as defined in [[API-DESIGN-PRINCIPLES]]. That
-              is, while a task is running, the frame counters must return the
-              same values every time the getters are called. The user agent can
-              achieve this for example by posting tasks to update these values
-              or to cache the values upon getting and clear the cache in the
-              next task execution cycle.</p>
-            </div>
           </dl>
         </section>
       </div>
