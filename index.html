@@ -486,7 +486,7 @@ partial interface MediaStreamTrack {
       <div>
         <pre class="idl">[Exposed=Window]
 interface MediaStreamTrackVideoStats {
-  readonly attribute unsigned long long deliveredFrames;
+  readonly attribute unsigned long long deliverableFrames;
   readonly attribute unsigned long long discardedFrames;
   readonly attribute unsigned long long totalFrames;
 };
@@ -498,10 +498,10 @@ interface MediaStreamTrackVideoStats {
           <ul>
             <li>
               <p>A frame is considered
-              <dfn data-lt="delivered frames">delivered</dfn> if it either was
-              delivered to a sink or would have been delivered to a sink, if one
-              was connected. This is a subset of [= total frames =] and it is
-              incremented at the same time as [= total frames =].</p>
+              <dfn data-lt="deliverable frames">deliverable</dfn> if it either
+              was delivered to a sink or would have been delivered to a sink, if
+              one was connected. This is a subset of [= total frames =] and it
+              is incremented at the same time as [= total frames =].</p>
             </li>
             <li>
               <p>A frame is considered
@@ -517,7 +517,7 @@ interface MediaStreamTrackVideoStats {
               whether the frame was considered delivered, discarded or dropped
               for any other reason. The number of dropped frames for various
               unknown reasons can be calculated by subtracting
-              [= delivered frames =] and [= discarded frames =] from
+              [= deliverable frames =] and [= discarded frames =] from
               [= total frames =].</p>
               <div class="note">
                 <p>If the track is unmuted and enabled and the source is backed
@@ -528,7 +528,7 @@ interface MediaStreamTrackVideoStats {
             </li>
           </ul>
           <p>Let the {{MediaStreamTrackVideoStats}} have internal slots
-          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\DeliveredFrames]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\DeliverableFrames]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\DiscardedFrames]]</dfn>
           and
           <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\TotalFrames]]</dfn>,
@@ -541,8 +541,8 @@ interface MediaStreamTrackVideoStats {
               <p>If this is the first time the [= expose frame counters steps =]
               are called for this {{MediaStreamTrackVideoStats}} in this task
               execution cycle, set the internal slots of as follows:
-              {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} is set to
-              [= delivered frames =],
+              {{MediaStreamTrackVideoStats/[[DeliverableFrames]]}} is set to
+              [= deliverable frames =],
               {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}} is set to
               [= discarded frames =] and
               {{MediaStreamTrackVideoStats/[[TotalFrames]]}} is set to
@@ -562,13 +562,13 @@ interface MediaStreamTrackVideoStats {
           <dl data-link-for="MediaStreamTrackVideoStats"
           data-dfn-for="MediaStreamTrackVideoStats" class="attributes">
             <dt>
-              <dfn data-idl="">deliveredFrames</dfn> of type <span class=
+              <dfn data-idl="">deliverableFrames</dfn> of type <span class=
               "idlMemberType">unsigned long long, readonly</span>
             </dt>
             <dd>
               <p>
                 Upon getting, run the [= expose frame counters steps =] and
-                return {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}}.
+                return {{MediaStreamTrackVideoStats/[[DeliverableFrames]]}}.
               </p>
             </dd>
             <dt>
