@@ -434,166 +434,120 @@ partial interface MediaStreamTrack {
     <div>
       <pre class="idl"
 >partial interface MediaStreamTrack {
-  [SameObject] readonly attribute MediaStreamTrackVideoStats videoStats;
+  readonly attribute unsigned long long deliveredFrames;
+  readonly attribute unsigned long long discardedFrames;
+  readonly attribute unsigned long long totalFrames;
 };
 </pre>
     </div>
     <div>
-      <p>Let the {{MediaStreamTrack}} have a
-      <dfn class=export data-dfn-for="MediaStreamTrack">[[\VideoStats]]</dfn>
-      internal slot. If the {{MediaStreamTrack}} is sourced from
-      <code>getUserMedia()</code> or <code>getDisplayMedia()</code> and is of
-      {{MediaStreamTrack/kind}} <code>"video"</code>, initialize
-      {{MediaStreamTrack/[[VideoStats]]}} to a new instance of
-      {{MediaStreamTrackVideoStats}} set up to expose video stats for this
-      {{MediaStreamTrack}}. Otherwise, initialized it to <code>null</code>.</p>
+      <p>Let the {{MediaStreamTrack}} have internal slots
+      <dfn class=export data-dfn-for="MediaStreamTrack">[[\HasVideoStats]]</dfn>,
+      <dfn class=export data-dfn-for="MediaStreamTrack">[[\DeliveredFrames]]</dfn>,
+      <dfn class=export data-dfn-for="MediaStreamTrack">[[\DiscardedFrames]]</dfn>
+      and
+      <dfn class=export data-dfn-for="MediaStreamTrack">[[\TotalFrames]]</dfn>.</p>
+      <p>If the {{MediaStreamTrack}} is sourced from <code>getUserMedia()</code>
+      or <code>getDisplayMedia()</code> and is of {{MediaStreamTrack/kind}}
+      <code>"video"</code>, the user agent is required to set
+      {{MediaStreamTrack/[[HasVideoStats]]}} to <code>true</code> and count each
+      frame from its source as follows:</p>
+      <ul>
+        <li>
+          <p>A frame is considered
+          <dfn data-lt="delivered frames">delivered</dfn> if it either was
+          delivered to a sink or would have been delivered to a sink, if one
+          was connected. This is a subset of [= total frames =] and it is
+          incremented at the same time as [= total frames =].</p>
+        </li>
+        <li>
+          <p>A frame is considered
+          <dfn data-lt="discarded frames">discarded</dfn> if it was
+          discarded in order to achieve the target
+          {{MediaTrackSettings/frameRate}}. This is a subset of
+          [= total frames =] and it is incremented at the same time as
+          [= total frames =].</p>
+        </li>
+        <li>
+          <p>The <dfn data-lt="total frames">total</dfn> number of frames
+          that have been processed by this source, meaning it is known
+          whether the frame was considered delivered, discarded or dropped
+          for any other reason. The number of dropped frames for various
+          unknown reasons can be calculated by subtracting
+          [= delivered frames =] and [= discarded frames =] from
+          [= total frames =].</p>
+          <div class="note">
+            <p>If the track is unmuted and enabled and the source is backed
+            by a camera, total frames is incremented by frames produced by
+            the camera. If no frames are flowing, such as if the track is
+            muted or disabled, then total frames does not increment.</p>
+          </div>
+        </li>
+      </ul>
+      <p>The <dfn data-lt="expose frame counters steps">expose frame counters
+      steps</dfn> are the following:</p>
+      <ul>
+        <li>
+          <p>If this is the first time the [= expose frame counters steps =]
+          are called for this {{MediaStreamTrack}} in this task
+          execution cycle, set the internal slots as follows:
+          {{MediaStreamTrack/[[DeliveredFrames]]}} is set to
+          [= delivered frames =],
+          {{MediaStreamTrack/[[DiscardedFrames]]}} is set to
+          [= discarded frames =] and
+          {{MediaStreamTrack/[[TotalFrames]]}} is set to
+          [= total frames =].
+          </p>
+          <div class="note">
+            <p>Only updating these counters once per task execution cycles
+            preserves the <a href=
+            "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
+            semantics defined in [[API-DESIGN-PRINCIPLES]].</p>
+          </div>
+        </li>
+      </ul>
     </div>
     <section>
       <h4>Attributes</h4>
       <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
       class="attributes">
         <dt>
-          <dfn data-idl="">videoStats</dfn> of type
-          {{MediaStreamTrackVideoStats}}, readonly
+          <dfn data-idl="">deliveredFrames</dfn> of type <span class=
+          "idlMemberType">unsigned long long, readonly</span>
         </dt>
         <dd>
           <p>
-            When this getter is called, the user agenst MUST run the following
-            steps:
+            Upon getting, if {{MediaStreamTrack/[[HasVideoStats]]}} is
+            <code>true</code> then run the [= expose frame counters steps =] and
+            return {{MediaStreamTrack/[[DeliveredFrames]]}}. Otherwise, throw
+            {{NotSupportedError}}.
           </p>
-          <ol>
-            <li>
-              <p>
-                Let <var>track</var> be the {{MediaStreamTrack}} that this
-                getter is called on.
-              </p>
-            </li>
-            <li>
-              <p>If <var>track</var>.{{MediaStreamTrack/[[VideoStats]]}} is
-              <code>null</code>, throw {{NotSupportedError}} and abort these
-              steps.</p>
-            </li>
-            <li>
-              <p>Return
-              <var>track</var>.{{MediaStreamTrack/[[VideoStats]]}}.</p>
-            </li>
-          </ol>
+        </dd>
+        <dt>
+          <dfn data-idl="">discardedFrames</dfn> of type <span class=
+          "idlMemberType">unsigned long long, readonly</span>
+        </dt>
+        <dd>
+          <p>
+            Upon getting, if {{MediaStreamTrack/[[HasVideoStats]]}} is
+            <code>true</code> then run the [= expose frame counters steps =] and
+            return {{MediaStreamTrack/[[DiscardedFrames]]}}. Otherwise, throw
+            {{NotSupportedError}}.
+          </p>
+        </dd>
+        <dt>
+          <dfn data-idl="">totalFrames</dfn> of type <span class=
+          "idlMemberType">unsigned long long, readonly</span>
+        </dt>
+        <dd>
+          <p>
+            Upon getting, if {{MediaStreamTrack/[[HasVideoStats]]}} is
+            <code>true</code> then run the [= expose frame counters steps =] and
+            return {{MediaStreamTrack/[[TotalFrames]]}}. Otherwise, throw
+            {{NotSupportedError}}.
+          </p>
         </dd>
       </dl>
-    </section>
-    <section>
-      <h4>The MediaStreamTrackVideoStats interface</h4>
-      <div>
-        <pre class="idl">[Exposed=Window]
-interface MediaStreamTrackVideoStats {
-  readonly attribute unsigned long long deliveredFrames;
-  readonly attribute unsigned long long discardedFrames;
-  readonly attribute unsigned long long totalFrames;
-};
-        </pre>
-        <div>
-          <p>The {{MediaStreamTrackVideoStats}} expose frame counters for the
-          {{MediaStreamTrack}} that created it. For this track, the user agent
-          is required to count each frame from its source as follows:</p>
-          <ul>
-            <li>
-              <p>A frame is considered
-              <dfn data-lt="delivered frames">delivered</dfn> if it either was
-              delivered to a sink or would have been delivered to a sink, if one
-              was connected. This is a subset of [= total frames =] and it is
-              incremented at the same time as [= total frames =].</p>
-            </li>
-            <li>
-              <p>A frame is considered
-              <dfn data-lt="discarded frames">discarded</dfn> if it was
-              discarded in order to achieve the target
-              {{MediaTrackSettings/frameRate}}. This is a subset of
-              [= total frames =] and it is incremented at the same time as
-              [= total frames =].</p>
-            </li>
-            <li>
-              <p>The <dfn data-lt="total frames">total</dfn> number of frames
-              that have been processed by this source, meaning it is known
-              whether the frame was considered delivered, discarded or dropped
-              for any other reason. The number of dropped frames for various
-              unknown reasons can be calculated by subtracting
-              [= delivered frames =] and [= discarded frames =] from
-              [= total frames =].</p>
-              <div class="note">
-                <p>If the track is unmuted and enabled and the source is backed
-                by a camera, total frames is incremented by frames produced by
-                the camera. If no frames are flowing, such as if the track is
-                muted or disabled, then total frames does not increment.</p>
-              </div>
-            </li>
-          </ul>
-          <p>Let the {{MediaStreamTrackVideoStats}} have internal slots
-          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\DeliveredFrames]]</dfn>,
-          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\DiscardedFrames]]</dfn>
-          and
-          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\TotalFrames]]</dfn>,
-          initialized to 0.
-          </p>
-          <p>The <dfn data-lt="expose frame counters steps">expose frame
-          counters steps</dfn> are the following:</p>
-          <ul>
-            <li>
-              <p>If this is the first time the [= expose frame counters steps =]
-              are called for this {{MediaStreamTrackVideoStats}} in this task
-              execution cycle, set the internal slots of as follows:
-              {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} is set to
-              [= delivered frames =],
-              {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}} is set to
-              [= discarded frames =] and
-              {{MediaStreamTrackVideoStats/[[TotalFrames]]}} is set to
-              [= total frames =].
-              </p>
-              <div class="note">
-                <p>Only updating these counters once per task execution cycles
-                preserves the <a href=
-                "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
-                semantics defined in [[API-DESIGN-PRINCIPLES]].</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <section>
-          <h4>Attributes</h4>
-          <dl data-link-for="MediaStreamTrackVideoStats"
-          data-dfn-for="MediaStreamTrackVideoStats" class="attributes">
-            <dt>
-              <dfn data-idl="">deliveredFrames</dfn> of type <span class=
-              "idlMemberType">unsigned long long, readonly</span>
-            </dt>
-            <dd>
-              <p>
-                Upon getting, run the [= expose frame counters steps =] and
-                return {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}}.
-              </p>
-            </dd>
-            <dt>
-              <dfn data-idl="">discardedFrames</dfn> of type <span class=
-              "idlMemberType">unsigned long long, readonly</span>
-            </dt>
-            <dd>
-              <p>
-                Upon getting, run the [= expose frame counters steps =] and
-                return {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}}.
-              </p>
-            </dd>
-            <dt>
-              <dfn data-idl="">totalFrames</dfn> of type <span class=
-              "idlMemberType">unsigned long long, readonly</span>
-            </dt>
-            <dd>
-              <p>
-                Upon getting, run the [= expose frame counters steps =] and
-                return {{MediaStreamTrackVideoStats/[[TotalFrames]]}}.
-              </p>
-            </dd>
-          </dl>
-        </section>
-      </div>
     </section>
   </section>
   <section id="the powerEfficientPixelFormat constraint">
