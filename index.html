@@ -434,7 +434,7 @@ partial interface MediaStreamTrack {
     <div>
       <pre class="idl"
 >partial interface MediaStreamTrack {
-  [SameObject] readonly attribute MediaStreamTrackVideoStats videoStats;
+  [SameObject] readonly attribute MediaStreamTrackVideoStats stats;
 };
 </pre>
     </div>
@@ -453,8 +453,8 @@ partial interface MediaStreamTrack {
       <dl data-link-for="MediaStreamTrack" data-dfn-for="MediaStreamTrack"
       class="attributes">
         <dt>
-          <dfn data-idl="">videoStats</dfn> of type
-          {{MediaStreamTrackVideoStats}}, readonly
+          <dfn data-idl="">stats</dfn> of type {{MediaStreamTrackVideoStats}},
+          readonly
         </dt>
         <dd>
           <p>
