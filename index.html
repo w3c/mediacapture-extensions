@@ -489,6 +489,7 @@ interface MediaStreamTrackVideoStats {
   readonly attribute unsigned long long deliveredFrames;
   readonly attribute unsigned long long discardedFrames;
   readonly attribute unsigned long long totalFrames;
+  [Default] object toJSON();
 };
         </pre>
         <div>
@@ -589,6 +590,20 @@ interface MediaStreamTrackVideoStats {
               <p>
                 Upon getting, run the [= expose frame counters steps =] and
                 return {{MediaStreamTrackVideoStats/[[TotalFrames]]}}.
+              </p>
+            </dd>
+          </dl>
+        </section>
+        <section>
+          <h4>Methods</h4>
+          <dl data-link-for="MediaStreamTrackVideoStats"
+          data-dfn-for="MediaStreamTrackVideoStats" class="methods">
+            <dt>
+              <dfn data-idl="">toJSON</dfn>
+            </dt>
+            <dd>
+              <p>
+                When called, run [[!WEBIDL]]'s [= default toJSON steps =].
               </p>
             </dd>
           </dl>
