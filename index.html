@@ -507,6 +507,7 @@ interface MediaStreamTrackAudioStats {
   readonly attribute unsigned long long deliveredFrames;
   readonly attribute DOMHighResTimeStamp deliveredFramesDuration;
   readonly attribute DOMHighResTimeStamp deliveredFramesLatency;
+  readonly attribute DOMHighResTimeStamp? latency;
   readonly attribute unsigned long long totalFrames;
   readonly attribute DOMHighResTimeStamp totalFramesDuration;
   [Default] object toJSON();
@@ -546,6 +547,12 @@ interface MediaStreamTrackAudioStats {
               frames =].</p>
             </div>
             <li>
+              <p>The <dfn data-lt="current audio latency">current audio
+              latency</dfn> is the input latency of the last audio frame that
+              was delivered. If no audio frames have been delivered yet, this
+              value is <code>null</code>.</p>
+            </li>
+            <li>
               <p>An audio frame that is discarded because it cannot be delivered
               on time, or it cannot be delivered for any other reason, is
               considered <dfn data-lt="dropped audio frames">dropped</dfn>.</p>
@@ -575,7 +582,8 @@ interface MediaStreamTrackAudioStats {
           <p>Let the {{MediaStreamTrackAudioStats}} have internal slots
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFrames]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFramesDuration]]</dfn>,
-          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFramesLatency]]</dfn>
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFramesLatency]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\Latency]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFrames]]</dfn>,
           and
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFramesDuration]]</dfn>,
@@ -593,6 +601,8 @@ interface MediaStreamTrackAudioStats {
               to [= delivered audio frames duration =],
               {{MediaStreamTrackAudioStats/[[DeliveredFramesLatency]]}} is set to
               [= delivered audio frames latency =],
+              {{MediaStreamTrackAudioStats/[[Latency]]}} is set to
+              [= current audio latency =],
               {{MediaStreamTrackAudioStats/[[DroppedFrames]]}} is set to
               [= dropped audio frames =] and
               {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} is set to
@@ -641,6 +651,17 @@ interface MediaStreamTrackAudioStats {
                 Upon getting, run the [= expose audio frame counters steps =]
                 and return
                 {{MediaStreamTrackAudioStats/[[DeliveredFramesLatency]]}}.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">latency</dfn> of type <span
+              class="idlMemberType">DOMHighResTimeStamp, readonly,
+              nullable</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return {{MediaStreamTrackAudioStats/[[Latency]]}}.
               </p>
             </dd>
             <dt>
