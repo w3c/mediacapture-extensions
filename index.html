@@ -435,7 +435,7 @@ partial interface MediaStreamTrack {
       <pre class="idl"
 >partial interface MediaStreamTrack {
   [SameObject] readonly attribute
-      (MediaStreamTrackAudioStats or MediaStreamTrackVideoStats) stats;
+      (MediaStreamTrackAudioStats or MediaStreamTrackVideoStats)? stats;
 };
 </pre>
     </div>
@@ -485,11 +485,6 @@ partial interface MediaStreamTrack {
                 Let <var>track</var> be the {{MediaStreamTrack}} that this
                 getter is called on.
               </p>
-            </li>
-            <li>
-              <p>If <var>track</var>.{{MediaStreamTrack/[[Stats]]}} is
-              <code>null</code>, throw {{NotSupportedError}} and abort these
-              steps.</p>
             </li>
             <li>
               <p>Return <var>track</var>.{{MediaStreamTrack/[[Stats]]}}.</p>
