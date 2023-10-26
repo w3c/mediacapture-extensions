@@ -422,13 +422,19 @@ partial interface MediaStreamTrack {
     <h3>MediaStreamTrack Statistics</h3>
     <div>
       <p>
-        On camera and screenshare tracks, frame counters allow the application
-        to tell what the frame rate is, which may be lower than the target
-        {{MediaTrackSettings/frameRate}}. For example, if the track is sourced
-        from a camera then the production of frames could be slowed down if it's
-        dark or frames could be dropped if the system is CPU starved. This could
-        impact the total number of frames produced by the source and impact how
-        many frames are delivered, discarded or dropped for other reasons.
+        On microphone audio tracks, frame counters allow the application to tell
+        the percentage of audio that is delivered as one quality indicator and
+        to measure latency of device capture.
+      </p>
+      <p>
+        On camera and screenshare video tracks, frame counters allow the
+        application to tell what the frame rate is, which may be lower than the
+        target {{MediaTrackSettings/frameRate}}. For example, if the track is
+        sourced from a camera then the production of frames could be slowed down
+        if it's dark or frames could be dropped if the system is CPU starved.
+        This could impact the total number of frames produced by the source and
+        impact how many frames are delivered, discarded or dropped for other
+        reasons.
       </p>
     </div>
     <div>
