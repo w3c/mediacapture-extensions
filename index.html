@@ -423,8 +423,7 @@ partial interface MediaStreamTrack {
     <div>
       <p>
         On microphone audio tracks, frame counters allow the application to tell
-        the percentage of audio that is delivered as one quality indicator and
-        to measure latency of device capture.
+        the percentage of audio that is delivered as one quality indicator.
       </p>
       <p>
         On camera and screenshare video tracks, frame counters allow the
@@ -544,9 +543,10 @@ interface MediaStreamTrackAudioStats {
               <p>Because audio capture devices produce audio in real-time,
               audio frames may be dropped if not processed in a timely
               manner.</p>
-              <p>The percentage of audio that was dropped can be calculated as
-              [= dropped audio frames duration =] / ([= delivered audio frames
-              duration =] + [= dropped audio frames duration =]).</p>
+              <p>The percentage of audio duration that was dropped can be
+              calculated as [= dropped audio frames duration =] / ([= delivered
+              audio frames duration =] + [= dropped audio frames
+              duration =]).</p>
             </div>
             <div class="note">
               <p>If the track is unmuted and enabled, the counters increase as
