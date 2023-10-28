@@ -423,7 +423,8 @@ partial interface MediaStreamTrack {
     <div>
       <p>
         On microphone audio tracks, frame counters allow the application to tell
-        the percentage of audio that is delivered as one quality indicator.
+        the percentage of audio that is delivered as one quality indicator and
+        the latency metrics measure the input delay from capture to application.
       </p>
       <p>
         On camera and screenshare video tracks, frame counters allow the
@@ -547,7 +548,7 @@ interface MediaStreamTrackAudioStats {
               <p>The <dfn data-lt="delivered audio frames latency">delivered
               audio frames latency</dfn> is the sum of input latency (see
               [= current audio latency =]) of each of the [= delivered audio
-              frames =].</p>
+              frames =], in milliseconds.</p>
             </li>
             <li>
               <p>An audio frame that is discarded because it cannot be delivered
