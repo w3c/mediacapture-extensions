@@ -540,15 +540,6 @@ interface MediaStreamTrackAudioStats {
               as [= dropped audio frames =] and is measured in milliseconds.</p>
             </li>
             <div class="note">
-              <p>Because audio capture devices produce audio in real-time,
-              audio frames may be dropped if not processed in a timely
-              manner.</p>
-              <p>The percentage of audio duration that was dropped can be
-              calculated as [= dropped audio frames duration =] / ([= delivered
-              audio frames duration =] + [= dropped audio frames
-              duration =]).</p>
-            </div>
-            <div class="note">
               <p>If the track is unmuted and enabled, the counters increase as
               audio is produced by the capture device. If no audio is flowing,
               such as if the track is muted or disabled, then the counters do
@@ -636,6 +627,15 @@ interface MediaStreamTrackAudioStats {
                 {{MediaStreamTrackAudioStats/[[DeliveredFramesDuration]]}} and
                 {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}}.
               </p>
+              <div class="note">
+                <p>Because audio capture devices produce audio in real-time,
+                audio frames may be dropped if not processed in a timely
+                manner.</p>
+                <p>The percentage of audio duration that was delivered, i.e. not
+                dropped, can be calculated as
+                {{MediaStreamTrackAudioStats/deliveredFramesDuration}} /
+                {{MediaStreamTrackAudioStats/totalFramesDuration}}.</p>
+              </div>
             </dd>
           </dl>
         </section>
