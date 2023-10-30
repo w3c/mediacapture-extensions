@@ -538,17 +538,18 @@ interface MediaStreamTrackAudioStats {
               delivered yet, this value is <code>null</code>.</p>
               <p>The input latency is the estimated latency of the capture
               device plus the time time it takes the user agent to deliver that
-              frame. This measurement is incremented at the same time as
-              [= delivered audio frames =] and is measured in milliseconds. Note
-              that once a frame has been delivered to a sink, that sink may
-              internally have its own latency (such as playout delay) which is
-              not included in this measurement</p>
+              frame. If the user agent buffers audio internally before
+              delivering, the length of the buffer is included in the latency
+              measurement. Note that once a frame has been delivered to a sink,
+              that sink may internally have its own latency (such as playout
+              delay) which is not included in this measurement.</p>
             </li>
             <li>
               <p>The <dfn data-lt="delivered audio frames latency">delivered
               audio frames latency</dfn> is the sum of input latency (see
               [= current audio latency =]) of each of the [= delivered audio
-              frames =], in milliseconds.</p>
+              frames =], in milliseconds. This measurement is incremented at the
+              same time as [= delivered audio frames =].</p>
             </li>
             <li>
               <p>An audio frame that is discarded because it cannot be delivered
