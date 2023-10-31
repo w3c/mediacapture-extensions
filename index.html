@@ -554,26 +554,38 @@ interface MediaStreamTrackAudioStats {
           and
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFramesDuration]]</dfn>,
           initialized to 0.</p>
+          <p>Let the {{MediaStreamTrackAudioStats}} also have an internal slot
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\CurrentTaskId]]</dfn>
+          initialized to <code>null</code>.</p>
           <p>The <dfn data-lt="expose audio frame counters steps">expose audio
           frame counters steps</dfn> are the following:</p>
           <ul>
             <li>
-              <p>If this is the first time the [= expose audio frame counters
-              steps =] are called for this {{MediaStreamTrackAudioStats}} in
-              this task execution cycle, set the internal slots of as follows:
-              {{MediaStreamTrackAudioStats/[[DeliveredFrames]]}} is set to
+              <p>Let <var>taskId</var> be a number unique to the current
+              task.</p>
+            </li>
+            <li>
+              <p>If {{MediaStreamTrackAudioStats/[[CurrentTaskId]]}} is equal to
+              <var>taskId</var>, abort these steps.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackAudioStats/[[CurrentTaskId]]}} to
+              <var>taskId</var>.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackAudioStats/[[DeliveredFrames]]}} to
               [= delivered audio frames =],
-              {{MediaStreamTrackAudioStats/[[DeliveredFramesDuration]]}} is set
+              set {{MediaStreamTrackAudioStats/[[DeliveredFramesDuration]]}}
               to [= delivered audio frames duration =],
-              {{MediaStreamTrackAudioStats/[[DroppedFrames]]}} is set to
+              set {{MediaStreamTrackAudioStats/[[DroppedFrames]]}} to
               [= dropped audio frames =] and
-              {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} is set to
+              set {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} to
               [= dropped audio frames duration =].</p>
               <div class="note">
-                <p>Only updating these counters once per task execution cycles
-                preserves the <a href=
-                "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
-                semantics defined in [[API-DESIGN-PRINCIPLES]].</p>
+                <p>Only updating these counters once per task preserves the
+                <a href="https://w3ctag.github.io/design-principles/#js-rtc">
+                run-to-completion</a> semantics defined in
+                [[API-DESIGN-PRINCIPLES]].</p>
               </div>
             </li>
           </ul>
@@ -709,25 +721,37 @@ interface MediaStreamTrackVideoStats {
           <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\TotalFrames]]</dfn>,
           initialized to 0.
           </p>
+          <p>Let the {{MediaStreamTrackVideoStats}} also have an internal slot
+          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\CurrentTaskId]]</dfn>
+          initialized to <code>null</code>.</p>
           <p>The <dfn data-lt="expose video frame counters steps">expose video
           frame counters steps</dfn> are the following:</p>
           <ul>
             <li>
-              <p>If this is the first time the [= expose video frame counters
-              steps =] are called for this {{MediaStreamTrackVideoStats}} in
-              this task execution cycle, set the internal slots of as follows:
-              {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} is set to
+              <p>Let <var>taskId</var> be a number unique to the current
+              task.</p>
+            </li>
+            <li>
+              <p>If {{MediaStreamTrackVideoStats/[[CurrentTaskId]]}} is equal to
+              <var>taskId</var>, abort these steps.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackVideoStats/[[CurrentTaskId]]}} to
+              <var>taskId</var>.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} to
               [= delivered video frames =],
-              {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}} is set to
+              set {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}} to
               [= discarded video frames =] and
-              {{MediaStreamTrackVideoStats/[[TotalFrames]]}} is set to
+              set {{MediaStreamTrackVideoStats/[[TotalFrames]]}} to
               [= total video frames =].
               </p>
               <div class="note">
-                <p>Only updating these counters once per task execution cycles
-                preserves the <a href=
-                "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
-                semantics defined in [[API-DESIGN-PRINCIPLES]].</p>
+                <p>Only updating these counters once per task preserves the
+                <a href="https://w3ctag.github.io/design-principles/#js-rtc">
+                run-to-completion</a> semantics defined in
+                [[API-DESIGN-PRINCIPLES]].</p>
               </div>
             </li>
           </ul>
