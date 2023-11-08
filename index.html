@@ -578,30 +578,42 @@ interface MediaStreamTrackAudioStats {
           and
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFramesDuration]]</dfn>,
           initialized to 0.</p>
+          <p>Let the {{MediaStreamTrackAudioStats}} also have an internal slot
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\CurrentTaskId]]</dfn>
+          initialized to <code>null</code>.</p>
           <p>The <dfn data-lt="expose audio frame counters steps">expose audio
           frame counters steps</dfn> are the following:</p>
           <ul>
             <li>
-              <p>If this is the first time the [= expose audio frame counters
-              steps =] are called for this {{MediaStreamTrackAudioStats}} in
-              this task execution cycle, set the internal slots of as follows:
-              {{MediaStreamTrackAudioStats/[[DeliveredFrames]]}} is set to
+              <p>Let <var>taskId</var> be a number unique to the current
+              task.</p>
+            </li>
+            <li>
+              <p>If {{MediaStreamTrackAudioStats/[[CurrentTaskId]]}} is equal to
+              <var>taskId</var>, abort these steps.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackAudioStats/[[CurrentTaskId]]}} to
+              <var>taskId</var>.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackAudioStats/[[DeliveredFrames]]}} to
               [= delivered audio frames =],
-              {{MediaStreamTrackAudioStats/[[DeliveredFramesDuration]]}} is set
+              set {{MediaStreamTrackAudioStats/[[DeliveredFramesDuration]]}}
               to [= delivered audio frames duration =],
-              {{MediaStreamTrackAudioStats/[[CurrentLatency]]}} is set
-              to [= current audio latency =],
-              {{MediaStreamTrackAudioStats/[[DeliveredFramesLatency]]}} is set
-              to [= delivered audio frames latency =],
-              {{MediaStreamTrackAudioStats/[[DroppedFrames]]}} is set to
+              set {{MediaStreamTrackAudioStats/[[CurrentLatency]]}} to
+              [= current audio latency =],
+              set {{MediaStreamTrackAudioStats/[[DeliveredFramesLatency]]}} to
+              [= delivered audio frames latency =],
+              set {{MediaStreamTrackAudioStats/[[DroppedFrames]]}} to
               [= dropped audio frames =] and
-              {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} is set to
+              set {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} to
               [= dropped audio frames duration =].</p>
               <div class="note">
-                <p>Only updating these counters once per task execution cycles
-                preserves the <a href=
-                "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
-                semantics defined in [[API-DESIGN-PRINCIPLES]].</p>
+                <p>Only updating these counters once per task preserves the
+                <a href="https://w3ctag.github.io/design-principles/#js-rtc">
+                run-to-completion</a> semantics defined in
+                [[API-DESIGN-PRINCIPLES]].</p>
               </div>
             </li>
           </ul>
@@ -682,7 +694,7 @@ interface MediaStreamTrackAudioStats {
                 <p>Because audio capture devices produce audio in real-time,
                 audio frames may be dropped if not processed in a timely
                 manner.</p>
-                <p>The percentage of audio duration that was delivered, i.e. not
+                <p>The ratio of audio duration that was delivered, i.e. not
                 dropped, can be calculated as
                 {{MediaStreamTrackAudioStats/deliveredFramesDuration}} /
                 {{MediaStreamTrackAudioStats/totalFramesDuration}}.</p>
@@ -760,25 +772,37 @@ interface MediaStreamTrackVideoStats {
           <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\TotalFrames]]</dfn>,
           initialized to 0.
           </p>
+          <p>Let the {{MediaStreamTrackVideoStats}} also have an internal slot
+          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\CurrentTaskId]]</dfn>
+          initialized to <code>null</code>.</p>
           <p>The <dfn data-lt="expose video frame counters steps">expose video
           frame counters steps</dfn> are the following:</p>
           <ul>
             <li>
-              <p>If this is the first time the [= expose video frame counters
-              steps =] are called for this {{MediaStreamTrackVideoStats}} in
-              this task execution cycle, set the internal slots of as follows:
-              {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} is set to
+              <p>Let <var>taskId</var> be a number unique to the current
+              task.</p>
+            </li>
+            <li>
+              <p>If {{MediaStreamTrackVideoStats/[[CurrentTaskId]]}} is equal to
+              <var>taskId</var>, abort these steps.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackVideoStats/[[CurrentTaskId]]}} to
+              <var>taskId</var>.</p>
+            </li>
+            <li>
+              <p>Set {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} to
               [= delivered video frames =],
-              {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}} is set to
+              set {{MediaStreamTrackVideoStats/[[DiscardedFrames]]}} to
               [= discarded video frames =] and
-              {{MediaStreamTrackVideoStats/[[TotalFrames]]}} is set to
+              set {{MediaStreamTrackVideoStats/[[TotalFrames]]}} to
               [= total video frames =].
               </p>
               <div class="note">
-                <p>Only updating these counters once per task execution cycles
-                preserves the <a href=
-                "https://w3ctag.github.io/design-principles/#js-rtc">run-to-completion</a>
-                semantics defined in [[API-DESIGN-PRINCIPLES]].</p>
+                <p>Only updating these counters once per task preserves the
+                <a href="https://w3ctag.github.io/design-principles/#js-rtc">
+                run-to-completion</a> semantics defined in
+                [[API-DESIGN-PRINCIPLES]].</p>
               </div>
             </li>
           </ul>
@@ -1023,6 +1047,68 @@ if (("faceFraming" in capabilities) {
   await videoTrack.applyConstraints({faceFraming: true});
 } else {
   // Face framing is not supported by the platform or by the camera.
+  // Consider falling back to some other method.
+}
+
+// Show to user.
+const videoElement = document.querySelector("video");
+videoElement.srcObject = stream;
+&lt;/script&gt;
+      </pre>
+    </section>
+  </section>
+  <section>
+    <h2>Exposing MediaStreamTrack source eye gaze correction support</h2>
+    <p>Some platforms or User Agents may provide built-in support for human eye
+       gaze correction to make the eyes of faces appear to look at the camera,
+       in particular for camera video streams.
+       This may for instance allow the web application to update its UI or to
+       not apply human eye gaze correction on its own.
+       For that reason, we extend {{MediaStreamTrack}} with the following
+       properties.
+    </p>
+    <p>The WebIDL changes are the following:</p>
+    <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean eyeGazeCorrection = true;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; eyeGazeCorrection;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean eyeGazeCorrection;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean eyeGazeCorrection;
+};</pre>
+    <section>
+      <h3>Processing considerations</h3>
+      <p>When the "eyeGazeCorrection" setting is set to <code>true</code>,
+         the User Agent will attempt to correct human eye gaze so that the eyes
+         of faces appear to look at the camera.
+      </p>
+      <p>When the "eyeGazeCorrection" setting is set to <code>false</code>,
+         the User Agent will not correct human eye gaze.
+      </p>
+    </section>
+    <section>
+      <h3>Examples</h3>
+      <pre class="example">
+&lt;video&gt;&lt;/video&gt;
+&lt;script&gt;
+// Open camera.
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Try to correct eye gaze.
+const videoCapabilities = videoTrack.getCapabilities();
+if ((videoCapabilities.eyeGazeCorrection || []).includes(true)) {
+  await videoTrack.applyConstraints({eyeGazeCorrection: {exact: true}});
+} else {
+  // Eye gaze correction is not supported by the platform or by the camera.
   // Consider falling back to some other method.
 }
 
