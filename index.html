@@ -555,9 +555,9 @@ interface MediaStreamTrackAudioStats {
               <p>The input latency is the estimated latency of the capture
               device, plus the latency added by buffering (if any) in the user
               agent and the time it takes the user agent to deliver the
-              frame(s). Note that once a frame has been delivered to a sink,
-              that sink may internally have its own latency (such as playout
-              delay) which is not included in this measurement.</p>
+              frame(s) to sinks. Note that once a frame has been delivered to a
+              sink, that sink may internally have its own latency (such as
+              playout delay) which is not included in this measurement.</p>
             </li>
           </ul>
           <p>Let the {{MediaStreamTrackAudioStats}} have internal slots
