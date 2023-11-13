@@ -555,22 +555,21 @@ interface MediaStreamTrackAudioStats {
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFramesDuration]]</dfn>,
           initialized to 0.</p>
           <p>Let the {{MediaStreamTrackAudioStats}} also have an internal slot
-          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\CurrentTaskId]]</dfn>
-          initialized to <code>null</code>.</p>
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\LastTask]]</dfn>
+          initialized to <code>undefined</code>.</p>
           <p>The <dfn data-lt="expose audio frame counters steps">expose audio
           frame counters steps</dfn> are the following:</p>
           <ul>
             <li>
-              <p>Let <var>taskId</var> be a number unique to the current
-              task.</p>
+              <p>Let <var>task</var> be a the current [=task=].</p>
             </li>
             <li>
-              <p>If {{MediaStreamTrackAudioStats/[[CurrentTaskId]]}} is equal to
-              <var>taskId</var>, abort these steps.</p>
+              <p>If {{MediaStreamTrackAudioStats/[[LastTask]]}} is equal to
+              <var>task</var>, abort these steps.</p>
             </li>
             <li>
-              <p>Set {{MediaStreamTrackAudioStats/[[CurrentTaskId]]}} to
-              <var>taskId</var>.</p>
+              <p>Set {{MediaStreamTrackAudioStats/[[LastTask]]}} to
+              <var>task</var>.</p>
             </li>
             <li>
               <p>Set {{MediaStreamTrackAudioStats/[[DeliveredFrames]]}} to
@@ -582,7 +581,7 @@ interface MediaStreamTrackAudioStats {
               set {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} to
               [= dropped audio frames duration =].</p>
               <div class="note">
-                <p>Only updating these counters once per task preserves the
+                <p>Only updating these counters once per [=task=] preserves the
                 <a href="https://w3ctag.github.io/design-principles/#js-rtc">
                 run-to-completion</a> semantics defined in
                 [[API-DESIGN-PRINCIPLES]].</p>
@@ -722,22 +721,21 @@ interface MediaStreamTrackVideoStats {
           initialized to 0.
           </p>
           <p>Let the {{MediaStreamTrackVideoStats}} also have an internal slot
-          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\CurrentTaskId]]</dfn>
+          <dfn class=export data-dfn-for="MediaStreamTrackVideoStats">[[\LastTask]]</dfn>
           initialized to <code>null</code>.</p>
           <p>The <dfn data-lt="expose video frame counters steps">expose video
           frame counters steps</dfn> are the following:</p>
           <ul>
             <li>
-              <p>Let <var>taskId</var> be a number unique to the current
-              task.</p>
+              <p>Let <var>task</var> be a the current [=task=].</p>
             </li>
             <li>
-              <p>If {{MediaStreamTrackVideoStats/[[CurrentTaskId]]}} is equal to
-              <var>taskId</var>, abort these steps.</p>
+              <p>If {{MediaStreamTrackVideoStats/[[LastTask]]}} is equal to
+              <var>task</var>, abort these steps.</p>
             </li>
             <li>
-              <p>Set {{MediaStreamTrackVideoStats/[[CurrentTaskId]]}} to
-              <var>taskId</var>.</p>
+              <p>Set {{MediaStreamTrackVideoStats/[[LastTask]]}} to
+              <var>task</var>.</p>
             </li>
             <li>
               <p>Set {{MediaStreamTrackVideoStats/[[DeliveredFrames]]}} to
@@ -748,7 +746,7 @@ interface MediaStreamTrackVideoStats {
               [= total video frames =].
               </p>
               <div class="note">
-                <p>Only updating these counters once per task preserves the
+                <p>Only updating these counters once per [=task=] preserves the
                 <a href="https://w3ctag.github.io/design-principles/#js-rtc">
                 run-to-completion</a> semantics defined in
                 [[API-DESIGN-PRINCIPLES]].</p>
