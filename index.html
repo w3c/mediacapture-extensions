@@ -548,16 +548,19 @@ interface MediaStreamTrackAudioStats {
               not increase.</p>
             </div>
             <li>
-              <p>The <dfn data-lt="current audio latency">current audio
-              latency</dfn> is the current input latency, in milliseconds.
-              Before the input latency is known, such as before any audio frames
-              have been delivered, this value is <code>null</code>.</p>
-              <p>The input latency is the estimated latency of the capture
-              device, plus the latency added by buffering (if any) in the user
-              agent and the time it takes the user agent to deliver the
-              frame(s) to sinks. Note that once a frame has been delivered to a
-              sink, that sink may internally have its own latency (such as
-              playout delay) which is not included in this measurement.</p>
+              <p><dfn data-lt="input latency">Input latency</dfn> is the time,
+              in milliseconds, between the point in time an audio input device
+              has acquired a signal and the time it is available for
+              consumption, which may include buffering by the user agent.</p>
+              <p>The <dfn data-lt="latest input latency">latest input
+              latency</dfn> is the latest available [= input latency =] as
+              estimated between the track's input device and delivery to any of
+              its sinks.</p>
+              <div class="note">
+                <p>A sink that consumes audio may add additional processing
+                latency not included in this measurement, such as playout delay
+                or encode time.</p>
+              </div>
             </li>
           </ul>
           <p>Let the {{MediaStreamTrackAudioStats}} have internal slots
@@ -566,7 +569,7 @@ interface MediaStreamTrackAudioStats {
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFrames]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFramesDuration]]</dfn>,
           and
-          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\CurrentLatency]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\Latency]]</dfn>,
           initialized to 0.</p>
           <p>Let the {{MediaStreamTrackAudioStats}} also have an internal slot
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\CurrentTaskId]]</dfn>
@@ -595,8 +598,8 @@ interface MediaStreamTrackAudioStats {
               [= dropped audio frames =],
               set {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} to
               [= dropped audio frames duration =] and
-              set {{MediaStreamTrackAudioStats/[[CurrentLatency]]}} to
-              [= current audio latency =].</p>
+              set {{MediaStreamTrackAudioStats/[[Latency]]}} to the
+              [= latest input latency =].</p>
               <div class="note">
                 <p>Only updating these counters once per task preserves the
                 <a href="https://w3ctag.github.io/design-principles/#js-rtc">
@@ -673,7 +676,7 @@ interface MediaStreamTrackAudioStats {
             <dd>
               <p>
                 Upon getting, run the [= expose audio frame counters steps =]
-                and return {{MediaStreamTrackAudioStats/[[CurrentLatency]]}}.
+                and return {{MediaStreamTrackAudioStats/[[Latency]]}}.
               </p>
             </dd>
           </dl>
