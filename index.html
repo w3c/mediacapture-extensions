@@ -990,7 +990,7 @@ const [videoTrack] = stream.getVideoTracks();
 
 // Try to improve framing.
 const capabilities = videoTrack.getCapabilities();
-if (("faceFraming" in capabilities) {
+if ("faceFraming" in capabilities) {
   await videoTrack.applyConstraints({faceFraming: true});
 } else {
   // Face framing is not supported by the platform or by the camera.
