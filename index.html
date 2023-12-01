@@ -423,7 +423,8 @@ partial interface MediaStreamTrack {
     <div>
       <p>
         On microphone audio tracks, frame counters allow the application to tell
-        the ratio of audio that is delivered as one quality indicator.
+        the ratio of audio that is delivered as one quality indicator and the
+        latency metrics measure the input delay from capture to application.
       </p>
       <p>
         On camera and screenshare video tracks, frame counters allow the
@@ -508,6 +509,7 @@ interface MediaStreamTrackAudioStats {
   readonly attribute DOMHighResTimeStamp deliveredFramesDuration;
   readonly attribute unsigned long long totalFrames;
   readonly attribute DOMHighResTimeStamp totalFramesDuration;
+  readonly attribute DOMHighResTimeStamp latency;
   [Default] object toJSON();
 };
         </pre>
@@ -545,14 +547,33 @@ interface MediaStreamTrackAudioStats {
               such as if the track is muted or disabled, then the counters do
               not increase.</p>
             </div>
+            <li>
+              <p><dfn data-lt="input latency">Input latency</dfn> is the time,
+              in milliseconds, between the point in time an audio input device
+              has acquired a signal and the time it is available for
+              consumption, which may include buffering by the user agent.</p>
+              <p>The <dfn data-lt="latest input latency">latest input
+              latency</dfn> is the latest available [= input latency =] as
+              estimated between the track's input device and delivery to any of
+              its sinks.</p>
+              <div class="note">
+                <p>The user agent updates its estimates at sufficient frequency
+                to allow monitoring. The latency is representative of the
+                experienced delay, but is not necessarily an exact measurement
+                of the last individual audio frame that was delivered.</p>
+                <p>A sink that consumes audio may add additional processing
+                latency not included in this measurement, such as playout delay
+                or encode time.</p>
+              </div>
             </li>
           </ul>
           <p>Let the {{MediaStreamTrackAudioStats}} have internal slots
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFrames]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFramesDuration]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFrames]]</dfn>,
-          and
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFramesDuration]]</dfn>,
+          and
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\Latency]]</dfn>,
           initialized to 0.</p>
           <p>Let the {{MediaStreamTrackAudioStats}} also have an internal slot
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\LastTask]]</dfn>
@@ -577,9 +598,11 @@ interface MediaStreamTrackAudioStats {
               set {{MediaStreamTrackAudioStats/[[DeliveredFramesDuration]]}}
               to [= delivered audio frames duration =],
               set {{MediaStreamTrackAudioStats/[[DroppedFrames]]}} to
-              [= dropped audio frames =] and
+              [= dropped audio frames =],
               set {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} to
-              [= dropped audio frames duration =].</p>
+              [= dropped audio frames duration =] and
+              set {{MediaStreamTrackAudioStats/[[Latency]]}} to the
+              [= latest input latency =].</p>
               <div class="note">
                 <p>Only updating these counters once per [=task=] preserves the
                 <a href="https://w3ctag.github.io/design-principles/#js-rtc">
@@ -647,6 +670,17 @@ interface MediaStreamTrackAudioStats {
                 {{MediaStreamTrackAudioStats/deliveredFramesDuration}} /
                 {{MediaStreamTrackAudioStats/totalFramesDuration}}.</p>
               </div>
+            </dd>
+            <dt>
+              <dfn data-idl="">latency</dfn> of type <span
+              class="idlMemberType">DOMHighResTimeStamp, readonly,
+              nullable</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return {{MediaStreamTrackAudioStats/[[Latency]]}}.
+              </p>
             </dd>
           </dl>
         </section>
