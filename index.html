@@ -510,6 +510,10 @@ interface MediaStreamTrackAudioStats {
   readonly attribute unsigned long long totalFrames;
   readonly attribute DOMHighResTimeStamp totalFramesDuration;
   readonly attribute DOMHighResTimeStamp latency;
+  readonly attribute DOMHighResTimeStamp averageLatency;
+  readonly attribute DOMHighResTimeStamp minimumLatency;
+  readonly attribute DOMHighResTimeStamp maximumLatency;
+  undefined resetLatency();
   [Default] object toJSON();
 };
         </pre>
@@ -565,6 +569,15 @@ interface MediaStreamTrackAudioStats {
                 latency not included in this measurement, such as playout delay
                 or encode time.</p>
               </div>
+              <p>Every time the [= latest input latency =] measurement is
+              updated, the user agent also updates its
+              <dfn data-lt="average input latency">average input latency</dfn>,
+              <dfn data-lt="minimum input latency">minimum input latency</dfn>
+              and <dfn data-lt="maximum input latency">maximum input
+              latency</dfn> which are the average, minimum and maximum observed
+              measurements since the last <dfn data-lt="latency reset">latency
+              reset</dfn>.
+              </p>
             </li>
           </ul>
           <p>Let the {{MediaStreamTrackAudioStats}} have internal slots
@@ -572,8 +585,11 @@ interface MediaStreamTrackAudioStats {
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFramesDuration]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFrames]]</dfn>,
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DroppedFramesDuration]]</dfn>,
-          and
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\Latency]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\AverageLatency]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\MinimumLatency]]</dfn>
+          and
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\MaximumLatency]]</dfn>,
           initialized to 0.</p>
           <p>Let the {{MediaStreamTrackAudioStats}} also have an internal slot
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\LastTask]]</dfn>
@@ -600,9 +616,15 @@ interface MediaStreamTrackAudioStats {
               set {{MediaStreamTrackAudioStats/[[DroppedFrames]]}} to
               [= dropped audio frames =],
               set {{MediaStreamTrackAudioStats/[[DroppedFramesDuration]]}} to
-              [= dropped audio frames duration =] and
+              [= dropped audio frames duration =],
               set {{MediaStreamTrackAudioStats/[[Latency]]}} to the
-              [= latest input latency =].</p>
+              [= latest input latency =],
+              set {{MediaStreamTrackAudioStats/[[AverageLatency]]}} to the
+              [= average input latency =],
+              set {{MediaStreamTrackAudioStats/[[MinimumLatency]]}} to the
+              [= minimum input latency =] and
+              set {{MediaStreamTrackAudioStats/[[MaximumLatency]]}} to the
+              [= maximum input latency =].</p>
               <div class="note">
                 <p>Only updating these counters once per [=task=] preserves the
                 <a href="https://w3ctag.github.io/design-principles/#js-rtc">
@@ -673,13 +695,42 @@ interface MediaStreamTrackAudioStats {
             </dd>
             <dt>
               <dfn data-idl="">latency</dfn> of type <span
-              class="idlMemberType">DOMHighResTimeStamp, readonly,
-              nullable</span>
+              class="idlMemberType">DOMHighResTimeStamp, readonly</span>
             </dt>
             <dd>
               <p>
                 Upon getting, run the [= expose audio frame counters steps =]
                 and return {{MediaStreamTrackAudioStats/[[Latency]]}}.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">averageLatency</dfn> of type <span
+              class="idlMemberType">DOMHighResTimeStamp, readonly</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return {{MediaStreamTrackAudioStats/[[AverageLatency]]}}.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">minimumLatency</dfn> of type <span
+              class="idlMemberType">DOMHighResTimeStamp, readonly</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return {{MediaStreamTrackAudioStats/[[MinimumLatency]]}}.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">maximumLatency</dfn> of type <span
+              class="idlMemberType">DOMHighResTimeStamp, readonly</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return {{MediaStreamTrackAudioStats/[[MaximumLatency]]}}.
               </p>
             </dd>
           </dl>
@@ -688,6 +739,27 @@ interface MediaStreamTrackAudioStats {
           <h4>Methods</h4>
           <dl data-link-for="MediaStreamTrackAudioStats"
           data-dfn-for="MediaStreamTrackAudioStats" class="methods">
+            <dt>
+              <dfn data-idl="">resetLatency</dfn>
+            </dt>
+            <dd>
+              <p>When called, run the following steps:</p>
+              <ul>
+                <li>
+                  <p>Run the [= expose audio frame counters steps =].</p>
+                </li>
+                <li>
+                  <p>Set {{MediaStreamTrackAudioStats/[[AverageLatency]]}},
+                  {{MediaStreamTrackAudioStats/[[MinimumLatency]]}} and
+                  {{MediaStreamTrackAudioStats/[[MaximumLatency]]}} to
+                  {{MediaStreamTrackAudioStats/[[Latency]]}}.</p>
+                </li>
+                <li>
+                  <p>Perform a [= latency reset =].</p>
+                </li>
+              </ul>
+              </p>
+            </dd>
             <dt>
               <dfn data-idl="">toJSON</dfn>
             </dt>
