@@ -518,13 +518,11 @@ interface MediaStreamTrackAudioStats {
 };
         </pre>
         <div class="note">
-          <p>The audio frame counters and durations
+          <p>The following metrics lack Working Group consensus:
           ({{MediaStreamTrackAudioStats/deliveredFrames}},
           {{MediaStreamTrackAudioStats/deliveredFramesDuration}},
           {{MediaStreamTrackAudioStats/totalFrames}} and
-          {{MediaStreamTrackAudioStats/totalFramesDuration}}) allowing the
-          application to measure audio glitches (dropped = total - delivered)
-          are at risk due to lack of consensus, see <a
+          {{MediaStreamTrackAudioStats/totalFramesDuration}}). See <a
           href="https://github.com/w3c/mediacapture-extensions/issues/129">Issue
           #129</a>.</p>
         </div>
