@@ -517,6 +517,17 @@ interface MediaStreamTrackAudioStats {
   [Default] object toJSON();
 };
         </pre>
+        <div class="note">
+          <p>The audio frame counters and durations
+          ({{MediaStreamTrackAudioStats/deliveredFrames}},
+          {{MediaStreamTrackAudioStats/deliveredFramesDuration}},
+          {{MediaStreamTrackAudioStats/totalFrames}} and
+          {{MediaStreamTrackAudioStats/totalFramesDuration}}) allowing the
+          application to measure audio glitches (dropped = total - delivered)
+          are at risk due to lack of consensus, see <a
+          href="https://github.com/w3c/mediacapture-extensions/issues/129">Issue
+          #129</a>.</p>
+        </div>
         <div>
           <p>The {{MediaStreamTrackAudioStats}} expose frame counters for the
           {{MediaStreamTrack}} that created it. For this track, the user agent
