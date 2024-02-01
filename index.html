@@ -584,8 +584,8 @@ interface MediaStreamTrackAudioStats {
               <dfn data-lt="minimum input latency">minimum input latency</dfn>
               and <dfn data-lt="maximum input latency">maximum input
               latency</dfn> which are the average, minimum and maximum observed
-              measurements since the last <dfn data-lt="latency reset">latency
-              reset</dfn>.
+              measurements since the last <dfn data-lt="latency reset time">
+              latency reset time</dfn>.
               </p>
             </li>
           </ul>
@@ -600,8 +600,10 @@ interface MediaStreamTrackAudioStats {
           and
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\MaximumLatency]]</dfn>,
           initialized to 0.</p>
-          <p>Let the {{MediaStreamTrackAudioStats}} also have an internal slot
+          <p>Let the {{MediaStreamTrackAudioStats}} also have internal slots
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\LastTask]]</dfn>
+          and
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\LastExposureTime]]</dfn>,
           initialized to <code>undefined</code>.</p>
           <p>The <dfn data-lt="expose audio frame counters steps">expose audio
           frame counters steps</dfn> are the following:</p>
@@ -634,6 +636,8 @@ interface MediaStreamTrackAudioStats {
               [= minimum input latency =] and
               set {{MediaStreamTrackAudioStats/[[MaximumLatency]]}} to the
               [= maximum input latency =].</p>
+              <p>Set {{MediaStreamTrackAudioStats/[[LastExposureTime]]}} to
+              reflect the time that these metrics were exposed.</p>
               <div class="note">
                 <p>Only updating these counters once per [=task=] preserves the
                 <a href="https://w3ctag.github.io/design-principles/#js-rtc">
@@ -764,7 +768,8 @@ interface MediaStreamTrackAudioStats {
                   {{MediaStreamTrackAudioStats/[[Latency]]}}.</p>
                 </li>
                 <li>
-                  <p>Perform a [= latency reset =].</p>
+                  <p>Set the [= latency reset time =] to
+                  {{MediaStreamTrackAudioStats/[[LastExposureTime]]}}.</p>
                 </li>
               </ul>
               </p>
