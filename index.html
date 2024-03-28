@@ -1060,6 +1060,35 @@ partial dictionary MediaTrackCapabilities {
     </div>
   </section>
   <section>
+    <h2>Exposing MediaStreamTrack source heuristic reactions support</h2>
+    <div>
+      <p>Some platforms or User Agents may provide built-in support for video effects triggered by user motion heuristics, in particular for camera video streams.
+         Web applications may either want to control or at least be aware that these heuristics are active and might trigger these effects at the source level.
+         This can for instance allow the web application to update its UI or to turn off these heuristics where having such effects tiggered accidentally might be considered insensitive or inappropriate.
+         For that reason, we extend {{MediaStreamTrack}} with the following properties.
+      </p>
+    </div>
+    <div>
+      <p>The WebIDL changes are the following:
+      <pre class="idl">
+partial dictionary MediaTrackSupportedConstraints {
+  boolean gestureReactions = true;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean gestureReactions;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean gestureReactions;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; gestureReactions;
+};</pre>
+    </div>
+  </section>
+  <section>
     <h2>Exposing MediaStreamTrack source automatic face framing support</h2>
     <p>Some platforms or User Agents may provide built-in support for automatic
        continuous framing based on the position of human faces within the field
