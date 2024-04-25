@@ -1676,5 +1676,17 @@ self.onmessage = async ({data: {track}}) => {
       </pre>
     </section>
   </section>
+  <section>
+    <h2>MediaStream in workers</h2>
+    <div>
+      <p>{{MediaStreamTrack}}'s objects are exposed to workers, so can do {{MediaStream}}'s objects.
+    <div>
+      <p>The WebIDL changes are the following:
+      <pre class="idl"
+>[Exposed=(Window,Worker)]
+partial interface MediaStream {
+};</pre>
+    </div>
+  </section>
 </body>
 </html>
