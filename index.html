@@ -1972,5 +1972,107 @@ partial interface MediaStream {
 };</pre>
     </div>
   </section>
+  <section>
+    <h2>Background segmentation mask</h2>
+    <p>Some platforms or User Agents may provide built-in support for background segmentation of video frames, in particular for camera video streams.
+       Web applications may want to control whether background segmentation is computed at the source level and to get access to the computed segmentation masks.
+       This allows the web application for instance
+       to do custom framing or background blurring or replacement
+       while leveraging on platform computed background segmentation.
+       This allows the web application
+       to access the original unmodified frame and
+       to fine tune frame modifications based on its likings.
+       For that reason, we extend {{MediaStreamTrack}} with the following properties and {{VideoFrameMetadata}} with the following attributes.
+    </p>
+    <pre class="idl">
+partial dictionary MediaTrackSupportedConstraints {
+  boolean backgroundSegmentationMask = true;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean backgroundSegmentationMask;
+};
+
+partial dictionary MediaTrackSettings {
+  boolean backgroundSegmentationMask;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; backgroundSegmentationMask;
+};</pre>
+    <section>
+      <h3>{{VideoFrameMetadata}}</h3>
+      <pre class="idl">
+partial dictionary VideoFrameMetadata {
+  ImageBitmap backgroundSegmentationMask;
+};</pre>
+      <section class="notoc">
+        <h4>Members</h4>
+        <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
+          <dt><dfn><code>backgroundSegmentationMask</code></dfn> of type <code>{{ImageBitmap}}</code></dt>
+          <dd>
+            <p>A background segmentation mask with
+               white denoting certainly foreground,
+               black denoting certainly background and
+               grey denoting uncertainty or ambiguity with
+               light shades of grey denoting likely foreground and
+               dark shades of grey denoting likely background.
+               Absence might indicate
+               that the frame is not from a camera, or
+               that the user agent does not support or
+               was not able to do background segmentation.
+            </p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>Example</h3>
+      <pre class="example">
+// Open camera.
+const stream = await navigator.mediaDevices.getUserMedia({video: true});
+const [videoTrack] = stream.getVideoTracks();
+
+// Try to enable background segmentation mask.
+const videoCapabilities = videoTrack.getCapabilities();
+if ((videoCapabilities.backgroundSegmentationMask || []).includes(true)) {
+  await videoTrack.applyConstraints({backgroundSegmentationMask: {exact: true}});
+} else {
+  // Background segmentation mask is not supported by the platform or
+  // by the camera. Consider falling back to some other method.
+}
+
+const canvasContext = document.querySelector('canvas').getContext('2d');
+const videoProcessor = new MediaStreamTrackProcessor({track: videoTrack});
+const videoProcessorReader = videoProcessor.readable.getReader();
+
+for (;;) {
+  const {done, value: videoFrame} = await videoProcessorReader.read();
+  if (done)
+    break;
+  const {backgroundSegmentationMask} = videoFrame.metadata();
+  if (backgroundSegmentationMask) {
+    // Draw the video frame.
+    canvasContext.globalCompositeOperation = 'copy';
+    context.drawImage(videoFrame, 0, 0);
+    // Draw (or multiply with) the mask.
+    // The result is the foreground on black.
+    context.globalCompositeOperation = 'multiply';
+    canvasContext.drawImage(backgroundSegmentationMask, 0, 0);
+  }
+  else {
+    // Everything is background. Fill with black.
+    canvasContext.globalCompositeOperation = 'copy';
+    canvasContext.fillStyle = 'black';
+    canvasContext.fillRect(
+      0,
+      0,
+      canvasContext.canvas.width,
+      canvasContext.canvas.height);
+  }
+}
+      </pre>
+    </section>
+  </section>
 </body>
 </html>
