@@ -243,10 +243,8 @@
               <li>
                 <p>Let <var>descriptor</var> be a {{PermissionDescriptor}}
                 with its {{PermissionDescriptor/name}} member set to the permission name
-                associated with <var>kind</var> (e.g. {{PermissionName/"camera"}} for
-                <code>"video"</code>, {{PermissionName/"microphone"}} for <code>"audio"</code>), and,
-                optionally, consider its {{DevicePermissionDescriptor/deviceId}} member set to any appropriate
-                device's <var>deviceId</var>.</p>
+                associated with <var>kind</var> (e.g. [="camera"=] for
+                <code>"video"</code>, [="microphone"=] for <code>"audio"</code>).</p>
               </li>
               <li>
                 <p>If the number of unique devices sourcing tracks of
@@ -402,7 +400,7 @@ partial interface MediaStreamTrack {
         <li><p>Set <var>dataHolder</var>.`[[constraints]]` to <var>value</var> active constraints.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[contentHint]]` to <var>value</var> application-set content hint.</p></li>
         <li><p>Set <var>value</var>.`[[IsDetached]]` to <code>true</code>.</p></li>
-        <li><p>Set <var>value</var>.{{MediaStreamTrack/[[ReadyState]]}} to <a data-cite="!mediacapture-streams/#track-ended">"ended"</a> (without stopping the underlying source or firing an `ended` event).</p></li>
+        <li><p>Set <var>value</var>.<a data-cite="mediacapture-streams#dfn-readystate" data-link-type="attribute">[[\ReadyState]]</a> to {{MediaStreamTrackState/"ended"}} (without stopping the underlying source or firing an `ended` event).</p></li>
       </ol>
     </div>
     <div><p>{{MediaStreamTrack}} <a data-cite="!HTML/#transfer-receiving-steps">transfer-receiving steps</a>, given <var>dataHolder</var> and <var>track</var>, are:</p>
@@ -414,7 +412,7 @@ partial interface MediaStreamTrack {
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/enabled}} to <var>dataHolder</var>.`[[enabled]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/muted}} to <var>dataHolder</var>.`[[muted]]`.</p></li>
         <li><p>Set <var>track</var> application-set content hint to <var>dataHolder</var>.`[[contentHint]]`.</p></li>
-        <li><p>[=MediaStreamTrack/Initialize the underlying source=] of <var>track</var> to <var>dataHolder</var>.`[[source]]`.</p></li>
+        <li><p>[=Initialize the underlying source=] of <var>track</var> to <var>dataHolder</var>.`[[source]]`.</p></li>
         <li><p>Set <var>track</var>'s constraints to <var>dataHolder</var>.`[[constraints]]`.</p></li>
       </ol>
     </div>
