@@ -1034,35 +1034,6 @@ interface MediaStreamTrackVideoStats {
       </table>
     </section>
   <section>
-    <h2>Exposing MediaStreamTrack source background blur support</h2>
-    <div>
-      <p>Some platforms or User Agents may provide built-in support for background blurring of video frames, in particular for camera video streams.
-         Web applications may either want to control or at least be aware that background blur is applied at the source level.
-         This may for instance allow the web application to update its UI or to not apply background blur on its own.
-         For that reason, we extend {{MediaStreamTrack}} with the following properties.
-      </p>
-    </div>
-    <div>
-      <p>The WebIDL changes are the following:
-      <pre class="idl">
-partial dictionary MediaTrackSupportedConstraints {
-  boolean backgroundBlur = true;
-};
-
-partial dictionary MediaTrackConstraintSet {
-  ConstrainBoolean backgroundBlur;
-};
-
-partial dictionary MediaTrackSettings {
-  boolean backgroundBlur;
-};
-
-partial dictionary MediaTrackCapabilities {
-  sequence&lt;boolean&gt; backgroundBlur;
-};</pre>
-    </div>
-  </section>
-  <section>
     <h2>Exposing MediaStreamTrack source heuristic reactions support</h2>
     <div>
       <p>Some platforms or User Agents may provide built-in support for video effects triggered by user motion heuristics, in particular for camera video streams.
