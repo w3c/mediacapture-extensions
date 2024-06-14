@@ -61,7 +61,7 @@
   </section>
   <section id="conformance">
   </section>
-  <section id="camera and microphone picker">
+  <section id="camera_and_microphone_picker">
     <h2>In-browser camera and microphone picker</h2>
     <p>The existing {{MediaDevices/enumerateDevices()}} function exposes camera
     and microphone {{MediaDeviceInfo/label}}s to let applications build
@@ -78,7 +78,7 @@
     <p>This specification augments the existing {{MediaDevices/getUserMedia()}}
     function instead of introducing a new less-powerful API to compete with it,
     for that reason as well.</p>
-    <section id="new getusermedia semantics">
+    <section>
       <h3>getUserMedia "user-chooses" semantics</h3>
       <p>This specification introduces
       slightly altered semantics to the {{MediaDevices/getUserMedia()}}
@@ -96,7 +96,7 @@
       {{MediaDevices/getUserMedia()}} repeatedly and lazily instead of using
       e.g. <code>stream.clone()</code>.</p>
     </section>
-    <section id="web compatibility">
+    <section>
       <h3>Web compatibility and migration</h3>
       <p>User agents are encouraged to provide the new semantics as opt-in
       initially for web compatibility. User agents MUST deprecate (remove)
@@ -232,7 +232,7 @@
           <li>
             <p>Let <var>semantics</var> be
             <var>constraints</var><code>.semantics</code>
-            if <a href="https://heycam.github.io/webidl/#dfn-present">present</a>,
+            if it [= map/exists =],
             or the value of <var>mediaDevices</var><code>.<a data-link-for="MediaDevices">defaultSemantics</a></code>
             otherwise.</p>
           </li>
@@ -928,7 +928,7 @@ interface MediaStreamTrackVideoStats {
       </div>
     </section>
   </section>
-  <section id="the powerEfficientPixelFormat constraint">
+  <section>
     <h2>The powerEfficientPixelFormat constraint</h2>
     <section id="mediatracksupportedconstraints-dictionary-extensions">
       <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
@@ -1300,7 +1300,7 @@ partial interface MediaStreamTrack {
     <p>The <dfn data-dfn-for="MediaStreamTrack">onconfigurationchange</dfn> attribute
       is an [=event handler IDL attribute=] for the `onconfigurationchange`
       [=event handler=], whose [=event handler event type=] is
-      <dfn event for=MediaStreamTrack>configurationchange</dfn>.
+      <dfn class=event data-dfn-for=MediaStreamTrack>configurationchange</dfn>.
     </p>
     <p>
       <p>When the [=User Agent=] detects <dfn data-export id="change-track-configuration">a change of configuration</dfn>
