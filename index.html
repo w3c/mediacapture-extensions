@@ -61,7 +61,7 @@
   </section>
   <section id="conformance">
   </section>
-  <section id="camera and microphone picker">
+  <section id="camera_and_microphone_picker">
     <h2>In-browser camera and microphone picker</h2>
     <p>The existing {{MediaDevices/enumerateDevices()}} function exposes camera
     and microphone {{MediaDeviceInfo/label}}s to let applications build
@@ -78,7 +78,7 @@
     <p>This specification augments the existing {{MediaDevices/getUserMedia()}}
     function instead of introducing a new less-powerful API to compete with it,
     for that reason as well.</p>
-    <section id="new getusermedia semantics">
+    <section>
       <h3>getUserMedia "user-chooses" semantics</h3>
       <p>This specification introduces
       slightly altered semantics to the {{MediaDevices/getUserMedia()}}
@@ -96,7 +96,7 @@
       {{MediaDevices/getUserMedia()}} repeatedly and lazily instead of using
       e.g. <code>stream.clone()</code>.</p>
     </section>
-    <section id="web compatibility">
+    <section>
       <h3>Web compatibility and migration</h3>
       <p>User agents are encouraged to provide the new semantics as opt-in
       initially for web compatibility. User agents MUST deprecate (remove)
@@ -232,7 +232,7 @@
           <li>
             <p>Let <var>semantics</var> be
             <var>constraints</var><code>.semantics</code>
-            if <a href="https://heycam.github.io/webidl/#dfn-present">present</a>,
+            if it [= map/exists =],
             or the value of <var>mediaDevices</var><code>.<a data-link-for="MediaDevices">defaultSemantics</a></code>
             otherwise.</p>
           </li>
@@ -243,10 +243,8 @@
               <li>
                 <p>Let <var>descriptor</var> be a {{PermissionDescriptor}}
                 with its {{PermissionDescriptor/name}} member set to the permission name
-                associated with <var>kind</var> (e.g. {{PermissionName/"camera"}} for
-                <code>"video"</code>, {{PermissionName/"microphone"}} for <code>"audio"</code>), and,
-                optionally, consider its {{DevicePermissionDescriptor/deviceId}} member set to any appropriate
-                device's <var>deviceId</var>.</p>
+                associated with <var>kind</var> (e.g. [="camera"=] for
+                <code>"video"</code>, [="microphone"=] for <code>"audio"</code>).</p>
               </li>
               <li>
                 <p>If the number of unique devices sourcing tracks of
@@ -402,7 +400,7 @@ partial interface MediaStreamTrack {
         <li><p>Set <var>dataHolder</var>.`[[constraints]]` to <var>value</var> active constraints.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[contentHint]]` to <var>value</var> application-set content hint.</p></li>
         <li><p>Set <var>value</var>.`[[IsDetached]]` to <code>true</code>.</p></li>
-        <li><p>Set <var>value</var>.{{MediaStreamTrack/[[ReadyState]]}} to <a data-cite="!mediacapture-streams/#track-ended">"ended"</a> (without stopping the underlying source or firing an `ended` event).</p></li>
+        <li><p>Set <var>value</var>.<a data-cite="mediacapture-streams#dfn-readystate" data-link-type="attribute">[[\ReadyState]]</a> to {{MediaStreamTrackState/"ended"}} (without stopping the underlying source or firing an `ended` event).</p></li>
       </ol>
     </div>
     <div><p>{{MediaStreamTrack}} <a data-cite="!HTML/#transfer-receiving-steps">transfer-receiving steps</a>, given <var>dataHolder</var> and <var>track</var>, are:</p>
@@ -414,7 +412,7 @@ partial interface MediaStreamTrack {
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/enabled}} to <var>dataHolder</var>.`[[enabled]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/muted}} to <var>dataHolder</var>.`[[muted]]`.</p></li>
         <li><p>Set <var>track</var> application-set content hint to <var>dataHolder</var>.`[[contentHint]]`.</p></li>
-        <li><p>[=MediaStreamTrack/Initialize the underlying source=] of <var>track</var> to <var>dataHolder</var>.`[[source]]`.</p></li>
+        <li><p>[=Initialize the underlying source=] of <var>track</var> to <var>dataHolder</var>.`[[source]]`.</p></li>
         <li><p>Set <var>track</var>'s constraints to <var>dataHolder</var>.`[[constraints]]`.</p></li>
       </ol>
     </div>
@@ -556,13 +554,13 @@ interface MediaStreamTrackAudioStats {
               frames duration</dfn> is the total duration of all [= dropped
               audio frames =]. This measurement is incremented at the same time
               as [= dropped audio frames =] and is measured in milliseconds.</p>
-            </li>
             <div class="note">
               <p>If the track is unmuted and enabled, the counters increase as
               audio is produced by the capture device. If no audio is flowing,
               such as if the track is muted or disabled, then the counters do
               not increase.</p>
             </div>
+            </li>
             <li>
               <p><dfn data-lt="input latency">Input latency</dfn> is the time,
               in milliseconds, between the point in time an audio input device
@@ -930,7 +928,7 @@ interface MediaStreamTrackVideoStats {
       </div>
     </section>
   </section>
-  <section id="the powerEfficientPixelFormat constraint">
+  <section>
     <h2>The powerEfficientPixelFormat constraint</h2>
     <section id="mediatracksupportedconstraints-dictionary-extensions">
       <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
@@ -1299,10 +1297,10 @@ partial dictionary MediaTrackCapabilities {
 partial interface MediaStreamTrack {
   attribute EventHandler onconfigurationchange;
 };</pre>
-    <p>The <dfn data-dfn-for="MediaStreamTrack">onconfigurationchange</dfn> attribute
+    <p>The <dfn class=attribute data-dfn-for="MediaStreamTrack">onconfigurationchange</dfn> attribute
       is an [=event handler IDL attribute=] for the `onconfigurationchange`
       [=event handler=], whose [=event handler event type=] is
-      <dfn event for=MediaStreamTrack>configurationchange</dfn>.
+      <dfn data-dfn-type=event>configurationchange</dfn>.
     </p>
     <p>
       <p>When the [=User Agent=] detects <dfn data-export id="change-track-configuration">a change of configuration</dfn>
