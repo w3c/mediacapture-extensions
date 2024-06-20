@@ -1219,6 +1219,179 @@ videoElement.srcObject = stream;
     </section>
   </section>
   <section>
+    <h2>Exposing MediaStreamTrack voice activity detection support</h2>
+    <p>Some platforms or User Agents may provide built-in support for voice
+       activity detection. Web applications may want to know whether a user is
+       speaking when the microphone is muted, so an unmute notification could be
+       displayed. For that reason, we extend {{MediaStreamTrack}} with the
+       following properties.
+    </p>
+    <h3>MediaTrackSupportedConstraints Dictionary Extensions</h3>
+    <pre class="idl">
+partial dictionary MediaTrackSupportedConstraints {
+  boolean voiceActivityDetection = true;
+};</pre>
+    <section class="notoc">
+      <h4>Dictionary {{MediaTrackSupportedConstraints}} Members</h4>
+      <dl class="dictionary-members" data-dfn-for=
+      "MediaTrackSupportedConstraints" data-link-for=
+      "MediaTrackSupportedConstraints">
+        <dt><dfn>voiceActivityDetection</dfn> of type {{boolean}}, defaulting to
+          <code>true</code></dt>
+          <dd>See <a href=
+          "#def-constraint-voiceActivityDetection">
+          voiceActivityDetection</a> for details.</dd>
+      </dl>
+    </section>
+    <h3>MediaTrackCapabilities Dictionary Extensions</h3>
+    <pre class="idl">
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; voiceActivityDetection;
+};</pre>
+    <section class="notoc">
+      <h4>Dictionary {{MediaTrackCapabilities}} Members</h4>
+      <dl class="dictionary-members" data-dfn-for="MediaTrackCapabilities"
+      data-link-for="MediaTrackCapabilities">
+        <dt><dfn>voiceActivityDetection</dfn> of type
+        <code>sequence&lt;{{boolean}}&gt;</code></dt>
+        <dd>
+          <p>If the source does not support voice activity detection, a single
+          <code>false</code> is reported. If the source supports voice activity
+          detection, a list with both <code>true</code> and <code>false</code>
+          are reported. See <a href=
+          "#def-constraint-voiceActivityDetection">
+          voiceActivityDetection</a> for additional
+          details.</p>
+        </dd>
+      </dl>
+    </section>
+    <h3>MediaTrackConstraintSet Dictionary Extensions</h3>
+    <pre class="idl">
+partial dictionary MediaTrackConstraintSet {
+  ConstrainBoolean voiceActivityDetection;
+};</pre>
+    <section class="notoc">
+      <h4>Dictionary {{MediaTrackConstraintSet}} Members</h4>
+      <dl class="dictionary-members" data-dfn-for="MediaTrackConstraintSet"
+      data-link-for="MediaTrackConstraintSet">
+        <dt><dfn>voiceActivityDetection</dfn> of type {{boolean}}, defaulting to
+          <code>true</code></dt>
+          <dd>See <a href=
+          "#def-constraint-voiceActivityDetection">
+          voiceActivityDetection</a> for details.</dd>
+      </dl>
+    </section>
+    <h3>MediaTrackSettings Dictionary Extensions</h3>
+    <pre class="idl">
+partial dictionary MediaTrackSettings {
+  boolean voiceActivityDetection;
+};</pre>
+    <section class="notoc">
+      <h4>Dictionary {{MediaTrackSettings}} Members</h4>
+      <dl class="dictionary-members" data-dfn-for="MediaTrackSettings"
+      data-link-for="MediaTrackSettings">
+        <dt><dfn>voiceActivityDetection</dfn> of type {{boolean}}, defaulting to
+          <code>true</code></dt>
+          <dd>See <a href=
+          "#def-constraint-voiceActivityDetection">
+          voiceActivityDetection</a> for details.</dd>
+      </dl>
+    </section>
+    <h3>Constrainable Properties</h3>
+      <p>The following constrainable properties are defined to apply only to
+        audio {{MediaStreamTrack}} objects:
+      </p>
+      <table class="simple">
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>Values</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><dfn id="def-constraint-voiceActivityDetection">
+              voiceActivityDetection</dfn></td>
+            <td>{{ConstrainBoolean}}</td>
+            <td>
+              <p>Voice activity detection allows web applications to be notified
+                when a voice activity starts.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    <h3>MediaStreamTrack Interface Extensions</h3>
+    <pre class="idl">
+partial interface MediaStreamTrack {
+  attribute EventHandler onvoiceactivitydetected;
+};</pre>
+    <p>
+      Let
+      <dfn data-dfn-for=MediaStreamTrack>{{MediaStreamTrack/[[LastVoiceActivityDetectedTimestamp]]}}</dfn>
+      be an internal slot of the {{MediaStreamTrack}}, initialized as
+      <code>undefined</code>.
+    </p>
+    <p>The <dfn data-dfn-for="MediaStreamTrack">onvoiceactivitydetected</dfn>
+      attribute is an [=event handler IDL attribute=] for the
+      `onvoiceactivitydetected` [=event handler=], whose
+      [=event handler event type=] is
+      <dfn event for=MediaStreamTrack>voiceactivitydetected</dfn>.
+    </p>
+    <p>
+      <p>When the [=User Agent=] detects a voice activity is started in a
+        <var>track</var>'s underlying source, the [=User Agent=] MUST run the
+        following steps:</p>
+      <ol data-cite="HR-TIME">
+        <li><p>If {{voiceActivityDetection}} setting of <var>track</var> is set
+          to <code>false</code> by the <a>ApplyConstraints algorithm</a>, abort
+          these steps.</p></li>
+        <li>Let <var>voiceActivityDetectionMinimalInterval</var> be a
+          [=User Agent=] defined value, depends on [=User Agent=]'s policy on
+          privacy and power efficiency.</li>
+        <li><p>If
+          <var>track</var>.{{MediaStreamTrack/[[LastVoiceActivityDetectedTimestamp]]}}
+          is not <code>undefined</code>, and {{Performance.now()}} -
+          <var>track</var>.{{MediaStreamTrack/[[LastVoiceActivityDetectedTimestamp]]}}
+          is less than <var>voiceActivityDetectionMinimalInterval</var>, abort
+          these steps.</p></li>
+        <li><p>[=Queue a task=] to perform the following steps:</p>
+          <ol>
+            <li><p>If <var>track</var>.{{MediaStreamTrack/readyState}} is
+              "ended", abort these steps.</p></li>
+            <li>
+              <p>[=Fire an event=] named {{voiceactivitydetected}} on
+                <var>track</var>.</p>
+            </li>
+            <li>
+              <p>Set
+                <var>track</var>.{{MediaStreamTrack/[[LastVoiceActivityDetectedTimestamp]]}}
+                to {{Performance.now()}}.</p>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </p>
+    <section>
+      <h2>Examples</h2>
+      <pre class="example">
+&lt;script&gt;
+// Open microphone.
+const stream = await navigator.mediaDevices.getUserMedia({
+  audio: true, voiceActivityDetection: true}
+);
+const [audioTrack] = stream.getAudioTracks();
+
+track.addEventListener("voiceactivitydetected", () => {
+  if (track.muted) {
+    // Show unmute notification.
+  }
+});
+&lt;/script&gt;
+      </pre>
+    </section>
+  </section>
+  <section>
     <h2>VoiceIsolation constraint</h2>
     <div>
       <p>Some platforms offer functionality for voice isolation:
