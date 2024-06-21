@@ -1033,7 +1033,7 @@ interface MediaStreamTrackVideoStats {
             to prefer configuration that it considers power efficient.</p>
           </td>
           <div class="note">
-          This constraint is not usable with getUserMedia, since it's not in <a>allowed required constraints for device selection</a>, and may give surprising results when specifies as a mandatory constraint for applyConstraints, so it should be most useful as an ideal constraint.
+          This constraint is not usable with getUserMedia as a mandatory constraint, since it's not in <a>allowed required constraints for device selection</a>. User Agents MAY use it for device selection though the current distance algorithm is not directly applicable as devices may have different power consumptions while having the same `powerEfficient` capabilities.
           </div>
           
         </tr>
