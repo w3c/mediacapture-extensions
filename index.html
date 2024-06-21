@@ -1032,6 +1032,10 @@ interface MediaStreamTrackVideoStats {
             <p>As a constraint, setting it to true instructs the user agent
             to prefer configuration that it considers power efficient.</p>
           </td>
+          <div class="note">
+          This constraint is not usable with getUserMedia, since it's not in <a>allowed required constraints for device selection</a>, and may give surprising results when specifies as a mandatory constraint for applyConstraints, so it should be most useful as an ideal constraint.
+          </div>
+          
         </tr>
       </tbody>
     </table>
