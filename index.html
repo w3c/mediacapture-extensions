@@ -928,9 +928,9 @@ interface MediaStreamTrackVideoStats {
       </div>
     </section>
   </section>
-  <section id="the powerEfficient constraint">
+  <section>
     <h2>The powerEfficient constraint</h2>
-    <section id="mediatracksupportedconstraints-dictionary-extensions">
+    <section>
       <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
       <div>
         <pre class="idl"
@@ -950,7 +950,7 @@ interface MediaStreamTrackVideoStats {
         </section>
       </div>
     </section>
-    <section id="mediatrackcapabilities-dictionary-extensions">
+    <section>
       <h3>MediaTrackCapabilities dictionary extensions</h3>
       <div>
         <pre class="idl"
@@ -978,7 +978,7 @@ interface MediaStreamTrackVideoStats {
         </section>
       </div>
     </section>
-    <section id="mediatracksettings-dictionary-extensions">
+    <section>
       <h3>MediaTrackSettings dictionary extensions</h3>
       <div>
         <pre class="idl"
@@ -1031,14 +1031,18 @@ interface MediaStreamTrackVideoStats {
             to prefer configuration that it considers power efficient.</p>
           </td>
           <div class="note">
-          This constraint is not usable with getUserMedia as a mandatory constraint, since it's not in <a>allowed required constraints for device selection</a>. User Agents MAY use it for device selection though the current distance algorithm is not directly applicable as devices may have different power consumptions while having the same `powerEfficient` capabilities.
+          This constraint is not usable with getUserMedia as a mandatory
+          constraint, since it's not in <a>allowed required constraints for
+          device selection</a>. User Agents MAY use it for device selection
+          though the current distance algorithm is not directly applicable
+          as devices may have different power consumptions while having the
+          same `powerEfficient` capabilities.
           </div>
-          
         </tr>
       </tbody>
     </table>
   </section>
-  <section id="the powerEfficientPixelFormat constraint">
+  <section>
     <h2>The powerEfficientPixelFormat constraint</h2>
     <section id="mediatracksupportedconstraints-dictionary-extensions">
       <div class="note">
