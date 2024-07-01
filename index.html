@@ -929,8 +929,128 @@ interface MediaStreamTrackVideoStats {
     </section>
   </section>
   <section>
+    <h2>The powerEfficient constraint</h2>
+    <section>
+      <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackSupportedConstraints {
+  boolean powerEfficient = true;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackSupportedConstraints}} Members</h2>
+          <dl data-link-for="MediaTrackSupportedConstraints" data-dfn-for=
+          "MediaTrackSupportedConstraints" class="dictionary-members">
+            <dt><dfn>powerEfficient</dfn> of type
+            {{boolean}}, defaulting to <code>true</code></dt>
+            <dd>See <a href=
+            "#def-constraint-powerEfficient">
+            powerEfficient</a> for details.</dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section>
+      <h3>MediaTrackCapabilities dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackCapabilities {
+  sequence&lt;boolean&gt; powerEfficient;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackCapabilities}} Members</h2>
+          <dl data-link-for="MediaTrackCapabilities" data-dfn-for=
+          "MediaTrackCapabilities" class="dictionary-members">
+            <dt><dfn>powerEfficient</dfn> of type
+            <code>sequence&lt;{{boolean}}&gt;</code></dt>
+            <dd>
+              <p>The source may operate in different configurations.
+              If all configurations have the same power efficiency
+              impact, a single <code>false</code> is reported.
+              Otherwise, the source reports a list with
+              both <code>true</code> and <code>false</code>
+              as possible values. See <a href=
+              "#def-constraint-powerEfficient">
+              powerEfficient</a> for additional
+              details.</p>
+            </dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section>
+      <h3>MediaTrackSettings dictionary extensions</h3>
+      <div>
+        <pre class="idl"
+>partial dictionary MediaTrackSettings {
+  boolean powerEfficient;
+};</pre>
+        <section>
+          <h2>Dictionary {{MediaTrackSettings}} Members</h2>
+          <dl data-link-for="MediaTrackSettings" data-dfn-for=
+          "MediaTrackSettings" class="dictionary-members">
+            <dt><dfn>powerEfficient</dfn> of type
+            {{boolean}}</dt>
+            <dd>See <a href=
+            "#def-constraint-powerEfficient">
+            powerEfficient</a> for details.</dd>
+      </section>
+      </div>
+    </section>
+    <h2>Constrainable Properties</h2>
+    <p>The constrainable properties in this document are defined below.</p>
+    <table class="simple">
+      <thead>
+        <tr>
+          <th>Property Name</th>
+          <th>Values</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><dfn id="def-constraint-powerEfficient">
+            powerEfficient</dfn></td>
+          <td>{{ConstrainBoolean}}</td>
+          <td>
+            <p>
+            Cameras can often operate in different configurations.
+            Configurations are typically selected based on constraints
+            that are related to observable parameters like width or height.
+            Configurations may have less directly observable characteristics:
+            power consumption, low light sensitivity, fast autofocus...
+            The powerEfficient constraint allows web applications to
+            favor selection of configurations that consume less power.
+            This may be useful for web applications that may use the camera
+            for an extended amount of time, like video conference web applications.
+            On the other hand, applications that may use the camera for a small amount
+            of time may prefer to not use the powerEfficient constraint.
+            This constraint is only applicable to camera sources.
+            </p>
+            <p>As a constraint, setting it to true instructs the user agent
+            to prefer configuration that it considers power efficient.</p>
+          </td>
+          <div class="note">
+          This constraint is not usable with getUserMedia as a mandatory
+          constraint, since it's not in <a>allowed required constraints for
+          device selection</a>. User Agents MAY use it for device selection
+          though the current distance algorithm is not directly applicable
+          as devices may have different power consumptions while having the
+          same `powerEfficient` capabilities.
+          </div>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section>
     <h2>The powerEfficientPixelFormat constraint</h2>
     <section id="mediatracksupportedconstraints-dictionary-extensions">
+      <div class="note">
+        This constraint is somewhat redundant with the <a href=
+        "#def-constraint-powerEfficient"> powerEfficient</a>
+        constraint. It may be removed in a future version of this
+        specification.
+      </div>
       <h3>MediaTrackSupportedConstraints dictionary extensions</h3>
       <div>
         <pre class="idl"
