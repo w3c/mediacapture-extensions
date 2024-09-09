@@ -58,6 +58,10 @@
       <p>The terms [=permission state=], [=request permission to use=], and
       <a data-cite="permissions">prompt the user to choose</a> are defined in
       [[!permissions]].</p>
+      <p>
+        {{Performance.timeOrigin}} and {{Performance.now()}} are defined in
+        [[!hr-time]].
+      </p>
   </section>
   <section id="conformance">
   </section>
@@ -1150,6 +1154,34 @@ interface MediaStreamTrackVideoStats {
           </tr>
         </tbody>
       </table>
+    </section>
+    <section>
+      <h2>Capture timestamps</h2>
+      <div>
+        <p>
+          Some video sources can supply information about when a video frame was captured.
+          This information is useful for example for AV sync and end-to-end delay measurement.
+          It MAY be set by the user agent (and be present in {{VideoFrameMetadata}}) by local capturers, or it
+          MAY be supplied in {{VideoFrameMetadata}} when a VideoFrame is created.
+        </p>
+        <section>
+          <h3>{{VideoFrameMetadata}}</h3>
+          <pre class="idl" data-cite="HR-TIME">
+    partial dictionary VideoFrameMetadata {
+      DOMHighResTimeStamp captureTime;
+    };</pre>
+          <section class="notoc">
+            <h4>Members</h4>
+            <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
+              <dt><dfn><code>captureTime</code></dfn> of type <span
+                class="idlMemberType">DOMHighResTimeStamp, readonly</span></dt>
+              <dd>
+                <p data-cite="HR-TIME">The capture time of the frame. The timestamp is defined as {{Performance.timeOrigin}} + {{Performance.now()}} at that time.</p>
+              </dd>
+            </dl>
+          </section>
+        </section>
+      </div>
     </section>
   <section>
     <h2>Exposing MediaStreamTrack source heuristic reactions support</h2>
