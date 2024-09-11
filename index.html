@@ -9,7 +9,7 @@
   // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
   var respecConfig = {
     group: "webrtc",
-    xref: ["geometry-1", "html", "infra", "permissions", "dom", "image-capture", "mediacapture-streams", "webaudio", "webcodecs", "webidl"],
+    xref: ["geometry-1", "html", "infra", "permissions", "dom", "hr-time", "image-capture", "mediacapture-streams", "screen-capture", "webaudio", "webcodecs", "webidl"],
     edDraftURI: "https://w3c.github.io/mediacapture-extensions/",
     editors:  [
       {name: "Jan-Ivar Bruaroey", company: "Mozilla Corporation", w3cid: 79152},
@@ -1159,14 +1159,15 @@ interface MediaStreamTrackVideoStats {
       <h2>Capture timestamps</h2>
       <div>
         <p>
+          [[mediacapture-fromelement]]
           Some video sources can supply information about when a video frame was captured.
           This information is useful for example for AV sync and end-to-end delay measurement.
-          It MAY be set by the user agent (and be present in {{VideoFrameMetadata}}) by local capturers, or it
+          It MAY be set by the user agent (and be present in {{VideoFrameMetadata}}) by local (e.g. {{MediaDevices/getUserMedia()}}, {{MediaDevices/getDisplayMedia()}}, or {{HTMLMediaElement/captureStream()}}) capturers, or it
           MAY be supplied in {{VideoFrameMetadata}} when a VideoFrame is created.
         </p>
         <section>
           <h3>{{VideoFrameMetadata}}</h3>
-          <pre class="idl" data-cite="HR-TIME">
+          <pre class="idl">
     partial dictionary VideoFrameMetadata {
       DOMHighResTimeStamp captureTime;
     };</pre>
@@ -1176,7 +1177,7 @@ interface MediaStreamTrackVideoStats {
               <dt><dfn><code>captureTime</code></dfn> of type <span
                 class="idlMemberType">DOMHighResTimeStamp, readonly</span></dt>
               <dd>
-                <p data-cite="HR-TIME">The capture time of the frame. The timestamp is defined as {{Performance.timeOrigin}} + {{Performance.now()}} at that time.</p>
+                <p>The capture time of the frame. The timestamp is defined as {{Performance.timeOrigin}} + {{Performance.now()}} at that time.</p>
               </dd>
             </dl>
           </section>
