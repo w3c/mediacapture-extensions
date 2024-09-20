@@ -9,7 +9,7 @@
   // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
   var respecConfig = {
     group: "webrtc",
-    xref: ["geometry-1", "html", "infra", "permissions", "dom", "hr-time", "image-capture", "mediacapture-fromelement", "mediacapture-streams", "screen-capture", "webaudio", "webcodecs", "webidl"],
+    xref: ["geometry-1", "html", "infra", "permissions", "dom", "hr-time", "image-capture", "mediacapture-streams", "screen-capture", "webaudio", "webcodecs", "webidl"],
     edDraftURI: "https://w3c.github.io/mediacapture-extensions/",
     editors:  [
       {name: "Jan-Ivar Bruaroey", company: "Mozilla Corporation", w3cid: 79152},
@@ -59,8 +59,7 @@
       <a data-cite="permissions">prompt the user to choose</a> are defined in
       [[!permissions]].</p>
       <p>
-        {{Performance.timeOrigin}} and {{Performance.now()}} are defined in
-        [[!hr-time]].
+        {{Performance.now()}} is defined in [[!hr-time]].
       </p>
   </section>
   <section id="conformance">
@@ -1155,41 +1154,81 @@ interface MediaStreamTrackVideoStats {
         </tbody>
       </table>
     </section>
-    <section>
-      <h2>Capture timestamps</h2>
-      <div>
-          Some video sources can supply information about when a video frame was captured.
-          This information is useful for example for AV sync and end-to-end delay measurement.
-        </p>
-        <p>
-          {{VideoFrameMetadata}}.{{VideoFrameMetadata/captureTime}} MUST be set by the user
-          agent in video frames sourced from {{MediaDevices/getUserMedia()}},
-          {{MediaDevices/getDisplayMedia()}}, and {{HTMLMediaElement/captureStream()}}.
-        </p>
-        <section>
-          <h3>{{VideoFrameMetadata}}</h3>
-          <pre class="idl">
-    partial dictionary VideoFrameMetadata {
-      DOMHighResTimeStamp captureTime;
-    };</pre>
-          <section class="notoc">
-            <h4>Members</h4>
-            <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
-              <dt><dfn><code>captureTime</code></dfn> of type <span
-                class="idlMemberType">DOMHighResTimeStamp, readonly</span></dt>
-              <dd>
-                <p>
-                  The capture time of the frame, defined as {{Performance.timeOrigin}} + {{Performance.now()}}.
-                  This is the user agent's best estimate of the instant the frame content was captured or
-                  generated.
-                </p>
-              </dd>
-            </dl>
-          </section>
-        </section>
-      </div>
+    <section class="informative">
+      <h2>Timestamp concepts</h2>
+      <p>
+        Media flowing inside media stream tracks comprise of a sequence of media frames, where
+        the frames are sampled from the media at instants spread out over time.
+      </p>
+      <p>
+        Each frame may have a <dfn class="export">capture timestamp</dfn> representing
+        the instant it was captured. A source of frames can define how this timestamp is set, otherwise
+        it is unset.
+      </p>
+      <p>
+        Each video frame has a <dfn class="export">presentation timestamp</dfn>
+        which is relative to the first frame appearing on the track.
+      </p>
+      <p>
+        Each frame may have a <dfn class="export">receive timestamp</dfn> representing
+        the last received timestamp of packets used to produce this video frame was received in its entirety.
+        A source of frames can define how this timestamp is set, otherwise
+        it is unset.
+      </p>
+      <p>
+        Each frame may have a <dfn class="export">RTP timestamp</dfn> representing
+        the packet RTP timestamp used to produce this video frame. A source of frames can define how
+        this timestamp is set, otherwise it is unset.
+        The packet RTP timestamp concept is defined in [[?RFC3550]] Section 5.1.
+      </p>
+      <h3>{{VideoFrameMetadata}}</h3>
+        <pre class="idl">
+partial dictionary VideoFrameMetadata {
+  DOMHighResTimeStamp captureTime;
+  DOMHighResTimeStamp receiveTime;
+  unsigned long rtpTimestamp;
+};</pre>
+      <section class="notoc">
+        <h5>Members</h5>
+        <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
+          <dt><dfn><code>captureTime</code></dfn> of type <span class="idlMemberType">DOMHighResTimeStamp</span></dt>
+          <dd>
+            <p>
+              The capture timestamp of the frame relative to {{Performance}}.{{Performance/timeOrigin}}.
+              MUST be set to the [=capture timestamp=] of the source {{MediaStreamTrack}} video frame if set.
+              It is not [=map/exist|present=] if [=capture timestamp=] is unset.
+            </p>
+          </dd>
+          <dt><dfn><code>receiveTime</code></dfn> of type <span class="idlMemberType">DOMHighResTimeStamp</span></dt>
+          <dd>
+            <p>
+              The receive time of the corresponding encoded frame relative to {{Performance}}.{{Performance/timeOrigin}}.
+              MUST be set to the [=receive timestamp=] of the source {{MediaStreamTrack}} video frame if set.
+              It is not [=map/exist|present=] if [=receive timestamp=] is unset.
+            </p>
+          </dd>
+          <dt><dfn><code>rtpTimestamp</code></dfn> of type <span class="idlMemberType">unsigned long</span></dt>
+          <dd>
+            <p>
+              The RTP timestamp of the corresponding encoded frame.
+              MUST be set to the [=RTP timestamp=] of the source {{MediaStreamTrack}} video frames if set.
+              It is not [=map/exist|present=] if [=receive timestamp=] is unset.
+            </p>
+          </dd>
+        </dl>
+      </section>
     </section>
-  <section>
+    <section>
+      <h3>Local video capture timestamps</h3>
+      <p>
+        The user agent MUST set the [= capture timestamp =] of each video frame
+        that is sourced from {{MediaDevices/getUserMedia()}} and
+        {{MediaDevices/getDisplayMedia()}} to its best estimate of the time that
+        the frame was captured. This value MUST be monotonically increasing.
+      </p>
+    </section>
+
+    <section>
     <h2>Exposing MediaStreamTrack source heuristic reactions support</h2>
     <div>
       <p>Some platforms or User Agents may provide built-in support for video effects triggered by user motion heuristics, in particular for camera video streams.
