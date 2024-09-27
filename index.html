@@ -1162,13 +1162,15 @@ interface MediaStreamTrackVideoStats {
       </p>
       <p>
         Each video frame has a <dfn class="export">presentation timestamp</dfn>
-        which is relative to the first frame appearing on the track. A sink of frames can define how
-        this timestamp is used. The timestamp is present for a sink to be able to define an absolute
-        timeline of the frames relative to a clock reference.
+        which is relative to the first frame appearing on the track. The timestamp
+        is present for sinks to be able to define an absolute timeline of the frames
+        relative to a clock reference. A source of frames can define how this timestamp
+        is set. A sink of frames can define how this timestamp is used.
       </p>
       <p>
         Each frame may have an absolute <dfn class="export">capture timestamp</dfn> representing
-        the instant it was captured, which is useful for example for delay measurements and synchronization.
+        the instant the frame capture process began, which is useful for example for
+        delay measurements and synchronization.
         A source of frames can define how this timestamp is set, otherwise it is unset. A
         sink of frames can define how this timestamp is used if set.
       </p>
@@ -1216,7 +1218,7 @@ partial dictionary VideoFrameMetadata {
         </dl>
       </section>
       <h3>Algorithms</h3>
-      The <dfn for=VideoFrame class="export">Initialize Video Frame Timestamps From Internal MediaStreamTrack Video Frame</dfn>
+      The <dfn class="export">Initialize Video Frame Timestamps From Internal MediaStreamTrack Video Frame</dfn>
       algorithm runs with |frame| as input.
       <ol>
         <li>Set {{VideoFrame/timestamp}} from [=presentation timestamp=].</li>
@@ -1224,7 +1226,7 @@ partial dictionary VideoFrameMetadata {
         <li>Set {{VideoFrameMetadata/receiveTime}} from [=receive timestamp=] if set.</li>
         <li>Set {{VideoFrameMetadata/rtpTimestamp}} from [=RTP timestamp=] if set.</li>
       </ol>
-      The <dfn for=VideoFrame class="export">Copy Video Frame Timestamps To Internal MediaStreamTrack Video Frame</dfn>
+      The <dfn class="export">Copy Video Frame Timestamps To Internal MediaStreamTrack Video Frame</dfn>
       algorithm runs with |frame| as input.
       <ol>
         <li>Set [=presentation timestamp=] from {{VideoFrame/timestamp}}.</li>
