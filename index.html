@@ -1162,23 +1162,29 @@ interface MediaStreamTrackVideoStats {
       </p>
       <p>
         Each video frame has a <dfn class="export">presentation timestamp</dfn>
-        which is relative to the first frame appearing on the track.
+        which is relative to the first frame appearing on the track. A sink of frames can define how
+        this timestamp is used. The timestamp is present for a sink to be able to define an absolute
+        timeline of the frames relative to a clock reference.
       </p>
       <p>
-        Each frame may have a <dfn class="export">capture timestamp</dfn> representing
-        the instant it was captured. A source of frames can define how this timestamp is set, otherwise
-        it is unset.
+        Each frame may have an absolute <dfn class="export">capture timestamp</dfn> representing
+        the instant it was captured, which is useful for example for delay measurements and synchronization.
+        A source of frames can define how this timestamp is set, otherwise it is unset. A
+        sink of frames can define how this timestamp is used if set.
       </p>
       <p>
-        Each frame may have a <dfn class="export">receive timestamp</dfn> representing
+        Each frame may have an absolute <dfn class="export">receive timestamp</dfn> representing
         the last received timestamp of packets used to produce this video frame was received in its entirety.
-        A source of frames can define how this timestamp is set, otherwise
-        it is unset.
+        The timestamp is useful for example for network jitter measurements.
+        A source of frames can define how this timestamp is set, otherwise it is unset. A sink of
+        frames can define how this timestamp is used if set.
       </p>
       <p>
-        Each frame may have a <dfn class="export">RTP timestamp</dfn> representing
-        the packet RTP timestamp used to produce this video frame. A source of frames can define how
-        this timestamp is set, otherwise it is unset.
+        Each frame may have a <dfn class="export">RTP timestamp</dfn> representing the packet RTP
+        timestamp used to produce this video frame. The timestamp is useful for example for frame
+        identification and playback quality measurements. A source of frames can define how the
+        timestamp is set, otherwise it is unset. A sink of frames can define how this timestamp is
+        used if set.
         The packet RTP timestamp concept is defined in [[?RFC3550]] Section 5.1.
       </p>
       <h3>{{VideoFrameMetadata}}</h3>
@@ -1230,10 +1236,10 @@ partial dictionary VideoFrameMetadata {
     <section>
       <h3>Local video capture timestamps</h3>
       <p>
-        The user agent MUST set the [= capture timestamp =] of each video frame
-        that is sourced from {{MediaDevices/getUserMedia()}} and
-        {{MediaDevices/getDisplayMedia()}} to its best estimate of the time that
-        the frame was captured. This value MUST be monotonically increasing.
+        The user agent MUST set the [= capture timestamp =] of each video frame that is sourced from
+        {{MediaDevices/getUserMedia()}} and {{MediaDevices/getDisplayMedia()}} to its best estimate of the time that
+        the frame was captured, which MUST be in the past relative to the time the frame is appearing on the track.
+        This value MUST be monotonically increasing.
       </p>
     </section>
 
