@@ -1162,9 +1162,9 @@ interface MediaStreamTrackVideoStats {
       </p>
       <p>
         Each video frame has a <dfn class="export">presentation timestamp</dfn>
-        which is relative to the first frame appearing on the track. The [=presentation timestamp=]
-        of the first video frame appearing on the track is 0. The timestamp
-        is present for sinks to be able to define an absolute timeline of the frames
+        which is relative to the first frame emitted by the {{MediaStreamTrack}}'s source, eg.
+        the timestamp of the first frame emitted by the source is 0.
+        The timestamp is present for sinks to be able to define an absolute timeline of the frames
         relative to a clock reference. A source of frames can define how this timestamp
         is set. A sink of frames can define how this timestamp is used.
       </p>
@@ -1189,6 +1189,11 @@ interface MediaStreamTrackVideoStats {
         timestamp is set, otherwise it is unset. A sink of frames can define how this timestamp is
         used if set.
         The packet RTP timestamp concept is defined in [[?RFC3550]] Section 5.1.
+      </p>
+      <p>
+        The [=presentation timestamp=] and [=capture timestamp=] are using the same clock and
+        have a constant offset. The [=capture timestamp=] and [=receive timestamp=] are using the same
+        clock and offset.
       </p>
       <h3>{{VideoFrameMetadata}}</h3>
         <pre class="idl">
