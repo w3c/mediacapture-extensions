@@ -1161,12 +1161,14 @@ interface MediaStreamTrackVideoStats {
         the frames are sampled from the media at instants spread out over time.
       </p>
       <p>
-        Each video frame has a <dfn class="export">presentation timestamp</dfn>
-        which is relative to the first frame emitted by the {{MediaStreamTrack}}'s source, eg.
-        the timestamp of the first frame emitted by the source is 0.
-        The timestamp is present for sinks to be able to define an absolute timeline of the frames
-        relative to a clock reference. A source of frames can define how this timestamp
-        is set. A sink of frames can define how this timestamp is used.
+        Each video frame must have a <dfn class="export">presentation timestamp</dfn>
+        which is relative to a source specific origin.
+        A source of frames can define how this timestamp is set. A sink of frames
+        can define how this timestamp is used.
+      </p>
+      <p>
+        The timestamp is present for sinks to be able to define an absolute presentation timeline of the frames
+        relative to a clock reference, for example for playback.
       </p>
       <p>
         Each frame may have an absolute <dfn class="export">capture timestamp</dfn> representing
@@ -1190,10 +1192,13 @@ interface MediaStreamTrackVideoStats {
         used if set.
         The packet RTP timestamp concept is defined in [[?RFC3550]] Section 5.1.
       </p>
+      <h3>Timestamp clock relations</h3>
       <p>
+        The [=capture timestamp=] and [=receive timestamp=] are using the same clock and offset.
         The [=presentation timestamp=] and [=capture timestamp=] are using the same clock and
-        have a constant offset. The [=capture timestamp=] and [=receive timestamp=] are using the same
-        clock and offset.
+        have an offset which can be arbitrarily chosen by the user agent since it isn't
+        directly observable by script.
+        </div>
       </p>
       <h3>{{VideoFrameMetadata}}</h3>
         <pre class="idl">
@@ -1225,9 +1230,9 @@ partial dictionary VideoFrameMetadata {
       </section>
       <h3>Algorithms</h3>
       When the <dfn class="abstract-op">Initialize Video Frame Timestamps From Internal MediaStreamTrack Video Frame</dfn>
-      algorithm is invoked with |frame| as input, run the following steps.
+      algorithm is invoked with |frame| and |offset| as input, run the following steps.
       <ol class=algorithm>
-        <li>Set {{VideoFrame/timestamp}} from [=presentation timestamp=].</li>
+        <li>Set {{VideoFrame/timestamp}} from [=presentation timestamp=] minus |offset|.</li>
         <li>Set {{VideoFrameMetadata/captureTime}} from [=capture timestamp=] if set.</li>
         <li>Set {{VideoFrameMetadata/receiveTime}} from [=receive timestamp=] if set.</li>
         <li>Set {{VideoFrameMetadata/rtpTimestamp}} from [=RTP timestamp=] if set.</li>
