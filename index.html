@@ -1253,6 +1253,10 @@ partial dictionary VideoFrameMetadata {
         the frame was captured.
         This value MUST be monotonically increasing.
       </p>
+      <div class="note">
+        Local capture tracks have a fixed offset between [=presentation timestamp=] and [=capture timestamp=]. The
+        user agent may let this be zero with the result that [=presentation timestamp=] is the same as [=capture timestamp=].
+      </div>
     </section>
 
     <section>
