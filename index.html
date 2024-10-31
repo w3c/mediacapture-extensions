@@ -9,7 +9,7 @@
   // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
   var respecConfig = {
     group: "webrtc",
-    xref: ["geometry-1", "html", "infra", "permissions", "dom", "image-capture", "mediacapture-streams", "webaudio", "webcodecs", "webidl"],
+    xref: ["geometry-1", "html", "infra", "permissions", "dom", "hr-time", "image-capture", "mediacapture-streams", "screen-capture", "webaudio", "webcodecs", "webidl"],
     edDraftURI: "https://w3c.github.io/mediacapture-extensions/",
     editors:  [
       {name: "Jan-Ivar Bruaroey", company: "Mozilla Corporation", w3cid: 79152},
@@ -58,6 +58,9 @@
       <p>The terms [=permission state=], [=request permission to use=], and
       <a data-cite="permissions">prompt the user to choose</a> are defined in
       [[!permissions]].</p>
+      <p>
+        {{Performance.now()}} is defined in [[!hr-time]].
+      </p>
   </section>
   <section id="conformance">
   </section>
@@ -1151,7 +1154,112 @@ interface MediaStreamTrackVideoStats {
         </tbody>
       </table>
     </section>
-  <section>
+    <section class="informative">
+      <h2>Video timestamp concepts</h2>
+      <p>
+        Video media flowing inside media stream tracks comprises of a sequence of video frames, where
+        the frames are sampled from the media at instants spread out over time.
+      </p>
+      <p>
+        Each video frame must have a <dfn class="export">presentation timestamp</dfn>
+        which is relative to a source specific origin.
+        A source of frames can define how this timestamp is set. A sink of frames
+        can define how this timestamp is used.
+      </p>
+      <p>
+        The timestamp is present for sinks to be able to define an absolute presentation timeline of the frames
+        relative to a clock reference, for example for playback.
+      </p>
+      <p>
+        Each frame may have an absolute <dfn class="export">capture timestamp</dfn> representing
+        the instant the frame capture process began, which is useful for example for
+        delay measurements and synchronization.
+        A source of frames can define how this timestamp is set, otherwise it is unset. A
+        sink of frames can define how this timestamp is used if set.
+      </p>
+      <p>
+        Each frame may have an absolute <dfn class="export">receive timestamp</dfn> representing
+        the last received timestamp of packets used to produce this video frame was received in its entirety.
+        The timestamp is useful for example for network jitter measurements.
+        A source of frames can define how this timestamp is set, otherwise it is unset. A sink of
+        frames can define how this timestamp is used if set.
+      </p>
+      <p>
+        Each frame may have a <dfn class="export">RTP timestamp</dfn> representing the packet RTP
+        timestamp used to produce this video frame. The timestamp is useful for example for frame
+        identification and playback quality measurements. A source of frames can define how the
+        timestamp is set, otherwise it is unset. A sink of frames can define how this timestamp is
+        used if set.
+        The packet RTP timestamp concept is defined in [[?RFC3550]] Section 5.1.
+      </p>
+      <h3>Timestamp clock relations</h3>
+      <p>
+        The [=capture timestamp=] and [=receive timestamp=] are using the same clock and offset.
+        The [=presentation timestamp=] and [=capture timestamp=] are using the same clock and
+        have an offset which can be arbitrarily chosen by the user agent since it isn't
+        directly observable by script.
+      </p>
+      <h3>{{VideoFrameMetadata}}</h3>
+        <pre class="idl">
+partial dictionary VideoFrameMetadata {
+  DOMHighResTimeStamp captureTime;
+  DOMHighResTimeStamp receiveTime;
+  unsigned long rtpTimestamp;
+};</pre>
+      <section class="notoc">
+        <h5>Members</h5>
+        <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
+          <dt><dfn><code>captureTime</code></dfn> of type <span class="idlMemberType">DOMHighResTimeStamp</span></dt>
+          <dd>
+            <p>The capture timestamp of the frame relative to {{Performance}}.{{Performance/timeOrigin}}. It corresponds to
+              the [=capture timestamp=] of {{MediaStreamTrack}} video frames.
+            </p>
+          </dd>
+          <dt><dfn><code>receiveTime</code></dfn> of type <span class="idlMemberType">DOMHighResTimeStamp</span></dt>
+          <dd>
+            <p>The receive time of the corresponding encoded frame relative to {{Performance}}.{{Performance/timeOrigin}}.
+              It corresponds to the [=receive timestamp=] of {{MediaStreamTrack}} video frames.</p>
+          </dd>
+          <dt><dfn><code>rtpTimestamp</code></dfn> of type <span class="idlMemberType">unsigned long</span></dt>
+          <dd>
+            <p>The RTP timestamp of the corresponding encoded frame. It corresponds to [=RTP timestamp=] of
+            {{MediaStreamTrack}} video frames.</p>
+          </dd>
+        </dl>
+      </section>
+      <h3>Algorithms</h3>
+      When the <dfn class="abstract-op">Initialize Video Frame Timestamps From Internal MediaStreamTrack Video Frame</dfn>
+      algorithm is invoked with |frame| and |offset| as input, run the following steps.
+      <ol class=algorithm>
+        <li>Set {{VideoFrame/timestamp}} from [=presentation timestamp=] minus |offset|.</li>
+        <li>Set {{VideoFrameMetadata/captureTime}} from [=capture timestamp=] if set.</li>
+        <li>Set {{VideoFrameMetadata/receiveTime}} from [=receive timestamp=] if set.</li>
+        <li>Set {{VideoFrameMetadata/rtpTimestamp}} from [=RTP timestamp=] if set.</li>
+      </ol>
+      When the <dfn class="abstract-op">Copy Video Frame Timestamps To Internal MediaStreamTrack Video Frame</dfn>
+      algorithm runs with |frame| as input, run the following steps.
+      <ol class=algorithm>
+        <li>Set [=presentation timestamp=] from {{VideoFrame/timestamp}}.</li>
+        <li>Set [=capture timestamp=] from {{VideoFrameMetadata/captureTime}} if [=map/exist|present=].</li>
+        <li>Set [=receive timestamp=] from {{VideoFrameMetadata/receiveTime}} if [=map/exist|present=].</li>
+        <li>Set [=RTP timestamp=] from {{VideoFrameMetadata/rtpTimestamp}} if [=map/exist|present=].</li>
+      </ol>
+    </section>
+    <section>
+      <h3>Local video capture timestamps</h3>
+      <p>
+        The user agent MUST set the [=capture timestamp=] of each video frame that is sourced from
+        {{MediaDevices/getUserMedia()}} and {{MediaDevices/getDisplayMedia()}} to its best estimate of the time that
+        the frame was captured.
+        This value MUST be monotonically increasing.
+      </p>
+      <div class="note">
+        Local capture tracks have a fixed offset between [=presentation timestamp=] and [=capture timestamp=]. The
+        user agent may let this be zero with the result that [=presentation timestamp=] is the same as [=capture timestamp=].
+      </div>
+    </section>
+
+    <section>
     <h2>Exposing MediaStreamTrack source heuristic reactions support</h2>
     <div>
       <p>Some platforms or User Agents may provide built-in support for video effects triggered by user motion heuristics, in particular for camera video streams.
