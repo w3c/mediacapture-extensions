@@ -1877,6 +1877,76 @@ self.onmessage = async ({data: {track}}) => {
     </section>
   </section>
   <section>
+    <h2>Camera Effect Status</h2>
+    <p>The {{VideoFrameMetadata}} interface exposes the effect state as a property,
+      which allows apps to know the state for every frame. This is important for
+      scenarios where the app must ensure user privacy by never sending an
+      un-blurred frame off of the user's device.</p>
+    <section>
+      <h3>{{VideoFrameMetadata}}</h3>
+      <pre class="idl">
+partial dictionary VideoFrameMetadata {
+  BackgroundBlur background_blur;
+};</pre>
+      <section class="notoc">
+        <h4>Members</h4>
+        <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
+          <dt><dfn><code>background_blur</code></dfn> of type <code>{{BackgroundBlur}}</code></dt>
+          <dd>
+            <p>The state of the background blur effect for the current frame.</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>{{BackgroundBlur}}</h3>
+      <pre class="idl">
+dictionary BackgroundBlur {
+  boolean enabled;
+};</pre>
+      <section class="notoc">
+        <h4>Dictionary {{BackgroundBlur}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="BackgroundBlur" data-link-for="BackgroundBlur">
+          <dt><dfn><code>enabled</code></dfn> of type {{boolean}}</dt>
+          <dd>
+            <p>True if background blur is enabled, false otherwise. This isn't a strong guarantee, as user
+              agents likely can't detect all possible video manipulation software.
+            </p>
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section>
+      <h3>Example</h3>
+      <pre class="example">
+// main.js:
+const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+const videoTrack = stream.getVideoTracks()[0];
+const blurIndicator = document.getElementById("blurIndicator");
+const trackProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
+const trackGenerator = new MediaStreamTrackGenerator({ kind: "video" });
+
+const transformer = new TransformStream({
+  async transform(videoFrame, controller) {
+    if ("backgroundBlur" in videoFrame.metadata()) {
+      console.log('backgroundBlur.enabled:', videoFrame.metadata().backgroundBlur.enabled);
+    } else {
+      console.log('backgroundBlur unsupported');
+    }
+
+    controller.enqueue(videoFrame);
+  },
+});
+
+trackProcessor.readable
+  .pipeThrough(transformer)
+  .pipeTo(trackGenerator.writable);
+
+const processedStream = new MediaStream();
+      </pre>
+    </section>
+  </section>
+  <section>
     <h2>MediaStream in workers</h2>
     <div>
       <p>{{MediaStreamTrack}}'s objects are exposed to workers, so can do {{MediaStream}}'s objects.
