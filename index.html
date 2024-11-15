@@ -1877,8 +1877,8 @@ self.onmessage = async ({data: {track}}) => {
     </section>
   </section>
   <section>
-    <h2>Camera Effect Status</h2>
-    <p>The {{VideoFrameMetadata}} interface exposes the effect state as a property,
+    <h2>Background Blur Effect Status</h2>
+    <p>The {{VideoFrameMetadata}} interface exposes the blur state as a property,
       which allows apps to know the state for every frame. This is important for
       scenarios where the app must ensure user privacy by never sending an
       un-blurred frame off of the user's device.</p>
@@ -1893,7 +1893,10 @@ partial dictionary VideoFrameMetadata {
         <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
           <dt><dfn><code>background_blur</code></dfn> of type <code>{{BackgroundBlur}}</code></dt>
           <dd>
-            <p>The state of the background blur effect for the current frame.</p>
+            <p>The state of the background blur effect for the current frame. If
+              the property isn't present, it indicates that the user agent doesn't
+              support reporting blur state.
+            </p>
           </dd>
         </dl>
       </section>
@@ -1901,15 +1904,22 @@ partial dictionary VideoFrameMetadata {
     <section>
       <h3>{{BackgroundBlur}}</h3>
       <pre class="idl">
-dictionary BackgroundBlur {
-  boolean enabled;
+dictionary BackgroundBlur: MediaEffectInfo {};</pre>
+      <section class="notoc">
+      </section>
+    </section>
+    <section>
+      <h3>{{MediaEffectInfo}}</h3>
+      <pre class="idl">
+dictionary MediaEffectInfo {
+  required boolean enabled;
 };</pre>
       <section class="notoc">
-        <h4>Dictionary {{BackgroundBlur}} Members</h4>
-        <dl class="dictionary-members" data-dfn-for="BackgroundBlur" data-link-for="BackgroundBlur">
+        <h4>Dictionary {{MediaEffectInfo}} Members</h4>
+        <dl class="dictionary-members" data-dfn-for="MediaEffectInfo" data-link-for="MediaEffectInfo">
           <dt><dfn><code>enabled</code></dfn> of type {{boolean}}</dt>
           <dd>
-            <p>True if background blur is enabled, false otherwise. This isn't a strong guarantee, as user
+            <p>True if the effect is enabled, false otherwise. This isn't a strong guarantee, as user
               agents likely can't detect all possible video manipulation software.
             </p>
           </dd>
