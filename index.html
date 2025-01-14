@@ -1886,12 +1886,12 @@ self.onmessage = async ({data: {track}}) => {
       <h3>{{VideoFrameMetadata}}</h3>
       <pre class="idl">
 partial dictionary VideoFrameMetadata {
-  BackgroundBlur background_blur;
+  BackgroundBlur backgroundBlur;
 };</pre>
       <section class="notoc">
         <h4>Members</h4>
         <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
-          <dt><dfn><code>background_blur</code></dfn> of type <code>{{BackgroundBlur}}</code></dt>
+          <dt><dfn><code>backgroundBlur</code></dfn> of type <code>{{BackgroundBlur}}</code></dt>
           <dd>
             <p>The state of the background blur effect for the current frame. If
               the property isn't present, it indicates that the user agent doesn't
@@ -1929,12 +1929,11 @@ dictionary MediaEffectInfo {
     <section>
       <h3>Example</h3>
       <pre class="example">
-// main.js:
 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 const videoTrack = stream.getVideoTracks()[0];
 const blurIndicator = document.getElementById("blurIndicator");
 const trackProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
-const trackGenerator = new MediaStreamTrackGenerator({ kind: "video" });
+const trackGenerator = new VideoTrackGenerator({ kind: "video" });
 
 const transformer = new TransformStream({
   async transform(videoFrame, controller) {
