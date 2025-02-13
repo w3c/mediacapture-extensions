@@ -1930,28 +1930,33 @@ dictionary MediaEffectInfo {
       <h3>Example</h3>
       <pre class="example">
 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-const videoTrack = stream.getVideoTracks()[0];
-const blurIndicator = document.getElementById("blurIndicator");
-const trackProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
-const trackGenerator = new VideoTrackGenerator({ kind: "video" });
+const track = stream.getVideoTracks()[0];
+const worker = new Worker(`data:text/javascript,(${work.toString()})()`);
+worker.postMessage({track}, [track]);
+const {data} = await new Promise(r => worker.onmessage = r);
+video.srcObject = new MediaStream([data.track]);
 
-const transformer = new TransformStream({
-  async transform(videoFrame, controller) {
-    if ("backgroundBlur" in videoFrame.metadata()) {
-      console.log('backgroundBlur.enabled:', videoFrame.metadata().backgroundBlur.enabled);
-    } else {
-      console.log('backgroundBlur unsupported');
-    }
+function work(track) {
+  const trackGenerator = new VideoTrackGenerator({ kind: "video" });
+  self.postMessage({track: trackGenerator.track}, [trackGenerator.track]);
+  const trackProcessor = new MediaStreamTrackProcessor({ track });
 
-    controller.enqueue(videoFrame);
-  },
-});
+  const transformer = new TransformStream({
+    async transform(videoFrame, controller) {
+      if ("backgroundBlur" in videoFrame.metadata()) {
+        console.log('backgroundBlur.enabled:', videoFrame.metadata().backgroundBlur.enabled);
+      } else {
+        console.log('backgroundBlur unsupported');
+      }
 
-trackProcessor.readable
-  .pipeThrough(transformer)
-  .pipeTo(trackGenerator.writable);
+      controller.enqueue(videoFrame);
+    },
+  });
 
-const processedStream = new MediaStream();
+  trackProcessor.readable
+    .pipeThrough(transformer)
+    .pipeTo(trackGenerator.writable);
+}
       </pre>
     </section>
   </section>
