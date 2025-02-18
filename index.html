@@ -1936,26 +1936,28 @@ worker.postMessage({track}, [track]);
 const {data} = await new Promise(r => worker.onmessage = r);
 video.srcObject = new MediaStream([data.track]);
 
-function work(track) {
-  const trackGenerator = new VideoTrackGenerator({ kind: "video" });
-  self.postMessage({track: trackGenerator.track}, [trackGenerator.track]);
-  const trackProcessor = new MediaStreamTrackProcessor({ track });
+function work() {
+  onmessage = async ({data: {track}}) => {
+    const trackGenerator = new VideoTrackGenerator({ kind: "video" });
+    self.postMessage({track: trackGenerator.track}, [trackGenerator.track]);
+    const trackProcessor = new MediaStreamTrackProcessor({ track });
 
-  const transformer = new TransformStream({
-    async transform(videoFrame, controller) {
-      if ("backgroundBlur" in videoFrame.metadata()) {
-        console.log('backgroundBlur.enabled:', videoFrame.metadata().backgroundBlur.enabled);
-      } else {
-        console.log('backgroundBlur unsupported');
-      }
+    const transformer = new TransformStream({
+      async transform(videoFrame, controller) {
+        if ("backgroundBlur" in videoFrame.metadata()) {
+          console.log('backgroundBlur.enabled:', videoFrame.metadata().backgroundBlur.enabled);
+        } else {
+          console.log('backgroundBlur unsupported');
+        }
 
-      controller.enqueue(videoFrame);
-    },
-  });
+        controller.enqueue(videoFrame);
+      },
+    });
 
-  trackProcessor.readable
-    .pipeThrough(transformer)
-    .pipeTo(trackGenerator.writable);
+    trackProcessor.readable
+      .pipeThrough(transformer)
+      .pipeTo(trackGenerator.writable);
+  };
 }
       </pre>
     </section>
