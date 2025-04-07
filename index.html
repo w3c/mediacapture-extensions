@@ -1984,7 +1984,7 @@ partial interface MediaStream {
        This allows the web application
        to access the original unmodified frame and
        to fine tune frame modifications based on its likings.
-       For that reason, we extend {{MediaStreamTrack}} with the following properties and {{VideoFrame}} with the following attributes.
+       For that reason, we extend {{MediaStreamTrack}} with the following properties and {{VideoFrameMetadata}} with the following attributes.
     </p>
     <pre class="idl">
 partial dictionary MediaTrackSupportedConstraints {
@@ -2003,24 +2003,27 @@ partial dictionary MediaTrackCapabilities {
   sequence&lt;boolean&gt; backgroundSegmentationMask;
 };</pre>
     <section>
-      <h3>VideoFrameMetadata dictionary extensions</h3>
+      <h3>{{VideoFrameMetadata}}</h3>
       <pre class="idl">
 partial dictionary VideoFrameMetadata {
   ImageBitmap backgroundSegmentationMask;
 };</pre>
-      <section>
-        <h4>Dictionary {{VideoFrameMetadata}} Members</h4>
-        <dl data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata" class="dictionary-members">
-          <dt><dfn><code>backgroundSegmentationMask</code></dfn>
-              of type
-              <span class="idlMemberType">{{VideoFrameMetadata}}</span></dt>
+      <section class="notoc">
+        <h4>Members</h4>
+        <dl class="dictionary-members" data-link-for="VideoFrameMetadata" data-dfn-for="VideoFrameMetadata">
+          <dt><dfn><code>backgroundSegmentationMask</code></dfn> of type <code>{{ImageBitmap}}</code></dt>
           <dd>
             <p>A background segmentation mask with
                white denoting certainly foreground,
                black denoting certainly background and
                grey denoting uncertainty or ambiguity with
                light shades of grey denoting likely foreground and
-               dark shades of grey denoting likely background.</p>
+               dark shades of grey denoting likely background.
+               Absence might indicate
+               that the frame is not from a camera, or
+               that the user agent does not support or
+               was not able to do background segmentation.
+            </p>
           </dd>
         </dl>
       </section>
