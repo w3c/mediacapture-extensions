@@ -1974,5 +1974,124 @@ partial interface MediaStream {
 };</pre>
     </div>
   </section>
+  <section>
+    <h2>Echo cancellation mode</h2>
+    <p>
+      Different applications have different requirements about what audio should
+      be cancelled when echo cancellation is enabled. Some applications require
+      cancelling from the microphone signal all audio played by the the system.
+      An example of this are applications with strong privacy requirements,
+      where, for example, audio played out by screen readers should be cancelled.
+      Other applications require cancelling only audio coming from remote
+      participants, since that is the source of echo, but require that other
+      local audio not be cancelled. An example is a remote music class, where a
+      student plays an instrument together with some accompaniment produced by a
+      local application. In this case, the application requires audio coming
+      from remote participants (i.e., the teacher) to be cancelled in order to
+      avoid echo, but also requires that the accompaniment not be cancelled
+      since the music teacher on the remote side needs to hear it together with
+      the sound from the instrument.
+      To support these use cases, we introduce the {{echoCancellationMode}}
+      constrainable property.
+    </p>
+    <p>The WebIDL changes are the following:</p>
+    <pre class="idl">
+enum EchoCancellationModeEnum {
+  "private",
+  "remote-only",
+  "flexible",
+  "none"
+};
+    </pre>
+    <table data-link-for="EchoCancellationModeEnum" data-dfn-for="EchoCancellationModeEnum" class="simple">
+      <caption><dfn>EchoCancellationModeEnum</dfn> Enumeration description</caption>
+      <thead>
+        <tr>
+          <th>Enum value</th><th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><dfn><code id=
+          "idl-def-EchoCancellationModeEnum.private">private</code></dfn></td>
+          <td>
+            <p>The system tries to cancel all local audio sources from the
+              microphone signal. This is compatible only with an
+              {{MediaTrackConstraintSet/echoCancellation}} value of <code>true</code>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td><dfn><code id=
+          "idl-def-EchoCancellationModeEnum.remote-only">remote-only</code></dfn></td>
+          <td>
+            <p>The system tries to cancel from the microphone signal audio
+              received from RTCPeerConnections. This is compatible only with an
+              {{MediaTrackConstraintSet/echoCancellation}} value of <code>true</code>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td><dfn><code id=
+          "idl-def-EchoCancellationModeEnum.left">flexible</code></dfn></td>
+          <td>
+            <p>The user agent decides what audio to cancel from the microphone
+              signal. It should cancel at least audio received from
+              RTCPeerConnections. This is compatible only with an
+              {{MediaTrackConstraintSet/echoCancellation}} value of <code>true</code>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td><dfn><code id=
+          "idl-def-EchoCancellationModeEnum.none">none</code></dfn></td>
+          <td>
+            <p>No audio is cancelled from the microphone signal. This is
+              compatible only with an {{MediaTrackConstraintSet/echoCancellation}} value of
+              <code>false</code>.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <pre class="idl">
+partial dictionary MediaTrackSupportedConstraints {
+  boolean echoCancellationMode = true;
+};
+
+partial dictionary MediaTrackCapabilities {
+  sequence&lt;DOMString&gt; echoCancellationMode;
+};
+
+partial dictionary MediaTrackConstraintSet {
+  ConstrainDOMString echoCancellationMode;
+};
+
+partial dictionary MediaTrackSettings {
+  DOMString echoCancellationMode;
+};
+    </pre>
+    <section>
+      <h3>Constrainable Properties</h3>
+      <p>The constrainable properties in this section are defined below.</p>
+      <table class="simple">
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>Values</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><dfn id="def-constraint-echoCancellationMode">
+              echoCancellationMode</dfn></td>
+            <td>{{ConstrainDOMString}}</td>
+            <td>
+              <p>This string is one of the members of {{EchoCancellationModeEnum}}.
+                The members describe what audio is cancelled from the
+                microphone signal.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </section>
 </body>
 </html>
