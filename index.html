@@ -2029,48 +2029,57 @@ partial dictionary VideoFrameMetadata {
     <section>
       <h3>Example</h3>
       <pre class="example">
+// main.js:
 // Open camera.
 const stream = await navigator.mediaDevices.getUserMedia({video: true});
-const [videoTrack] = stream.getVideoTracks();
+const [track] = stream.getVideoTracks();
+// Do video processing in a worker.
+const worker = new Worker('worker.js');
+worker.postMessage({track}, [track]);
+const {data} = await new Promise(result => worker.onmessage = result);
+const videoElement = document.querySelector('video');
+videoElement.srcObject = new MediaStream([data.track]);
 
-// Try to enable background segmentation mask.
-const videoCapabilities = videoTrack.getCapabilities();
-if ((videoCapabilities.backgroundSegmentationMask || []).includes(true)) {
-  await videoTrack.applyConstraints({backgroundSegmentationMask: {exact: true}});
-} else {
-  // Background segmentation mask is not supported by the platform or
-  // by the camera. Consider falling back to some other method.
-}
-
-const canvasContext = document.querySelector('canvas').getContext('2d');
-const videoProcessor = new MediaStreamTrackProcessor({track: videoTrack});
-const videoProcessorReader = videoProcessor.readable.getReader();
-
-for (;;) {
-  const {done, value: videoFrame} = await videoProcessorReader.read();
-  if (done)
-    break;
-  const {backgroundSegmentationMask} = videoFrame.metadata();
-  if (backgroundSegmentationMask) {
-    // Draw the video frame.
-    canvasContext.globalCompositeOperation = 'copy';
-    context.drawImage(videoFrame, 0, 0);
-    // Draw (or multiply with) the mask.
-    // The result is the foreground on black.
-    context.globalCompositeOperation = 'multiply';
-    canvasContext.drawImage(backgroundSegmentationMask, 0, 0);
+// worker.js:
+onmessage = async ({data: {track}}) => {
+  // Try to enable background segmentation mask.
+  const capabilities = track.getCapabilities();
+  if (capabilities.backgroundSegmentationMask?.includes(true)) {
+    await track.applyConstraints({backgroundSegmentationMask: {exact: true}});
+  } else {
+    // Background segmentation mask is not supported by the platform or
+    // by the camera. Consider falling back to some other method.
   }
-  else {
-    // Everything is background. Fill with black.
-    canvasContext.globalCompositeOperation = 'copy';
-    canvasContext.fillStyle = 'black';
-    canvasContext.fillRect(
-      0,
-      0,
-      canvasContext.canvas.width,
-      canvasContext.canvas.height);
-  }
-}
+  const trackGenerator = new VideoTrackGenerator();
+  self.postMessage({track: trackGenerator.track}, [trackGenerator.track]);
+  const {readable} = new MediaStreamTrackProcessor({track});
+
+  const canvas = new OffscreenCanvas(640, 480);
+  const context = canvas.getContext('2d', {desynchronized: true});
+
+  const transformer = new TransformStream({
+    async transform(frame, controller) {
+      const {backgroundSegmentationMask} = frame.metadata();
+      if (backgroundSegmentationMask) {
+        // Draw the video frame.
+        context.globalCompositeOperation = 'copy';
+        context.drawImage(frame, 0, 0);
+        // Draw (or multiply with) the mask.
+        // The result is the foreground on black.
+        context.globalCompositeOperation = 'multiply';
+        context.drawImage(backgroundSegmentationMask, 0, 0);
+      } else {
+        // Everything is background. Fill with black.
+        context.globalCompositeOperation = 'copy';
+        context.fillStyle = 'black';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      controller.enqueue(new VideoFrame(canvas, {timestamp: frame.timestamp}));
+      frame.close();
+    }
+  });
+  await readable.pipeThrough(transformer).pipeTo(trackGenerator.writable);
+};
       </pre>
     </section>
   </section>
