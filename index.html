@@ -9,7 +9,7 @@
   // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
   var respecConfig = {
     group: "webrtc",
-    xref: ["geometry-1", "html", "infra", "permissions", "dom", "hr-time", "image-capture", "mediacapture-streams", "screen-capture", "webaudio", "webcodecs", "webidl"],
+    xref: ["geometry-1", "html", "infra", "permissions", "dom", "hr-time", "image-capture", "mediacapture-streams", "screen-capture", "webaudio", "webcodecs", "webidl", "ECMAScript"],
     edDraftURI: "https://w3c.github.io/mediacapture-extensions/",
     editors:  [
       {name: "Jan-Ivar Bruaroey", company: "Mozilla Corporation", w3cid: 79152},
@@ -353,7 +353,7 @@ function setCameraTrack(track) {
     <div>
       <p>A {{MediaStreamTrack}} is a <a data-cite="!HTML/#transferable-objects">transferable object</a>.
       This allows manipulating real-time media outside the context it was requested or created in,
-      for instance in workers or third-party iframes.</p>
+      for instance in dedicated workers or same-agent-cluster iframes.</p>
       <p>To preserve the existing privacy and security infrastructure, in particular for capture tracks,
       the track source lifetime management remains tied to the context that created it.
       The transfer algorithm MUST ensure the following behaviors:</p>
@@ -379,7 +379,7 @@ function setCameraTrack(track) {
     <div>
       <p>The WebIDL changes to make the track transferable are the following:
       <pre class="idl"
->[Exposed=(Window,Worker), Transferable]
+>[Exposed=(Window,DedicatedWorker), Transferable]
 partial interface MediaStreamTrack {
 };</pre>
     </div>
@@ -393,6 +393,7 @@ partial interface MediaStreamTrack {
       <p>The {{MediaStreamTrack}} <a data-cite="!HTML/#transfer-steps">transfer steps</a>, given <var>value</var> and <var>dataHolder</var>, are:</p>
       <ol>
         <li><p>If <var>value</var>.`[[IsDetached]]` is <code>true</code>, throw a "DataCloneError" DOMException.</p></li>
+        <li><p>Set <var>dataHolder</var>.`[[agentCluster]]` to the [=ECMAScript/surrounding agent=]’s [=ECMAScript/agent cluster=].</p></li>
         <li><p>Set <var>dataHolder</var>.`[[id]]` to <var>value</var>.{{MediaStreamTrack/id}}.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[kind]]` to <var>value</var>.{{MediaStreamTrack/kind}}.</p></li>
         <li><p>Set <var>dataHolder</var>.`[[label]]` to <var>value</var>.{{MediaStreamTrack/label}}.</p></li>
@@ -408,6 +409,8 @@ partial interface MediaStreamTrack {
     </div>
     <div><p>{{MediaStreamTrack}} <a data-cite="!HTML/#transfer-receiving-steps">transfer-receiving steps</a>, given <var>dataHolder</var> and <var>track</var>, are:</p>
       <ol>
+        <li><p>If the [=ECMAScript/surrounding agent=]’s [=ECMAScript/agent cluster=] is not
+          <var>dataHolder</var>.`[[agentCluster]]`, then throw a "DataCloneError" DOMException.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/id}} to <var>dataHolder</var>.`[[id]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/kind}} to <var>dataHolder</var>.`[[kind]]`.</p></li>
         <li><p>Initialize <var>track</var>.{{MediaStreamTrack/label}} to <var>dataHolder</var>.`[[label]]`.</p></li>
@@ -507,7 +510,7 @@ partial interface MediaStreamTrack {
     <section>
       <h4>The MediaStreamTrackAudioStats interface</h4>
       <div>
-        <pre class="idl" data-cite="HR-TIME">[Exposed=Window]
+        <pre class="idl" data-cite="HR-TIME">[Exposed=(Window,DedicatedWorker)]
 interface MediaStreamTrackAudioStats {
   readonly attribute unsigned long long deliveredFrames;
   readonly attribute DOMHighResTimeStamp deliveredFramesDuration;
@@ -793,7 +796,7 @@ interface MediaStreamTrackAudioStats {
     <section>
       <h4>The MediaStreamTrackVideoStats interface</h4>
       <div>
-        <pre class="idl">[Exposed=Window]
+        <pre class="idl">[Exposed=(Window,DedicatedWorker)]
 interface MediaStreamTrackVideoStats {
   readonly attribute unsigned long long deliveredFrames;
   readonly attribute unsigned long long discardedFrames;
@@ -1845,7 +1848,7 @@ if (videoTrack.getSettings().humanFaceDetectionMode != 'bounding-box') {
   throw('Face bounding box detection is not supported');
 }
 
-// Use a video worker and show to user.
+// Use a dedicated video worker and show to user.
 const videoElement = document.querySelector('video');
 const videoWorker = new Worker('video-worker.js');
 videoWorker.postMessage({track: videoTrack}, [videoTrack]);
@@ -1961,13 +1964,12 @@ function work() {
     </section>
   </section>
   <section>
-    <h2>MediaStream in workers</h2>
+    <h2>MediaStream in dedicated workers</h2>
     <div>
-      <p>{{MediaStreamTrack}}'s objects are exposed to workers, so can do {{MediaStream}}'s objects.
-    <div>
+      <p>{{MediaStream}} is exposed to dedicated workers, matching {{MediaStreamTrack}}, to enable composition.</p>
       <p>The WebIDL changes are the following:
       <pre class="idl"
->[Exposed=(Window,Worker)]
+>[Exposed=(Window,DedicatedWorker)]
 partial interface MediaStream {
 };</pre>
     </div>
@@ -2033,7 +2035,7 @@ partial dictionary VideoFrameMetadata {
 // Open camera.
 const stream = await navigator.mediaDevices.getUserMedia({video: true});
 const [track] = stream.getVideoTracks();
-// Do video processing in a worker.
+// Do video processing in a dedicated worker.
 const worker = new Worker('worker.js');
 worker.postMessage({track}, [track]);
 const {data} = await new Promise(result => worker.onmessage = result);
