@@ -377,11 +377,17 @@ function setCameraTrack(track) {
       </p>
     </div>
     <div>
-      <p>The WebIDL changes to make the track transferable are the following:
+      <p>The WebIDL changes are the following:
       <pre class="idl"
 >[Exposed=(Window,DedicatedWorker), Transferable]
 partial interface MediaStreamTrack {
+};
+
+[Exposed=(Window,DedicatedWorker)]
+partial interface OverconstrainedError {
 };</pre>
+      <p>{{OverconstrainedError}} is exposed to dedicated workers too,
+        since {{MediaStreamTrack/applyConstraints()}} rejects with it.</p>
     </div>
     <div>
       <p>At creation of a {{MediaStreamTrack}} object, called <var>track</var>, run the following steps:</p>
@@ -1966,10 +1972,15 @@ function work() {
     <h2>MediaStream in dedicated workers</h2>
     <div>
       <p>{{MediaStream}} is exposed to dedicated workers, matching {{MediaStreamTrack}}, to enable composition.</p>
+      <p>{{MediaStreamTrackEvent}} is also exposed to dedicated workers, since {{MediaStream}} fires it.</p>
       <p>The WebIDL changes are the following:
       <pre class="idl"
 >[Exposed=(Window,DedicatedWorker)]
 partial interface MediaStream {
+};
+
+[Exposed=(Window,DedicatedWorker)]
+partial interface MediaStreamTrackEvent {
 };</pre>
     </div>
   </section>
