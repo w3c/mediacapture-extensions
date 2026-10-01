@@ -386,6 +386,10 @@ partial interface MediaStreamTrack {
 [Exposed=(Window,DedicatedWorker)]
 partial interface OverconstrainedError {
 };</pre>
+      <div class="note">
+        WebIDL does not allow extending the exposure set of a base interface from a partial interface.
+        This is temporary until these extensions get merged into the [[mediacapture-streams]] spec.
+      </div>
       <p>{{OverconstrainedError}} is exposed to dedicated workers too,
         since {{MediaStreamTrack/applyConstraints()}} rejects with it.</p>
     </div>
@@ -1982,6 +1986,10 @@ partial interface MediaStream {
 [Exposed=(Window,DedicatedWorker)]
 partial interface MediaStreamTrackEvent {
 };</pre>
+      <div class="note">
+        WebIDL does not allow extending the exposure set of a base interface from a partial interface.
+        This is temporary until these extensions get merged into the [[mediacapture-streams]] spec.
+      </div>
     </div>
   </section>
   <section>
