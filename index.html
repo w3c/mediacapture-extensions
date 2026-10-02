@@ -2109,29 +2109,12 @@ onmessage = async ({data: {track}}) => {
         readonly attribute MediaStreamTrack? track;
         readonly attribute DOMException? error;
         undefined setConstraints(optional MediaTrackConstraintSet constraints = {});
-        [Reflect] attribute MuteTarget mute;
 
         attribute EventHandler ontrack;
         attribute EventHandler onerror;
         attribute EventHandler oncancel;
       };
       </pre>
-
-      <p>The {{MuteTarget}} enum, used throughout this section, is defined
-        here:</p>
-      <pre class=idl>
-      [Exposed=Window]
-      enum MuteTarget { "source", "manual" };
-      </pre>
-      <p>A {{MuteTarget}} value of {{MuteTarget/"source"}} indicates that the
-      {{MediaStreamTrack}}'s <a data-cite=mediacapture-streams/#dfn-source-0 data-link-type=attribute data-link-for=MediaStreamTrack>[[\Source]]</a>
-      should be muted.
-      {{MuteTarget/"manual"}} indicates that the application would like to
-      manage the mute state itself. This puts responsibility for the
-      implementation and for matching users' expectations on the application,
-      rather than on the [=user agent=]. The HTML media capture elements'
-      user interface should always reflect the true state of the underlying
-      track or stream.</p>
 
       <p>The [^camera^] element uses the following internal slots:</p>
       <ul>
@@ -2146,10 +2129,6 @@ onmessage = async ({data: {track}}) => {
         <li>
           <dfn data-dfn-for="HTMLCameraElement">[[\error]]</dfn> &mdash;
           Holds null or a {{DOMException}}.
-        </li>
-        <li>
-          <dfn data-dfn-for="HTMLCameraElement">[[\mute]]</dfn> &mdash;
-          Holds a {{MuteTarget}}.
         </li>
       </ul>
 
@@ -2196,9 +2175,6 @@ onmessage = async ({data: {track}}) => {
           <a href="https://html.spec.whatwg.org/multipage/dom.html#global-attributes">global attributes</a>
         </dt>
         <dd>&mdash; all global content attributes.</dd>
-        <dt>{{HTMLCameraElement/mute}}</dt>
-        <dd>&mdash; {{MuteTarget}}, which determines activation behavior
-          when the track is already active.</dd>
         <dt>{{HTMLCameraElement/ontrack}}</dt>
         <dt>{{HTMLCameraElement/oncancel}}</dt>
         <dt>{{HTMLCameraElement/onerror}}</dt>
@@ -2241,8 +2217,6 @@ onmessage = async ({data: {track}}) => {
           <li>Initialize [=this=].{{HTMLCameraElement/[[track]]}} to null.</li>
           <li>Initialize [=this=].{{HTMLCameraElement/[[constraints]]}} to «».</li>
           <li>Initialize [=this=].{{HTMLCameraElement/[[error]]}} to null.</li>
-          <li>Initialize [=this=].{{HTMLCameraElement/[[mute]]}} to
-            {{MuteTarget/"source"}}.</li>
         </ol>
 
         <p>The <dfn data-dfn-for=HTMLCameraElement>track</dfn> <a>getter</a> steps are:</p>
@@ -2265,18 +2239,6 @@ onmessage = async ({data: {track}}) => {
           </li>
         </ol>
 
-        <p>The <dfn data-dfn-for=HTMLCameraElement>mute</dfn> [=getter=] steps are:</p>
-        <ol class=algorithm>
-          <li>Return [=this=].{{HTMLCameraElement/[[mute]]}}.</li>
-        </ol>
-
-        <p>The {{HTMLCameraElement/mute}} [=setter=] steps given a
-          {{MuteTarget}} |value| are:</p>
-        <ol class=algorithm>
-          <li>Set [=this=].{{HTMLCameraElement/[[mute]]}} to
-            |value|.</li>
-        </ol>
-
         <p>
           The [^camera^] element's [=EventTarget/activation behavior=]
           given |event| is:
@@ -2296,15 +2258,8 @@ onmessage = async ({data: {track}}) => {
             run [=HTMLCameraElement/activation start=] steps given
             [=this=].
           </li>
-          <li>Otherwise:
-            <ol>
-              <li>If {{HTMLCameraElement/[[mute]]}} is
-                {{MuteTarget/"source"}}, then run the
-                [=HTMLCameraElement/mute source=]
-                steps given [=this=].</li>
-              <li>If {{HTMLCameraElement/[[mute]]}} is
-                {{MuteTarget/"manual"}}, then do nothing.</li>
-            </ol>
+          <li>Otherwise, run the [=HTMLCameraElement/activation toggle=]
+            steps given [=this=].
           </li>
         </ol>
 
@@ -2372,13 +2327,11 @@ onmessage = async ({data: {track}}) => {
           </li>
         </ol>
 
-        <p>The <dfn data-dfn-for="HTMLCameraElement">mute source</dfn>
+        <p>The <dfn data-dfn-for="HTMLCameraElement">activation toggle</dfn>
           steps for a given |element| are:</p>
         <ol class=algorithm>
           <li>[=Assert=]: |element|.{{HTMLCameraElement/[[track]]}} is not
             null.</li>
-          <li>[=Assert=]: |element|.{{HTMLCameraElement/[[mute]]}} is
-            {{MuteTarget/"source"}}.</li>
           <li>
             If |element|.{{HTMLCameraElement/[[track]]}}.<a data-cite=mediacapture-streams/#dfn-muted data-link-type=attribute data-link-for=MediaStreamTrack>[[\Muted]]</a> is true:
             <ol>
@@ -2394,13 +2347,6 @@ onmessage = async ({data: {track}}) => {
               <li>[=MediaStreamTrack/muted|Mute=]
                 |element|.{{HTMLCameraElement/[[track]]}}.<a data-cite=mediacapture-streams/#dfn-source-0 data-link-type=attribute data-link-for=MediaStreamTrack>[[\Source]]</a>.</li>
             </ol>
-            <div class=note>Modifying the <a data-cite=mediacapture-streams/#dfn-muted data-link-type=attribute data-link-for=MediaStreamTrack>[[\Muted]]</a> state
-              affects the {{HTMLCameraElement/[[track]]}}'s
-              <a data-cite=mediacapture-streams#dfn-source>source</a>. This is
-              not exposed to regular APIs and is a prerogative of the
-              [=user agent=]. This makes a {{MuteTarget/"source"}}
-              mute something the page cannot undo or emulate.
-            </div>
           </li>
         </ol>
 
@@ -2434,7 +2380,6 @@ onmessage = async ({data: {track}}) => {
         readonly attribute MediaStreamTrack? track;
         readonly attribute DOMException? error;
         undefined setConstraints(optional MediaTrackConstraintSet constraints = {});
-        [Reflect] attribute MuteTarget mute;
 
         attribute EventHandler ontrack;
         attribute EventHandler onerror;
@@ -2455,10 +2400,6 @@ onmessage = async ({data: {track}}) => {
         <li>
           <dfn data-dfn-for="HTMLMicrophoneElement">[[\error]]</dfn> &mdash;
           Holds null or a {{DOMException}}.
-        </li>
-        <li>
-          <dfn data-dfn-for="HTMLMicrophoneElement">[[\mute]]</dfn> &mdash;
-          Holds a {{MuteTarget}}.
         </li>
      </ul>
 
@@ -2505,9 +2446,6 @@ onmessage = async ({data: {track}}) => {
           <a href="https://html.spec.whatwg.org/multipage/dom.html#global-attributes">global attributes</a>
         </dt>
         <dd>&mdash; all global content attributes.</dd>
-        <dt>{{HTMLMicrophoneElement/mute}}</dt>
-        <dd>&mdash; {{MuteTarget}}, which determines activation behavior
-          when the track is already active.</dd>
         <dt>{{HTMLMicrophoneElement/ontrack}}</dt>
         <dt>{{HTMLMicrophoneElement/oncancel}}</dt>
         <dt>{{HTMLMicrophoneElement/onerror}}</dt>
@@ -2541,6 +2479,55 @@ onmessage = async ({data: {track}}) => {
       </p>
 
       <section>
+        <h4>API Notes</h4>
+        <p>
+          The HTML media capture elements follow the regular model of DOM / HTML
+          [=EventTarget/activation behavior|activation=]. From this follows the
+          ability to customize the default behaviors the element.
+        </p>
+        <p>
+          A popular functionality in video conferencing software is detection
+          when the user is speaking into a muted microphone, and to display a
+          suitable note in the UI if so.
+          In order to implement such functionality using [^microphone^]
+          element requires custom toggle behaviour. This could look roughly as
+          follows:
+        </p>
+        <pre class="js example">
+          &lt;microphone id=mic&gt;&lt;/microphone&gt;
+          &lt;script&gt;
+            function ontoggle(event) {
+              // The track we're interested in. Might be empty.
+              const track = event.target.track;
+
+              // Setting up the track should be handled by the element. We have
+              // nothing to add here.
+              if (!track) return true;
+
+              // If we already have a stream, we can now manually toggle instead
+              // of letting &lt;microphone&gt; handle it, by disabling and
+              // re-enabling the specific track (rather than the source).
+              track.enabled = !track.enabled;
+
+              // Prevent the default behavior to prevent a "double mute", and
+              // to keep our "are you speaking?" detection going.
+              event.preventDefault();
+              return true;
+            }
+            function ontrack(event) {
+              const track = event.target.track;
+              startAreYouSpeakingDetection(track.clone());
+            }
+
+            const mic = document.getElementById("mic");
+            mic.setConstraints( &#x2026;constraints&#x2026; );
+            mic.addEventListener("click", ontoggle);
+            mic.addEventListener("track", ontrack);
+          &lt;/script&gt;
+        </pre>
+      </section>
+
+      <section>
         <h4>Algorithms</h4>
 
         <p>The <dfn data-dfn-for=HTMLMicrophoneElement>constructor()</dfn>
@@ -2550,8 +2537,6 @@ onmessage = async ({data: {track}}) => {
           <li>Initialize [=this=].{{HTMLMicrophoneElement/[[track]]}} to null.</li>
           <li>Initialize [=this=].{{HTMLMicrophoneElement/[[constraints]]}} to «».</li>
           <li>Initialize [=this=].{{HTMLMicrophoneElement/[[error]]}} to null.</li>
-          <li>Initialize [=this=].{{HTMLMicrophoneElement/[[mute]]}} to
-            {{MuteTarget/"source"}}.</li>
         </ol>
 
         <p>The <dfn data-dfn-for=HTMLMicrophoneElement>track</dfn> <a>getter</a>
@@ -2574,18 +2559,6 @@ onmessage = async ({data: {track}}) => {
           </li>
         </ol>
 
-        <p>The <dfn data-dfn-for=HTMLMicrophoneElement>mute</dfn> [=getter=] steps are:</p>
-        <ol class=algorithm>
-          <li>Return [=this=].{{HTMLMicrophoneElement/[[mute]]}}.</li>
-        </ol>
-
-        <p>The {{HTMLMicrophoneElement/mute}} [=setter=] steps given a
-          {{MuteTarget}} |value| are:</p>
-        <ol class=algorithm>
-          <li>Set [=this=].{{HTMLMicrophoneElement/[[mute]]}} to
-            |value|.</li>
-        </ol>
-
         <p>
           The [^microphone^] element's
           [=EventTarget/activation behavior=] given |event| is:
@@ -2605,15 +2578,8 @@ onmessage = async ({data: {track}}) => {
             run [=HTMLMicrophoneElement/activation start=] steps given
             [=this=].
           </li>
-          <li>Otherwise:
-            <ol>
-              <li>If {{HTMLMicrophoneElement/[[mute]]}} is
-                {{MuteTarget/"source"}}, then run the
-                [=HTMLMicrophoneElement/mute source=]
-                steps given [=this=].</li>
-              <li>If {{HTMLMicrophoneElement/[[mute]]}} is
-                {{MuteTarget/"manual"}}, then do nothing.</li>
-            </ol>
+          <li>Otherwise, run the [=HTMLMicrophoneElement/activation toggle=]
+            steps given [=this=].
           </li>
         </ol>
 
@@ -2682,13 +2648,11 @@ onmessage = async ({data: {track}}) => {
           </li>
         </ol>
 
-        <p>The <dfn data-dfn-for="HTMLMicrophoneElement">mute source</dfn>
+        <p>The <dfn data-dfn-for="HTMLMicrophoneElement">activation toggle</dfn>
           steps for a given |element| are:</p>
         <ol class=algorithm>
           <li>[=Assert=]: |element|.{{HTMLMicrophoneElement/[[track]]}} is not
             null.</li>
-          <li>[=Assert=]: |element|.{{HTMLMicrophoneElement/[[mute]]}} is
-            {{MuteTarget/"source"}}.</li>
           <li>
             If |element|.{{HTMLMicrophoneElement/[[track]]}}.<a data-cite=mediacapture-streams/#dfn-muted data-link-type=attribute data-link-for=MediaStreamTrack>[[\Muted]]</a> is true:
             <ol>
@@ -2704,13 +2668,6 @@ onmessage = async ({data: {track}}) => {
               <li>[=MediaStreamTrack/muted|Mute=]
                 |element|.{{HTMLMicrophoneElement/[[track]]}}.<a data-cite=mediacapture-streams/#dfn-source-0 data-link-type=attribute data-link-for=MediaStreamTrack>[[\Source]]</a>.</li>
             </ol>
-            <div class=note>Modifying the <a data-cite=mediacapture-streams/#dfn-muted data-link-type=attribute data-link-for=MediaStreamTrack>[[\Muted]]</a> state
-              affects the {{HTMLMicrophoneElement/[[track]]}}'s
-              <a data-cite=mediacapture-streams#dfn-source>source</a>. This is
-              not exposed to regular APIs and is a prerogative of the
-              [=user agent=]. This makes a {{MuteTarget/"source"}}
-              mute something the page cannot undo or emulate.
-            </div>
           </li>
         </ol>
 
@@ -2749,7 +2706,6 @@ onmessage = async ({data: {track}}) => {
         readonly attribute MediaStream? stream;
         readonly attribute DOMException? error;
         undefined setConstraints(optional HTMLMediaStreamConstraints constraints = {});
-        [Reflect] attribute MuteTarget mute;
 
         attribute EventHandler onstream;
         attribute EventHandler onerror;
@@ -2770,10 +2726,6 @@ onmessage = async ({data: {track}}) => {
         <li>
           <dfn data-dfn-for="HTMLUserMediaElement">[[\error]]</dfn> &mdash;
           Holds null or a {{DOMException}}.
-        </li>
-        <li>
-          <dfn data-dfn-for="HTMLUserMediaElement">[[\mute]]</dfn> &mdash;
-          Holds a {{MuteTarget}}.
         </li>
       </ul>
 
@@ -2820,9 +2772,6 @@ onmessage = async ({data: {track}}) => {
           <a href="https://html.spec.whatwg.org/multipage/dom.html#global-attributes">global attributes</a>
         </dt>
         <dd>&mdash; all global content attributes.</dd>
-        <dt>{{HTMLUserMediaElement/mute}}</dt>
-        <dd>&mdash; {{MuteTarget}}, which determines activation behavior
-          when the stream is already active.</dd>
         <dt>{{HTMLUserMediaElement/onstream}}</dt>
         <dt>{{HTMLUserMediaElement/oncancel}}</dt>
         <dt>{{HTMLUserMediaElement/onerror}}</dt>
@@ -2866,8 +2815,6 @@ onmessage = async ({data: {track}}) => {
           <li>Initialize [=this=].{{HTMLUserMediaElement/[[stream]]}} to null.</li>
           <li>Initialize [=this=].{{HTMLUserMediaElement/[[constraints]]}} to «».</li>
           <li>Initialize [=this=].{{HTMLUserMediaElement/[[error]]}} to null.</li>
-          <li>Initialize [=this=].{{HTMLUserMediaElement/[[mute]]}} to
-            {{MuteTarget/"source"}}.</li>
         </ol>
 
         <p>The <dfn data-dfn-for=HTMLUserMediaElement>stream</dfn>
@@ -2891,18 +2838,6 @@ onmessage = async ({data: {track}}) => {
           </li>
         </ol>
 
-        <p>The <dfn data-dfn-for=HTMLUserMediaElement>mute</dfn> [=getter=] steps are:</p>
-        <ol class=algorithm>
-          <li>Return [=this=].{{HTMLUserMediaElement/[[mute]]}}.</li>
-        </ol>
-
-        <p>The {{HTMLUserMediaElement/mute}} [=setter=] steps given a
-          {{MuteTarget}} |value| are:</p>
-        <ol class=algorithm>
-          <li>Set [=this=].{{HTMLUserMediaElement/[[mute]]}} to
-            |value|.</li>
-        </ol>
-
         <p>
           The [^usermedia^] element's [=EventTarget/activation behavior=],
           given |event|, is:
@@ -2922,15 +2857,8 @@ onmessage = async ({data: {track}}) => {
             run [=HTMLUserMediaElement/activation start=] steps given
             [=this=].
           </li>
-          <li>Otherwise:
-            <ol>
-              <li>If {{HTMLUserMediaElement/[[mute]]}} is
-                {{MuteTarget/"source"}}, then run the
-                [=HTMLUserMediaElement/mute source=]
-                steps given [=this=].</li>
-              <li>If {{HTMLUserMediaElement/[[mute]]}} is
-                {{MuteTarget/"manual"}}, then do nothing.</li>
-            </ol>
+          <li>Otherwise, run the [=HTMLUserMediaElement/activation toggle=]
+             steps given [=this=].
           </li>
         </ol>
 
@@ -2992,13 +2920,11 @@ onmessage = async ({data: {track}}) => {
           </li>
         </ol>
 
-        <p>The <dfn data-dfn-for="HTMLUserMediaElement">mute source</dfn>
+        <p>The <dfn data-dfn-for="HTMLUserMediaElement">activation toggle</dfn>
           steps for a given |element| are:</p>
         <ol class=algorithm>
           <li>[=Assert=]: |element|.{{HTMLUserMediaElement/[[stream]]}} is not
             null.</li>
-          <li>[=Assert=]: |element|.{{HTMLUserMediaElement/[[mute]]}} is
-            {{MuteTarget/"source"}}.</li>
           <li>Let |tracks| be |element|.{{HTMLUserMediaElement/[[stream]]}}'s
             [=/track set=].</li>
           <li>Let |muted| be true if any |track| in |tracks| has
@@ -3026,13 +2952,6 @@ onmessage = async ({data: {track}}) => {
                 </ol>
               </li>
             </ol>
-            <div class=note>Modifying the <a data-cite=mediacapture-streams/#dfn-muted data-link-type=attribute data-link-for=MediaStreamTrack>[[\Muted]]</a> state
-              affects each track's
-              <a data-cite=mediacapture-streams#dfn-source>source</a>. This is
-              not exposed to regular APIs and is a prerogative of the
-              [=user agent=]. This makes a {{MuteTarget/"source"}}
-              mute something the page cannot undo or emulate.
-            </div>
           </li>
         </ol>
 
