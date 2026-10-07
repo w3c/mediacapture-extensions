@@ -2481,16 +2481,62 @@ onmessage = async ({data: {track}}) => {
       <section>
         <h4>API Notes</h4>
         <p>
-          The HTML media capture elements follow the regular model of DOM / HTML
-          [=EventTarget/activation behavior|activation=]. From this follows the
-          ability to customize the default behaviors the element.
+          The basic use case is also the simplest. To offer the user the ability
+          to open the microphone and to mute themselves when they choose, do:
+        </p>
+        <pre class="js example">
+          &lt;microphone id=mic&gt;&lt;/microphone&gt;
+          &lt;script&gt;
+            document.getElementById("mic").addEventListener("track", event =&gt; {
+              const track = event.target.track;
+              // &#x2026; do your thing here &#x2026;
+            });
+          &lt;/script&gt;
+        </pre>
+
+        <p>
+          Not all browsers support the usermedia capture elements. The
+          <a href="https://html.spec.whatwg.org/multipage/dom.html#fallback-content">fallback content</a>
+          can be used to provide an alternative implementation.
+        </p>
+        <pre class="js example">
+          &lt;microphone id=mic&gt;
+            &lt;div id=mic-alt&gt;Click here to enable your microphone.&lt;/div&gt;
+          &lt;/microphone&gt;
+          &lt;script&gt;
+            document.getElementById("mic").addEventListener("track", event =&gt; {
+              const track = event.target.track;
+              // &#x2026; do your thing here &#x2026;
+            });
+            document.getElementById("mic-alt").addEventListener("click", event=&gt; {
+              if (&#x2026; first click &#x2026;) {
+                const stream = await navigator.mediaDevices.getUserMedia(&#x2026;);
+                const track = stream.getAudioTracks()[0];
+                // &#x2026; do your thing here &#x2026;
+              } else {
+                // &#x2026; handle mute / unmute manually &#x2026;
+              }
+            });
+          &lt;/script&gt;
+        </pre>
+
+        <p>
+          Some use cases are more complicated and require customization of the
+          default behaviour. The HTML media capture elements allow this by
+          following the regular model of DOM / HTML
+          [=EventTarget/activation behavior|activation=], where calling
+          {{Event/preventDefault()}} will prevent the user agent from execution
+          from performing the default action.
         </p>
         <p>
-          A popular functionality in video conferencing software is detection
-          when the user is speaking into a muted microphone, and to display a
-          suitable note in the UI if so.
+          For example, a
+          popular functionality in video conferencing software is to detect
+          when a user is speaking into a muted microphone, and to remind them
+          with suitable note in the UI if so.
+          This would be blocked by the built-in toggle functionality, since
+          muting the source will also mute any track attached to it.
           In order to implement such functionality using [^microphone^]
-          element requires custom toggle behaviour. This could look roughly as
+          element requires custom toggle behaviour. This would look roughly as
           follows:
         </p>
         <pre class="js example">
@@ -2516,9 +2562,9 @@ onmessage = async ({data: {track}}) => {
             }
             function ontrack(event) {
               const track = event.target.track;
+              // &#x2026; do your thing here &#x2026;
               startAreYouSpeakingDetection(track.clone());
             }
-
             const mic = document.getElementById("mic");
             mic.setConstraints( &#x2026;constraints&#x2026; );
             mic.addEventListener("click", ontoggle);
