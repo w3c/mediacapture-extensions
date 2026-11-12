@@ -2128,6 +2128,7 @@ onmessage = async ({data: {track}}) => {
         readonly attribute MediaStreamTrack? track;
         readonly attribute DOMException? error;
         undefined setConstraints(optional MediaTrackConstraintSet constraints = {});
+        [Reflect] attribute MediaElementDisplayHint? displayhint;
 
         attribute EventHandler ontrack;
         attribute EventHandler onerror;
@@ -2148,6 +2149,10 @@ onmessage = async ({data: {track}}) => {
         <li>
           <dfn data-dfn-for="HTMLCameraElement">[[\error]]</dfn> &mdash;
           Holds null or a {{DOMException}}.
+        </li>
+        <li>
+          <dfn data-dfn-for="HTMLCameraElement">[[\displayhint]]</dfn> &mdash;
+          Holds null or a {{MediaElementDisplayHint}}.
         </li>
       </ul>
 
@@ -2190,6 +2195,9 @@ onmessage = async ({data: {track}}) => {
         <a href="https://html.spec.whatwg.org/multipage/dom.html#concept-element-attributes">content attributes</a>:
       </p>
       <dl>
+        <dt>displayhint</dt>
+        <dd>&mdash; whether the display of the element should feature text,
+          an icon, or both.</dd>
         <dt>
           <a href="https://html.spec.whatwg.org/multipage/dom.html#global-attributes">global attributes</a>
         </dt>
@@ -2210,6 +2218,8 @@ onmessage = async ({data: {track}}) => {
       <p>The [^camera^] element's presentation is left to the [=user
         agent=]. It's expected that the presentation is chiefly that of a button,
         with text and/or an icon to indicate this is managing camera access.
+        {{HTMLCameraElement/[[displayhint]]}} indicates whether the website
+        has a preference on the presentation.
         The presentation is expected to reflect the state of the underlying
         track (if any), e.g. by hinting to the user that a track is live
         (or not), or that the camera might be open or muted.
@@ -2256,6 +2266,19 @@ onmessage = async ({data: {track}}) => {
           <li>
             Set [=this=].{{HTMLCameraElement/[[constraints]]}} to |constraints|.
           </li>
+        </ol>
+
+        <p>The <dfn data-dfn-for=HTMLCameraElement>displayhint</dfn> <a>getter</a>
+          steps are:</p>
+        <ol class=algorithm>
+          <li>Return [=this=].{{HTMLCameraElement/[[displayhint]]}}.</li>
+        </ol>
+
+        <p>The {{HTMLCameraElement/displayhint}} <a>setter</a>
+          steps with an optional {{MediaElementDisplayHint}} |hint| with
+          default null are:</p>
+        <ol class=algorithm>
+          <li>Set [=this=].{{HTMLCameraElement/[[displayhint]]}} to |hint|.</li>
         </ol>
 
         <p>
@@ -2383,6 +2406,7 @@ onmessage = async ({data: {track}}) => {
         readonly attribute MediaStreamTrack? track;
         readonly attribute DOMException? error;
         undefined setConstraints(optional MediaTrackConstraintSet constraints = {});
+        [Reflect] attribute MediaElementDisplayHint? displayhint;
 
         attribute EventHandler ontrack;
         attribute EventHandler onerror;
@@ -2403,6 +2427,10 @@ onmessage = async ({data: {track}}) => {
         <li>
           <dfn data-dfn-for="HTMLMicrophoneElement">[[\error]]</dfn> &mdash;
           Holds null or a {{DOMException}}.
+        </li>
+        <li>
+          <dfn data-dfn-for="HTMLMicrophoneElement">[[\displayhint]]</dfn> &mdash;
+          Holds null or a {{MediaElementDisplayHint}}.
         </li>
      </ul>
 
@@ -2445,6 +2473,9 @@ onmessage = async ({data: {track}}) => {
         <a href="https://html.spec.whatwg.org/multipage/dom.html#concept-element-attributes">content attributes</a>:
       </p>
       <dl>
+        <dt>displayhint</dt>
+        <dd>&mdash; whether the display of the element should feature text,
+          an icon, or both.</dd>
         <dt>
           <a href="https://html.spec.whatwg.org/multipage/dom.html#global-attributes">global attributes</a>
         </dt>
@@ -2458,7 +2489,10 @@ onmessage = async ({data: {track}}) => {
       <p>The [^microphone^] element's presentation is left to the
         [=user agent=]. It's expected that the presentation is chiefly that of a
         button, with text and/or an icon to indicate this is managing microphone
-        access. The presentation is expected to reflect the state of the
+        access.
+        {{HTMLMicrophoneElement/[[displayhint]]}} indicates whether the website
+        has a preference on the presentation.
+        The presentation is expected to reflect the state of the
         underlying track (if any), e.g. by hinting to the user that a track
         is live (or not), or that the microphone might be open or muted.
       </p>
@@ -2511,6 +2545,19 @@ onmessage = async ({data: {track}}) => {
           <li>
             Set [=this=].{{HTMLMicrophoneElement/[[constraints]]}} to |constraints|.
           </li>
+        </ol>
+
+        <p>The <dfn data-dfn-for=HTMLMicrophoneElement>displayhint</dfn> <a>getter</a>
+          steps are:</p>
+        <ol class=algorithm>
+          <li>Return [=this=].{{HTMLMicrophoneElement/[[displayhint]]}}.</li>
+        </ol>
+
+        <p>The {{HTMLMicrophoneElement/displayhint}} <a>setter</a>
+          steps with an optional {{MediaElementDisplayHint}} |hint| with
+          default null are:</p>
+        <ol class=algorithm>
+          <li>Set [=this=].{{HTMLMicrophoneElement/[[displayhint]]}} to |hint|.</li>
         </ol>
 
         <p>
@@ -2641,6 +2688,7 @@ onmessage = async ({data: {track}}) => {
         readonly attribute MediaStream? stream;
         readonly attribute DOMException? error;
         undefined setConstraints(optional HTMLMediaStreamConstraints constraints = {});
+        [Reflect] attribute MediaElementDisplayHint? displayhint;
 
         attribute EventHandler onstream;
         attribute EventHandler onerror;
@@ -2661,6 +2709,10 @@ onmessage = async ({data: {track}}) => {
         <li>
           <dfn data-dfn-for="HTMLUserMediaElement">[[\error]]</dfn> &mdash;
           Holds null or a {{DOMException}}.
+        </li>
+        <li>
+          <dfn data-dfn-for="HTMLUserMediaElement">[[\displayhint]]</dfn> &mdash;
+          Holds null or a {{MediaElementDisplayHint}}.
         </li>
       </ul>
 
@@ -2703,6 +2755,9 @@ onmessage = async ({data: {track}}) => {
         <a href="https://html.spec.whatwg.org/multipage/dom.html#concept-element-attributes">content attributes</a>:
       </p>
       <dl>
+        <dt>displayhint</dt>
+        <dd>&mdash; whether the display of the element should feature text,
+          an icon, or both.</dd>
         <dt>
           <a href="https://html.spec.whatwg.org/multipage/dom.html#global-attributes">global attributes</a>
         </dt>
@@ -2716,7 +2771,10 @@ onmessage = async ({data: {track}}) => {
       <p>The [^usermedia^] element's presentation is left to the [=user
         agent=]. It's expected that the presentation is chiefly that of a button,
         with text and/or an icon to indicate this is managing camera and microphone
-        access. The presentation is expected to reflect the state of the underlying
+        access.
+        {{HTMLUserMediaElement/[[displayhint]]}} indicates whether the website
+        has a preference on the presentation.
+        The presentation is expected to reflect the state of the underlying
         stream (if any), e.g. by hinting to the user that a stream is live
         (or not), or that the camera and microphone might be active or muted.
       </p>
@@ -2771,6 +2829,19 @@ onmessage = async ({data: {track}}) => {
           <li>
             Set [=this=].{{HTMLUserMediaElement/[[constraints]]}} to |constraints|.
           </li>
+        </ol>
+
+        <p>The <dfn data-dfn-for=HTMLUserMediaElement>displayhint</dfn> <a>getter</a>
+          steps are:</p>
+        <ol class=algorithm>
+          <li>Return [=this=].{{HTMLUserMediaElement/[[displayhint]]}}.</li>
+        </ol>
+
+        <p>The {{HTMLUserMediaElement/displayhint}} <a>setter</a>
+          steps with an optional {{MediaElementDisplayHint}} |hint| with
+          default null are:</p>
+        <ol class=algorithm>
+          <li>Set [=this=].{{HTMLUserMediaElement/[[displayhint]]}} to |hint|.</li>
         </ol>
 
         <p>
@@ -2895,8 +2966,35 @@ onmessage = async ({data: {track}}) => {
       </section>
     </section>
     <section>
+      <h3>Shared Definitions</h3>
+      <pre class=idl>
+        enum MediaElementDisplayHint { "icon", "text", "icon+text"};
+      </pre>
+      <p>
+        The {{MediaElementDisplayHint}} enum specifies how a website would
+        prefer the element to be presented. Its values are
+        {{MediaElementDisplayHint/"icon"}},
+        {{MediaElementDisplayHint/"text"}}, and
+        {{MediaElementDisplayHint/"icon+text"}}.
+      </p>
+      <div class=example>
+        <div class=marker>Examples:</div>
+        <div>
+          {{MediaElementDisplayHint/"icon"}}:
+          [&nbsp;&#x1F4F7;&nbsp;]
+        </div>
+        <div>
+          {{MediaElementDisplayHint/"text"}}:
+          [ use camera ]
+        </div>
+        <div>
+          {{MediaElementDisplayHint/"icon+text"}}:
+          [&nbsp;&#x1F4F7;&nbsp;Camera&nbsp;]
+        </div>
+      </div>
+    </section>
+    <section>
       <h3>Shared Algorithms</h3>
-
       <p>To determine whether an {{Event}} |event| is
         <dfn data-dfn-for=AllUserMediaElements>trusted</dfn>:</p>
 
