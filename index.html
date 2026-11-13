@@ -527,6 +527,11 @@ interface MediaStreamTrackAudioStats {
   readonly attribute DOMHighResTimeStamp minimumLatency;
   readonly attribute DOMHighResTimeStamp maximumLatency;
   undefined resetLatency();
+  readonly attribute double? voiceIsolationIndex;
+  readonly attribute double? averageVoiceIsolationIndex;
+  readonly attribute double? minimumVoiceIsolationIndex;
+  readonly attribute double? maximumVoiceIsolationIndex;
+  undefined resetVoiceIsolationIndex();
   [Default] object toJSON();
 };
         </pre>
@@ -604,6 +609,103 @@ interface MediaStreamTrackAudioStats {
               latency reset time</dfn>.
               </p>
             </li>
+            <li>
+              <p>The <dfn>voice isolation index</dfn> represents how much
+              non-voice signal the user agent is currently removing from the
+              track's audio as a result of the track's "voiceIsolation" setting.
+              It is either <code>null</code> or a number from 0.0 to 1.0,
+              inclusive. It is computed over a window of the most recent audio.
+              The window is short enough, and the index is updated often
+              enough, for the application to follow its changes in real time,
+              for example in a visual indicator.</p>
+              <p>The [= voice isolation index =] is <code>null</code> if the
+              track's "voiceIsolation" setting is not <code>true</code>, or if
+              the user agent does not measure how much non-voice signal it
+              removes, for example because voice isolation is performed by the
+              platform.</p>
+              <p>When the [= voice isolation index =] is not <code>null</code>,
+              it MUST be 0.0 if no non-voice signal, or only a negligible
+              amount, is being removed, and above 0.0 otherwise, and removing
+              more non-voice signal MUST NOT result in a lower value. The user
+              agent SHOULD map the amount of removed non-voice signal to
+              non-<code>null</code> values according to the following
+              table:</p>
+              <table class="simple">
+                <thead>
+                  <tr>
+                    <th>Index</th>
+                    <th>Level</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0.0</td>
+                    <td>No suppression</td>
+                    <td>No non-voice signal, or only a negligible amount, is
+                    being removed.</td>
+                  </tr>
+                  <tr>
+                    <td>Above 0.0, up to 0.3</td>
+                    <td>Light suppression</td>
+                    <td>Suppression of quiet, low-level background noises that
+                    are close to the acoustic noise floor.</td>
+                  </tr>
+                  <tr>
+                    <td>Above 0.3, up to 0.6</td>
+                    <td>Moderate suppression</td>
+                    <td>Suppression of moderately loud non-voice signals.</td>
+                  </tr>
+                  <tr>
+                    <td>Above 0.6, up to 0.9</td>
+                    <td>Heavy suppression</td>
+                    <td>Suppression of very loud background noise.</td>
+                  </tr>
+                  <tr>
+                    <td>Above 0.9, up to 1.0</td>
+                    <td>Maximum suppression</td>
+                    <td>Suppression of extreme, overpowering acoustic noise
+                    events. 1.0 is the top of the scale.</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="note">
+                <p>As with voice isolation itself, the exact methods used to
+                estimate the removed non-voice signal may vary between
+                implementations. The table keeps values comparable across user
+                agents.</p>
+                <p>For example, a user agent can measure the energy of the
+                non-voice signal it removes during that window, express it in
+                decibels above a fixed reference level at a defined point in its
+                processing, such as a level just above the noise floor of a
+                quiet room, and map it linearly to the index as
+                min(1, max(0, <var>R</var> / <var>D</var>)), where <var>R</var>
+                is that energy in decibels above the reference and <var>D</var>
+                is the range in decibels that maps to the full scale. Other
+                formulas are possible.</p>
+                <p>The window that the index is computed over can be a few tens
+                of milliseconds long, up to about 100 milliseconds. That lets a
+                visual indicator follow the index without noticeable lag, and
+                still lets short events, such as a cough or a dog bark, show up
+                in the [= maximum voice isolation index =].</p>
+              </div>
+            </li>
+            <li>
+              <p>Every time the [= voice isolation index =] is updated, the user
+              agent also updates its <dfn>average voice isolation index</dfn>,
+              <dfn>minimum voice isolation index</dfn> and <dfn>maximum voice
+              isolation index</dfn>, which are the average, minimum and maximum
+              non-<code>null</code> values of the [= voice isolation index =]
+              since the last <dfn>voice isolation index reset time</dfn>. They
+              are <code>null</code> if there were no such values.</p>
+            </li>
+            <li>
+              <p>If no audio is flowing, such as if the track is muted or
+              disabled, the user agent does not update the [= voice isolation
+              index =], the [= average voice isolation index =], the [= minimum
+              voice isolation index =] or the [= maximum voice isolation
+              index =].</p>
+            </li>
           </ul>
           <p>Let the {{MediaStreamTrackAudioStats}} have internal slots
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\DeliveredFrames]]</dfn>,
@@ -621,6 +723,13 @@ interface MediaStreamTrackAudioStats {
           and
           <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\LastExposureTime]]</dfn>,
           initialized to <code>undefined</code>.</p>
+          <p>Let the {{MediaStreamTrackAudioStats}} also have internal slots
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\VoiceIsolationIndex]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\AverageVoiceIsolationIndex]]</dfn>,
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\MinimumVoiceIsolationIndex]]</dfn>
+          and
+          <dfn class=export data-dfn-for="MediaStreamTrackAudioStats">[[\MaximumVoiceIsolationIndex]]</dfn>,
+          initialized to <code>null</code>.</p>
           <p>The <dfn data-lt="expose audio frame counters steps">expose audio
           frame counters steps</dfn> are the following:</p>
           <ul>
@@ -652,6 +761,14 @@ interface MediaStreamTrackAudioStats {
               [= minimum input latency =] and
               set {{MediaStreamTrackAudioStats/[[MaximumLatency]]}} to the
               [= maximum input latency =].</p>
+              <p>Set {{MediaStreamTrackAudioStats/[[VoiceIsolationIndex]]}} to
+              the [= voice isolation index =],
+              set {{MediaStreamTrackAudioStats/[[AverageVoiceIsolationIndex]]}}
+              to the [= average voice isolation index =],
+              set {{MediaStreamTrackAudioStats/[[MinimumVoiceIsolationIndex]]}}
+              to the [= minimum voice isolation index =] and
+              set {{MediaStreamTrackAudioStats/[[MaximumVoiceIsolationIndex]]}}
+              to the [= maximum voice isolation index =].</p>
               <p>Set {{MediaStreamTrackAudioStats/[[LastExposureTime]]}} to
               reflect the time that these metrics were exposed.</p>
               <div class="note">
@@ -762,6 +879,50 @@ interface MediaStreamTrackAudioStats {
                 and return {{MediaStreamTrackAudioStats/[[MaximumLatency]]}}.
               </p>
             </dd>
+            <dt>
+              <dfn data-idl="">voiceIsolationIndex</dfn> of type <span class=
+              "idlMemberType">double, readonly, nullable</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return
+                {{MediaStreamTrackAudioStats/[[VoiceIsolationIndex]]}}.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">averageVoiceIsolationIndex</dfn> of type <span
+              class="idlMemberType">double, readonly, nullable</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return
+                {{MediaStreamTrackAudioStats/[[AverageVoiceIsolationIndex]]}}.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">minimumVoiceIsolationIndex</dfn> of type <span
+              class="idlMemberType">double, readonly, nullable</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return
+                {{MediaStreamTrackAudioStats/[[MinimumVoiceIsolationIndex]]}}.
+              </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">maximumVoiceIsolationIndex</dfn> of type <span
+              class="idlMemberType">double, readonly, nullable</span>
+            </dt>
+            <dd>
+              <p>
+                Upon getting, run the [= expose audio frame counters steps =]
+                and return
+                {{MediaStreamTrackAudioStats/[[MaximumVoiceIsolationIndex]]}}.
+              </p>
+            </dd>
           </dl>
         </section>
         <section>
@@ -789,6 +950,29 @@ interface MediaStreamTrackAudioStats {
                 </li>
               </ul>
               </p>
+            </dd>
+            <dt>
+              <dfn data-idl="">resetVoiceIsolationIndex</dfn>
+            </dt>
+            <dd>
+              <p>When called, run the following steps:</p>
+              <ul>
+                <li>
+                  <p>Run the [= expose audio frame counters steps =].</p>
+                </li>
+                <li>
+                  <p>Set
+                  {{MediaStreamTrackAudioStats/[[AverageVoiceIsolationIndex]]}},
+                  {{MediaStreamTrackAudioStats/[[MinimumVoiceIsolationIndex]]}}
+                  and
+                  {{MediaStreamTrackAudioStats/[[MaximumVoiceIsolationIndex]]}}
+                  to {{MediaStreamTrackAudioStats/[[VoiceIsolationIndex]]}}.</p>
+                </li>
+                <li>
+                  <p>Set the [= voice isolation index reset time =] to
+                  {{MediaStreamTrackAudioStats/[[LastExposureTime]]}}.</p>
+                </li>
+              </ul>
             </dd>
             <dt>
               <dfn data-idl="">toJSON</dfn>
