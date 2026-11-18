@@ -627,7 +627,7 @@ interface MediaStreamTrackAudioStats {
               it MUST be 0.0 if no non-voice signal, or only a negligible
               amount, is being removed, and above 0.0 otherwise, and removing
               more non-voice signal MUST NOT result in a lower value. The user
-              agent SHOULD map the amount of removed non-voice signal to
+              agent MUST map the amount of removed non-voice signal to
               non-<code>null</code> values according to the following
               table:</p>
               <table class="simple">
@@ -669,20 +669,41 @@ interface MediaStreamTrackAudioStats {
                   </tr>
                 </tbody>
               </table>
+              <p>The user agent SHOULD compute the [= voice isolation index =]
+              as follows:</p>
+              <ol>
+                <li>
+                  <p>Let <var>N</var> be the mean power of the non-voice signal
+                  that voice isolation removes during the window, measured at
+                  the point in the user agent's processing where voice
+                  isolation is applied.</p>
+                </li>
+                <li>
+                  <p>Let <var>R</var> be max(0, 10 &middot;
+                  log<sub>10</sub>(<var>N</var> /
+                  <var>N<sub>ref</sub></var>)), where
+                  <var>N<sub>ref</sub></var> is a fixed reference power at or
+                  just above the noise floor of a quiet room.</p>
+                </li>
+                <li>
+                  <p>The [= voice isolation index =] is min(1, <var>R</var> /
+                  <var>D</var>), where <var>D</var> is the number of decibels
+                  above <var>N<sub>ref</sub></var> at which the index reaches
+                  1.0.</p>
+                </li>
+              </ol>
+              <p>The user agent SHOULD choose <var>N<sub>ref</sub></var> and
+              <var>D</var> so that typical sounds produce values in the bands
+              of the table above.</p>
               <div class="note">
                 <p>As with voice isolation itself, the exact methods used to
                 estimate the removed non-voice signal may vary between
-                implementations. The table keeps values comparable across user
-                agents.</p>
-                <p>For example, a user agent can measure the energy of the
-                non-voice signal it removes during that window, express it in
-                decibels above a fixed reference level at a defined point in its
-                processing, such as a level just above the noise floor of a
-                quiet room, and map it linearly to the index as
-                min(1, max(0, <var>R</var> / <var>D</var>)), where <var>R</var>
-                is that energy in decibels above the reference and <var>D</var>
-                is the range in decibels that maps to the full scale. Other
-                formulas are possible.</p>
+                implementations, for example comparing the input and the output
+                of voice isolation.</p>
+                <p>Suitable values of <var>N<sub>ref</sub></var> and
+                <var>D</var> depend on the processing chain: the microphone,
+                the input volume, and any gain applied before voice isolation,
+                such as automatic gain control.</p>
                 <p>The window that the index is computed over can be a few tens
                 of milliseconds long, up to about 100 milliseconds. That lets a
                 visual indicator follow the index without noticeable lag, and
