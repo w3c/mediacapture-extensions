@@ -648,24 +648,23 @@ interface MediaStreamTrackAudioStats {
                   <tr>
                     <td>Above 0.0, up to 0.3</td>
                     <td>Light suppression</td>
-                    <td>Suppression of quiet, low-level background noises that
-                    are close to the acoustic noise floor.</td>
+                    <td>Suppression of quiet, low-level non-voice sounds.</td>
                   </tr>
                   <tr>
                     <td>Above 0.3, up to 0.6</td>
                     <td>Moderate suppression</td>
-                    <td>Suppression of moderately loud non-voice signals.</td>
+                    <td>Suppression of moderately loud non-voice sounds.</td>
                   </tr>
                   <tr>
                     <td>Above 0.6, up to 0.9</td>
                     <td>Heavy suppression</td>
-                    <td>Suppression of very loud background noise.</td>
+                    <td>Suppression of very loud non-voice sounds.</td>
                   </tr>
                   <tr>
                     <td>Above 0.9, up to 1.0</td>
                     <td>Maximum suppression</td>
-                    <td>Suppression of extreme, overpowering acoustic noise
-                    events. 1.0 is the top of the scale.</td>
+                    <td>Suppression of extreme, overpowering non-voice sounds.
+                    1.0 is the top of the scale.</td>
                   </tr>
                 </tbody>
               </table>
@@ -673,23 +672,24 @@ interface MediaStreamTrackAudioStats {
               as follows:</p>
               <ol>
                 <li>
-                  <p>Let <var>N</var> be the mean power of the non-voice signal
-                  that voice isolation removes during the window, measured at
-                  the point in the user agent's processing where voice
-                  isolation is applied.</p>
+                  <p>Let <var>N</var> be the power of the non-voice signal that
+                  voice isolation removes during the window, measured at the
+                  point in the user agent's processing where voice isolation is
+                  applied.</p>
                 </li>
                 <li>
-                  <p>Let <var>R</var> be max(0, 10 &middot;
-                  log<sub>10</sub>(<var>N</var> /
-                  <var>N<sub>ref</sub></var>)), where
-                  <var>N<sub>ref</sub></var> is a fixed reference power at or
-                  just above the noise floor of a quiet room.</p>
+                  <p>Let <var>R</var> be 10 &middot;
+                  log<sub>10</sub>(max(<var>N</var>,
+                  <var>N<sub>ref</sub></var>) / <var>N<sub>ref</sub></var>),
+                  where <var>N<sub>ref</sub></var> is a fixed, positive
+                  reference power at that same point, at or below which the
+                  removed signal counts as negligible.</p>
                 </li>
                 <li>
                   <p>The [= voice isolation index =] is min(1, <var>R</var> /
-                  <var>D</var>), where <var>D</var> is the number of decibels
-                  above <var>N<sub>ref</sub></var> at which the index reaches
-                  1.0.</p>
+                  <var>D</var>), where <var>D</var> is a positive number of
+                  decibels: the level above <var>N<sub>ref</sub></var> at which
+                  the index reaches 1.0.</p>
                 </li>
               </ol>
               <p>The user agent SHOULD choose <var>N<sub>ref</sub></var> and
